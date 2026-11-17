@@ -1,0 +1,2215 @@
+{
+ "format": "wordcrown",
+ "version": 2,
+ "kind": "site",
+ "updated": "2026-11-17T20:24:59.720Z",
+ "words": [
+  {
+   "id": "8233ef60-cc0a-4334-8db0-7fc366387485",
+   "en": "reliable",
+   "ipa": "/rɪˈlaɪəbl/",
+   "ru": "надёжный",
+   "example": "My old phone is slow, but it is reliable.",
+   "updated": 1794944312860,
+   "image": "content/img/reliable-c3547e1d77.webp"
+  },
+  {
+   "id": "48aa8606-9efc-4cd1-9dca-6d9dc987c96b",
+   "en": "awkward",
+   "ipa": "/ˈɔːkwəd/",
+   "ru": "неловкий, неудобный",
+   "example": "There was an awkward silence after his joke.",
+   "updated": 1794944320408,
+   "image": "content/img/awkward-b77794c269.webp"
+  },
+  {
+   "id": "2eea89f3-7593-4416-a6d1-9133d6d749ae",
+   "en": "genuine",
+   "ipa": "/ˈdʒenjuɪn/",
+   "ru": "настоящий, искренний",
+   "example": "She gave me a genuine smile.",
+   "updated": 1794944334858,
+   "image": "content/img/genuine-b954a8a62d.webp"
+  },
+  {
+   "id": "444e5a88-0370-4c4b-a830-03d6e8bb5602",
+   "en": "overwhelmed",
+   "ipa": "/ˌəʊvəˈwelmd/",
+   "ru": "перегруженный, ошеломлённый",
+   "example": "I felt overwhelmed by all the homework.",
+   "updated": 1794944339037,
+   "image": "content/img/overwhelmed-74df2b880e.webp"
+  },
+  {
+   "id": "91f9aebf-9d3e-4e2d-8bd7-a8f71b86f78a",
+   "en": "procrastinate",
+   "ipa": "/prəˈkræstɪneɪt/",
+   "ru": "откладывать на потом",
+   "example": "If you procrastinate, the essay will not write itself.",
+   "updated": 1794944345409,
+   "image": "content/img/procrastinate-ac0c8bca5c.webp"
+  },
+  {
+   "id": "7ecc66c3-ec1c-48cd-a731-a5c2b500803d",
+   "en": "deadline",
+   "ipa": "/ˈdedlaɪn/",
+   "ru": "крайний срок",
+   "example": "The deadline for the project is Friday.",
+   "updated": 1794944352551,
+   "image": "content/img/deadline-e95a3500cb.webp"
+  },
+  {
+   "id": "919c78ec-f682-483a-b172-0018576741a1",
+   "en": "accomplish",
+   "ipa": "/əˈkʌmplɪʃ/",
+   "ru": "выполнить, достичь",
+   "example": "We can accomplish a lot in one week.",
+   "updated": 1794944356463,
+   "image": "content/img/accomplish-a06e31c7b5.webp"
+  },
+  {
+   "id": "35cc56fc-4a47-48d2-b462-ee2d35f010aa",
+   "en": "consequence",
+   "ipa": "/ˈkɒnsɪkwəns/",
+   "ru": "последствие",
+   "example": "Every choice has a consequence.",
+   "updated": 1794944361952,
+   "image": "content/img/consequence-46d571051f.webp"
+  },
+  {
+   "id": "28acc382-44ee-400d-bf32-e9d9edbc14e1",
+   "en": "opportunity",
+   "ipa": "/ˌɒpəˈtjuːnəti/",
+   "ru": "возможность, шанс",
+   "example": "This trip is a great opportunity to practise English.",
+   "updated": 1794944367408,
+   "image": "content/img/opportunity-af82be70a7.webp"
+  },
+  {
+   "id": "78c7d0cb-4b13-4f28-b2c1-aaff5308480e",
+   "en": "sufficient",
+   "ipa": "/səˈfɪʃnt/",
+   "ru": "достаточный",
+   "example": "Ten minutes is not sufficient for this test.",
+   "updated": 1794944374416,
+   "image": "content/img/sufficient-5df7ffb719.webp"
+  },
+  {
+   "id": "eb769dff-7ba4-4abe-af89-b4d3e3c9bba7",
+   "en": "obvious",
+   "ipa": "/ˈɒbviəs/",
+   "ru": "очевидный",
+   "example": "The answer was obvious.",
+   "updated": 1794944381157,
+   "image": "content/img/obvious-9a9a74eaac.webp"
+  },
+  {
+   "id": "52fa5d4b-a10d-400e-b584-ff4a68e58dde",
+   "en": "reluctant",
+   "ipa": "/rɪˈlʌktənt/",
+   "ru": "неохотный",
+   "example": "He was reluctant to leave the party.",
+   "updated": 1794944386962,
+   "image": "content/img/reluctant-a3ebcaadf6.webp"
+  },
+  {
+   "id": "b4c79408-84ec-4c92-9d0e-a6e1342d7140",
+   "en": "efficient",
+   "ipa": "/ɪˈfɪʃnt/",
+   "ru": "эффективный",
+   "example": "This is a more efficient way to study.",
+   "updated": 1794944400364,
+   "image": "content/img/efficient-0aa5d00747.webp"
+  },
+  {
+   "id": "0606daf8-7a4c-4300-bff3-7104dcd9e53a",
+   "en": "approximately",
+   "ipa": "/əˈprɒksɪmətli/",
+   "ru": "приблизительно",
+   "example": "The film lasts approximately two hours.",
+   "updated": 1794944403987,
+   "image": "content/img/approximately-3c0e40315d.webp"
+  },
+  {
+   "id": "787cce13-e2df-47b2-8ae9-5b00a4065699",
+   "en": "environment",
+   "ipa": "/ɪnˈvaɪrənmənt/",
+   "ru": "окружающая среда",
+   "example": "We must protect the environment.",
+   "updated": 1794944407899,
+   "image": "content/img/environment-275c8ccb6f.webp"
+  },
+  {
+   "id": "9c048c17-c030-4d4d-a1a1-b89fcc0c6640",
+   "en": "convenient",
+   "ipa": "/kənˈviːniənt/",
+   "ru": "удобный",
+   "example": "Is Saturday convenient for you?",
+   "updated": 1794944412896,
+   "image": "content/img/convenient-79d98b7ac4.webp"
+  },
+  {
+   "id": "65eeeb2f-34e7-4dd0-a0a3-1cad3524b927",
+   "en": "achievement",
+   "ipa": "/əˈtʃiːvmənt/",
+   "ru": "достижение",
+   "example": "Winning the match was a big achievement.",
+   "updated": 1794944416954,
+   "image": "content/img/achievement-b5fbe14c4f.webp"
+  },
+  {
+   "id": "76ad561c-e117-4b9a-8287-b02fb935119a",
+   "en": "confident",
+   "ipa": "/ˈkɒnfɪdənt/",
+   "ru": "уверенный",
+   "example": "She feels confident before exams.",
+   "updated": 1794944423425,
+   "image": "content/img/confident-f12efd8533.webp"
+  },
+  {
+   "id": "e2f373f4-05e0-462c-a1d8-6ad12d5df632",
+   "en": "curious",
+   "ipa": "/ˈkjʊəriəs/",
+   "ru": "любопытный",
+   "example": "Cats are very curious animals.",
+   "updated": 1794944427645,
+   "image": "content/img/curious-6bd902822d.webp"
+  },
+  {
+   "id": "48bc3cec-b47a-44d6-bd34-2f83f91c91b1",
+   "en": "suspicious",
+   "ipa": "/səˈspɪʃəs/",
+   "ru": "подозрительный",
+   "example": "The teacher looked suspicious when I said the dog ate my homework.",
+   "updated": 1794944434090,
+   "image": "content/img/suspicious-d7ebbfdc37.webp"
+  },
+  {
+   "id": "d0e0a6a9-93ee-4bc6-946d-4b544d9495b3",
+   "en": "exaggerate",
+   "ipa": "/ɪɡˈzædʒəreɪt/",
+   "ru": "преувеличивать",
+   "example": "Don't exaggerate, it wasn't that cold.",
+   "updated": 1794944441054,
+   "image": "content/img/exaggerate-6954af020e.webp"
+  },
+  {
+   "id": "66ea9ce4-591a-4612-a70e-dc7e487b946a",
+   "en": "persuade",
+   "ipa": "/pəˈsweɪd/",
+   "ru": "убеждать, уговаривать",
+   "example": "I tried to persuade Dad to buy a new console.",
+   "updated": 1794944446739,
+   "image": "content/img/persuade-69a4bde457.webp"
+  },
+  {
+   "id": "e7557619-0574-4633-852e-f7cb50f04579",
+   "en": "recommend",
+   "ipa": "/ˌrekəˈmend/",
+   "ru": "рекомендовать, советовать",
+   "example": "Can you recommend a good book?",
+   "updated": 1794944454312,
+   "image": "content/img/recommend-c99950a7b7.webp"
+  },
+  {
+   "id": "641b4608-9f4c-46f5-a278-c5275421c6c8",
+   "en": "complain",
+   "ipa": "/kəmˈpleɪn/",
+   "ru": "жаловаться",
+   "example": "He always complains about the weather.",
+   "updated": 1794944459516,
+   "image": "content/img/complain-61637f397e.webp"
+  },
+  {
+   "id": "68a7a1a2-0306-45a0-a6ca-1394f7f25e95",
+   "en": "temporary",
+   "ipa": "/ˈtemprəri/",
+   "ru": "временный",
+   "example": "This is only a temporary password.",
+   "updated": 1794944464657,
+   "image": "content/img/temporary-29b982ab86.webp"
+  },
+  {
+   "id": "00646b03-330a-40db-a3ac-5603f2f3bbc8",
+   "en": "permanent",
+   "ipa": "/ˈpɜːmənənt/",
+   "ru": "постоянный, несмываемый",
+   "example": "Don't write on the board with a permanent marker.",
+   "updated": 1794944471369,
+   "image": "content/img/permanent-af0006e21a.webp"
+  },
+  {
+   "id": "7da90286-9a26-4c83-9274-06ae13d02d01",
+   "en": "essential",
+   "ipa": "/ɪˈsenʃl/",
+   "ru": "необходимый, важнейший",
+   "example": "Water is essential for life.",
+   "updated": 1794944475783,
+   "image": "content/img/essential-81afefdc1e.webp"
+  },
+  {
+   "id": "d9d41d7a-e175-41dd-80bd-b97796f0e51c",
+   "en": "ridiculous",
+   "ipa": "/rɪˈdɪkjələs/",
+   "ru": "нелепый, смешной",
+   "example": "That idea is ridiculous.",
+   "updated": 1794944480399,
+   "image": "content/img/ridiculous-650b5c36a5.webp"
+  },
+  {
+   "id": "d5d3c5a6-3b08-4117-b67f-3129e8c51b94",
+   "en": "independent",
+   "ipa": "/ˌɪndɪˈpendənt/",
+   "ru": "независимый, самостоятельный",
+   "example": "He wants to be more independent.",
+   "updated": 1794944490671,
+   "image": "content/img/independent-73c089b48d.webp"
+  },
+  {
+   "id": "b9f43cdb-3d68-4334-9f07-0523fc889dfb",
+   "en": "responsibility",
+   "ipa": "/rɪˌspɒnsəˈbɪləti/",
+   "ru": "ответственность",
+   "example": "Feeding the dog is my responsibility.",
+   "updated": 1794944497560,
+   "image": "content/img/responsibility-7a345b3d8f.webp"
+  },
+  {
+   "id": "bdd03b07-0469-4a02-abe2-29fdd8af35df",
+   "en": "encourage",
+   "ipa": "/ɪnˈkʌrɪdʒ/",
+   "ru": "поощрять, поддерживать",
+   "example": "My coach encourages me to try harder.",
+   "updated": 1794944501984,
+   "image": "content/img/encourage-6dc5fecf42.webp"
+  },
+  {
+   "id": "5f3f143b-f0df-4d8b-a405-60c363062ea5",
+   "en": "threat",
+   "ipa": "/θret/",
+   "ru": "угроза",
+   "example": "Pollution is a threat to the ocean.",
+   "updated": 1794944506265,
+   "image": "content/img/threat-a43f550d0b.webp"
+  },
+  {
+   "id": "354b5518-2442-41a0-ae23-a59811cf82c0",
+   "en": "privacy",
+   "ipa": "/ˈprɪvəsi/",
+   "ru": "личное пространство, конфиденциальность",
+   "example": "Please respect my privacy.",
+   "updated": 1794944510653,
+   "image": "content/img/privacy-f68ea6d043.webp"
+  },
+  {
+   "id": "111e2e38-1490-4429-8e8a-8789582867b5",
+   "en": "subscribe",
+   "ipa": "/səbˈskraɪb/",
+   "ru": "подписываться",
+   "example": "Subscribe to the channel for more videos.",
+   "updated": 1794944521496,
+   "image": "content/img/subscribe-73b1da7dea.webp"
+  },
+  {
+   "id": "6ad2414f-c56d-4a19-9c49-1de231ab171e",
+   "en": "available",
+   "ipa": "/əˈveɪləbl/",
+   "ru": "доступный, в наличии",
+   "example": "The new game is available online.",
+   "updated": 1794944525622,
+   "image": "content/img/available-8b2e25aeab.webp"
+  },
+  {
+   "id": "2bd5f19b-a717-4526-b787-cf201ada4e2f",
+   "en": "particularly",
+   "ipa": "/pəˈtɪkjələli/",
+   "ru": "особенно",
+   "example": "I don't particularly like broccoli.",
+   "updated": 1794944532891,
+   "image": "content/img/particularly-2625e715b5.webp"
+  },
+  {
+   "id": "0d9c848d-555d-406b-a9ff-aefd077d5fb4",
+   "en": "eventually",
+   "ipa": "/ɪˈventʃuəli/",
+   "ru": "в конце концов",
+   "example": "Eventually, we found the hotel.",
+   "updated": 1794944539033,
+   "image": "content/img/eventually-6d8eb26134.webp"
+  },
+  {
+   "id": "cef1f19e-729f-4ccf-bbad-d94e51d1dbfa",
+   "en": "although",
+   "ipa": "/ɔːlˈðəʊ/",
+   "ru": "хотя",
+   "example": "Although it was raining, we went skiing.",
+   "updated": 1794944542608,
+   "image": "content/img/although-fa4011e8b2.webp"
+  },
+  {
+   "id": "0b0671a8-52e5-4067-8fa6-887520dbae67",
+   "en": "throughout",
+   "ipa": "/θruːˈaʊt/",
+   "ru": "на протяжении, по всему",
+   "example": "It snowed throughout the night.",
+   "updated": 1794944547170,
+   "image": "content/img/throughout-a1471f5a98.webp"
+  },
+  {
+   "id": "c1827d79-bae4-405b-86a2-ea502f2982b3",
+   "en": "definitely",
+   "ipa": "/ˈdefɪnətli/",
+   "ru": "определённо, точно",
+   "example": "I will definitely come to your party.",
+   "updated": 1794944553391,
+   "image": "content/img/definitely-d7132ac98e.webp"
+  },
+  {
+   "id": "v-cut",
+   "type": "verb",
+   "seq": 1,
+   "en": "cut",
+   "ru": "резать",
+   "past": [
+    "cut"
+   ],
+   "pp": [
+    "cut"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/001-cut-811961ef4f.webp"
+  },
+  {
+   "id": "v-put",
+   "type": "verb",
+   "seq": 2,
+   "en": "put",
+   "ru": "класть, ставить",
+   "past": [
+    "put"
+   ],
+   "pp": [
+    "put"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/002-put-7380fee118.webp"
+  },
+  {
+   "id": "v-let",
+   "type": "verb",
+   "seq": 3,
+   "en": "let",
+   "ru": "позволять",
+   "past": [
+    "let"
+   ],
+   "pp": [
+    "let"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/003-let-9f0f518302.webp"
+  },
+  {
+   "id": "v-hit",
+   "type": "verb",
+   "seq": 4,
+   "en": "hit",
+   "ru": "ударять",
+   "past": [
+    "hit"
+   ],
+   "pp": [
+    "hit"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/004-hit-c2de382f33.webp"
+  },
+  {
+   "id": "v-set",
+   "type": "verb",
+   "seq": 5,
+   "en": "set",
+   "ru": "ставить, устанавливать",
+   "past": [
+    "set"
+   ],
+   "pp": [
+    "set"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/005-set-5e8fc65e84.webp"
+  },
+  {
+   "id": "v-shut",
+   "type": "verb",
+   "seq": 6,
+   "en": "shut",
+   "ru": "закрывать",
+   "past": [
+    "shut"
+   ],
+   "pp": [
+    "shut"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/006-shut-f32ebe7d36.webp"
+  },
+  {
+   "id": "v-cost",
+   "type": "verb",
+   "seq": 7,
+   "en": "cost",
+   "ru": "стоить",
+   "past": [
+    "cost"
+   ],
+   "pp": [
+    "cost"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/007-cost-e63247d7a8.webp"
+  },
+  {
+   "id": "v-hurt",
+   "type": "verb",
+   "seq": 8,
+   "en": "hurt",
+   "ru": "причинять боль",
+   "past": [
+    "hurt"
+   ],
+   "pp": [
+    "hurt"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/008-hurt-a4b8eabf45.webp"
+  },
+  {
+   "id": "v-read",
+   "type": "verb",
+   "seq": 9,
+   "en": "read",
+   "ru": "читать",
+   "past": [
+    "read"
+   ],
+   "pp": [
+    "read"
+   ],
+   "note": "past and participle sound like 'red'",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/009-read-7ad39b7959.webp"
+  },
+  {
+   "id": "v-quit",
+   "type": "verb",
+   "seq": 10,
+   "en": "quit",
+   "ru": "бросать (занятие)",
+   "past": [
+    "quit"
+   ],
+   "pp": [
+    "quit"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/010-quit-8c9d3ad7ac.webp"
+  },
+  {
+   "id": "v-spread",
+   "type": "verb",
+   "seq": 11,
+   "en": "spread",
+   "ru": "распространять, намазывать",
+   "past": [
+    "spread"
+   ],
+   "pp": [
+    "spread"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/011-spread-4ec9602618.webp"
+  },
+  {
+   "id": "v-bet",
+   "type": "verb",
+   "seq": 12,
+   "en": "bet",
+   "ru": "спорить (на что-то)",
+   "past": [
+    "bet"
+   ],
+   "pp": [
+    "bet"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/012-bet-af6653a0c8.webp"
+  },
+  {
+   "id": "v-burst",
+   "type": "verb",
+   "seq": 13,
+   "en": "burst",
+   "ru": "лопаться",
+   "past": [
+    "burst"
+   ],
+   "pp": [
+    "burst"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/013-burst-5451c3a797.webp"
+  },
+  {
+   "id": "v-split",
+   "type": "verb",
+   "seq": 14,
+   "en": "split",
+   "ru": "раскалывать, делить",
+   "past": [
+    "split"
+   ],
+   "pp": [
+    "split"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/014-split-9f1db86423.webp"
+  },
+  {
+   "id": "v-have",
+   "type": "verb",
+   "seq": 15,
+   "en": "have",
+   "ru": "иметь",
+   "past": [
+    "had"
+   ],
+   "pp": [
+    "had"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/015-have-00b8437f32.webp"
+  },
+  {
+   "id": "v-make",
+   "type": "verb",
+   "seq": 16,
+   "en": "make",
+   "ru": "делать, создавать",
+   "past": [
+    "made"
+   ],
+   "pp": [
+    "made"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/016-make-24fbe349c0.webp"
+  },
+  {
+   "id": "v-say",
+   "type": "verb",
+   "seq": 17,
+   "en": "say",
+   "ru": "сказать",
+   "past": [
+    "said"
+   ],
+   "pp": [
+    "said"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/017-say-dbe6d77f3a.webp"
+  },
+  {
+   "id": "v-get",
+   "type": "verb",
+   "seq": 18,
+   "en": "get",
+   "ru": "получать",
+   "past": [
+    "got"
+   ],
+   "pp": [
+    "got",
+    "gotten"
+   ],
+   "note": "British: got · American: gotten",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/018-get-1c84cafbb5.webp"
+  },
+  {
+   "id": "v-find",
+   "type": "verb",
+   "seq": 19,
+   "en": "find",
+   "ru": "находить",
+   "past": [
+    "found"
+   ],
+   "pp": [
+    "found"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/019-find-4a0f701ac0.webp"
+  },
+  {
+   "id": "v-tell",
+   "type": "verb",
+   "seq": 20,
+   "en": "tell",
+   "ru": "рассказывать",
+   "past": [
+    "told"
+   ],
+   "pp": [
+    "told"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/020-tell-61a43ebb8d.webp"
+  },
+  {
+   "id": "v-think",
+   "type": "verb",
+   "seq": 21,
+   "en": "think",
+   "ru": "думать",
+   "past": [
+    "thought"
+   ],
+   "pp": [
+    "thought"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/021-think-2c55965c52.webp"
+  },
+  {
+   "id": "v-buy",
+   "type": "verb",
+   "seq": 22,
+   "en": "buy",
+   "ru": "покупать",
+   "past": [
+    "bought"
+   ],
+   "pp": [
+    "bought"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/022-buy-4c94bc53e0.webp"
+  },
+  {
+   "id": "v-bring",
+   "type": "verb",
+   "seq": 23,
+   "en": "bring",
+   "ru": "приносить",
+   "past": [
+    "brought"
+   ],
+   "pp": [
+    "brought"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/023-bring-6e1959aceb.webp"
+  },
+  {
+   "id": "v-teach",
+   "type": "verb",
+   "seq": 24,
+   "en": "teach",
+   "ru": "учить (кого-то)",
+   "past": [
+    "taught"
+   ],
+   "pp": [
+    "taught"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/024-teach-a086255dad.webp"
+  },
+  {
+   "id": "v-catch",
+   "type": "verb",
+   "seq": 25,
+   "en": "catch",
+   "ru": "ловить",
+   "past": [
+    "caught"
+   ],
+   "pp": [
+    "caught"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/025-catch-f47eb6242c.webp"
+  },
+  {
+   "id": "v-fight",
+   "type": "verb",
+   "seq": 26,
+   "en": "fight",
+   "ru": "драться",
+   "past": [
+    "fought"
+   ],
+   "pp": [
+    "fought"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/026-fight-b9b778e4bc.webp"
+  },
+  {
+   "id": "v-sell",
+   "type": "verb",
+   "seq": 27,
+   "en": "sell",
+   "ru": "продавать",
+   "past": [
+    "sold"
+   ],
+   "pp": [
+    "sold"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/027-sell-8a7d0f09ea.webp"
+  },
+  {
+   "id": "v-pay",
+   "type": "verb",
+   "seq": 28,
+   "en": "pay",
+   "ru": "платить",
+   "past": [
+    "paid"
+   ],
+   "pp": [
+    "paid"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/028-pay-487f17f3f1.webp"
+  },
+  {
+   "id": "v-lay",
+   "type": "verb",
+   "seq": 29,
+   "en": "lay",
+   "ru": "класть, накрывать (стол)",
+   "past": [
+    "laid"
+   ],
+   "pp": [
+    "laid"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/029-lay-cf145fcc69.webp"
+  },
+  {
+   "id": "v-hold",
+   "type": "verb",
+   "seq": 30,
+   "en": "hold",
+   "ru": "держать",
+   "past": [
+    "held"
+   ],
+   "pp": [
+    "held"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/030-hold-233aebf1f3.webp"
+  },
+  {
+   "id": "v-stand",
+   "type": "verb",
+   "seq": 31,
+   "en": "stand",
+   "ru": "стоять",
+   "past": [
+    "stood"
+   ],
+   "pp": [
+    "stood"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/031-stand-9fecde0bb8.webp"
+  },
+  {
+   "id": "v-understand",
+   "type": "verb",
+   "seq": 32,
+   "en": "understand",
+   "ru": "понимать",
+   "past": [
+    "understood"
+   ],
+   "pp": [
+    "understood"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/032-understand-c8b20b9512.webp"
+  },
+  {
+   "id": "v-sit",
+   "type": "verb",
+   "seq": 33,
+   "en": "sit",
+   "ru": "сидеть",
+   "past": [
+    "sat"
+   ],
+   "pp": [
+    "sat"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/033-sit-27c440f72c.webp"
+  },
+  {
+   "id": "v-win",
+   "type": "verb",
+   "seq": 34,
+   "en": "win",
+   "ru": "выигрывать",
+   "past": [
+    "won"
+   ],
+   "pp": [
+    "won"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/034-win-7f8f359438.webp"
+  },
+  {
+   "id": "v-lose",
+   "type": "verb",
+   "seq": 35,
+   "en": "lose",
+   "ru": "терять, проигрывать",
+   "past": [
+    "lost"
+   ],
+   "pp": [
+    "lost"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/035-lose-bbb56fd7bf.webp"
+  },
+  {
+   "id": "v-send",
+   "type": "verb",
+   "seq": 36,
+   "en": "send",
+   "ru": "отправлять",
+   "past": [
+    "sent"
+   ],
+   "pp": [
+    "sent"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/036-send-90dc9e134f.webp"
+  },
+  {
+   "id": "v-spend",
+   "type": "verb",
+   "seq": 37,
+   "en": "spend",
+   "ru": "тратить",
+   "past": [
+    "spent"
+   ],
+   "pp": [
+    "spent"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/037-spend-ecfff1aef4.webp"
+  },
+  {
+   "id": "v-build",
+   "type": "verb",
+   "seq": 38,
+   "en": "build",
+   "ru": "строить",
+   "past": [
+    "built"
+   ],
+   "pp": [
+    "built"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/038-build-10090beec6.webp"
+  },
+  {
+   "id": "v-lend",
+   "type": "verb",
+   "seq": 39,
+   "en": "lend",
+   "ru": "одалживать (кому-то)",
+   "past": [
+    "lent"
+   ],
+   "pp": [
+    "lent"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/039-lend-a3117a94ab.webp"
+  },
+  {
+   "id": "v-leave",
+   "type": "verb",
+   "seq": 40,
+   "en": "leave",
+   "ru": "уходить, оставлять",
+   "past": [
+    "left"
+   ],
+   "pp": [
+    "left"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/040-leave-898e73aac2.webp"
+  },
+  {
+   "id": "v-feel",
+   "type": "verb",
+   "seq": 41,
+   "en": "feel",
+   "ru": "чувствовать",
+   "past": [
+    "felt"
+   ],
+   "pp": [
+    "felt"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/041-feel-97bd13b45a.webp"
+  },
+  {
+   "id": "v-keep",
+   "type": "verb",
+   "seq": 42,
+   "en": "keep",
+   "ru": "хранить, держать",
+   "past": [
+    "kept"
+   ],
+   "pp": [
+    "kept"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/042-keep-98cc89e4ec.webp"
+  },
+  {
+   "id": "v-sleep",
+   "type": "verb",
+   "seq": 43,
+   "en": "sleep",
+   "ru": "спать",
+   "past": [
+    "slept"
+   ],
+   "pp": [
+    "slept"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/043-sleep-80884f7193.webp"
+  },
+  {
+   "id": "v-meet",
+   "type": "verb",
+   "seq": 44,
+   "en": "meet",
+   "ru": "встречать",
+   "past": [
+    "met"
+   ],
+   "pp": [
+    "met"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/044-meet-a4687f16a6.webp"
+  },
+  {
+   "id": "v-lead",
+   "type": "verb",
+   "seq": 45,
+   "en": "lead",
+   "ru": "вести",
+   "past": [
+    "led"
+   ],
+   "pp": [
+    "led"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/045-lead-42b4b86e77.webp"
+  },
+  {
+   "id": "v-feed",
+   "type": "verb",
+   "seq": 46,
+   "en": "feed",
+   "ru": "кормить",
+   "past": [
+    "fed"
+   ],
+   "pp": [
+    "fed"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/046-feed-141365ed54.webp"
+  },
+  {
+   "id": "v-hear",
+   "type": "verb",
+   "seq": 47,
+   "en": "hear",
+   "ru": "слышать",
+   "past": [
+    "heard"
+   ],
+   "pp": [
+    "heard"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/047-hear-b5d96acb32.webp"
+  },
+  {
+   "id": "v-mean",
+   "type": "verb",
+   "seq": 48,
+   "en": "mean",
+   "ru": "значить",
+   "past": [
+    "meant"
+   ],
+   "pp": [
+    "meant"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/048-mean-fee6817d39.webp"
+  },
+  {
+   "id": "v-light",
+   "type": "verb",
+   "seq": 49,
+   "en": "light",
+   "ru": "зажигать",
+   "past": [
+    "lit"
+   ],
+   "pp": [
+    "lit"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/049-light-e51235a2a6.webp"
+  },
+  {
+   "id": "v-shoot",
+   "type": "verb",
+   "seq": 50,
+   "en": "shoot",
+   "ru": "стрелять",
+   "past": [
+    "shot"
+   ],
+   "pp": [
+    "shot"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/050-shoot-4c3cf9a5d3.webp"
+  },
+  {
+   "id": "v-dig",
+   "type": "verb",
+   "seq": 51,
+   "en": "dig",
+   "ru": "копать",
+   "past": [
+    "dug"
+   ],
+   "pp": [
+    "dug"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/051-dig-e391dea97c.webp"
+  },
+  {
+   "id": "v-hang",
+   "type": "verb",
+   "seq": 52,
+   "en": "hang",
+   "ru": "вешать",
+   "past": [
+    "hung"
+   ],
+   "pp": [
+    "hung"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/052-hang-fba6e918b7.webp"
+  },
+  {
+   "id": "v-stick",
+   "type": "verb",
+   "seq": 53,
+   "en": "stick",
+   "ru": "приклеивать, застревать",
+   "past": [
+    "stuck"
+   ],
+   "pp": [
+    "stuck"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/053-stick-1570d3d929.webp"
+  },
+  {
+   "id": "v-learn",
+   "type": "verb",
+   "seq": 54,
+   "en": "learn",
+   "ru": "учить, узнавать",
+   "past": [
+    "learnt",
+    "learned"
+   ],
+   "pp": [
+    "learnt",
+    "learned"
+   ],
+   "note": "learned is also correct",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/054-learn-05a705eacf.webp"
+  },
+  {
+   "id": "v-burn",
+   "type": "verb",
+   "seq": 55,
+   "en": "burn",
+   "ru": "гореть, жечь",
+   "past": [
+    "burnt",
+    "burned"
+   ],
+   "pp": [
+    "burnt",
+    "burned"
+   ],
+   "note": "burned is also correct",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/055-burn-1cf2946de0.webp"
+  },
+  {
+   "id": "v-shine",
+   "type": "verb",
+   "seq": 56,
+   "en": "shine",
+   "ru": "светить, сиять",
+   "past": [
+    "shone"
+   ],
+   "pp": [
+    "shone"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/056-shine-944879645a.webp"
+  },
+  {
+   "id": "v-slide",
+   "type": "verb",
+   "seq": 57,
+   "en": "slide",
+   "ru": "скользить",
+   "past": [
+    "slid"
+   ],
+   "pp": [
+    "slid"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/057-slide-0e6b77cea9.webp"
+  },
+  {
+   "id": "v-come",
+   "type": "verb",
+   "seq": 58,
+   "en": "come",
+   "ru": "приходить",
+   "past": [
+    "came"
+   ],
+   "pp": [
+    "come"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/058-come-1d632d3c53.webp"
+  },
+  {
+   "id": "v-become",
+   "type": "verb",
+   "seq": 59,
+   "en": "become",
+   "ru": "становиться",
+   "past": [
+    "became"
+   ],
+   "pp": [
+    "become"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/059-become-9b2da2b7ed.webp"
+  },
+  {
+   "id": "v-run",
+   "type": "verb",
+   "seq": 60,
+   "en": "run",
+   "ru": "бежать",
+   "past": [
+    "ran"
+   ],
+   "pp": [
+    "run"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/060-run-bde5f15567.webp"
+  },
+  {
+   "id": "v-be",
+   "type": "verb",
+   "seq": 61,
+   "en": "be",
+   "ru": "быть",
+   "past": [
+    "was",
+    "were"
+   ],
+   "pp": [
+    "been"
+   ],
+   "note": "was: I/he/she/it · were: you/we/they",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/061-be-c994af2837.webp"
+  },
+  {
+   "id": "v-go",
+   "type": "verb",
+   "seq": 62,
+   "en": "go",
+   "ru": "идти, ехать",
+   "past": [
+    "went"
+   ],
+   "pp": [
+    "gone"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/062-go-ae5a613a45.webp"
+  },
+  {
+   "id": "v-do",
+   "type": "verb",
+   "seq": 63,
+   "en": "do",
+   "ru": "делать",
+   "past": [
+    "did"
+   ],
+   "pp": [
+    "done"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/063-do-fdd1741d2e.webp"
+  },
+  {
+   "id": "v-see",
+   "type": "verb",
+   "seq": 64,
+   "en": "see",
+   "ru": "видеть",
+   "past": [
+    "saw"
+   ],
+   "pp": [
+    "seen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/064-see-7d8877e132.webp"
+  },
+  {
+   "id": "v-eat",
+   "type": "verb",
+   "seq": 65,
+   "en": "eat",
+   "ru": "есть",
+   "past": [
+    "ate"
+   ],
+   "pp": [
+    "eaten"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/065-eat-7d4c2b467a.webp"
+  },
+  {
+   "id": "v-give",
+   "type": "verb",
+   "seq": 66,
+   "en": "give",
+   "ru": "давать",
+   "past": [
+    "gave"
+   ],
+   "pp": [
+    "given"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/066-give-6902c501dd.webp"
+  },
+  {
+   "id": "v-take",
+   "type": "verb",
+   "seq": 67,
+   "en": "take",
+   "ru": "брать",
+   "past": [
+    "took"
+   ],
+   "pp": [
+    "taken"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/067-take-0f18c92850.webp"
+  },
+  {
+   "id": "v-write",
+   "type": "verb",
+   "seq": 68,
+   "en": "write",
+   "ru": "писать",
+   "past": [
+    "wrote"
+   ],
+   "pp": [
+    "written"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/068-write-0f446c3b2b.webp"
+  },
+  {
+   "id": "v-speak",
+   "type": "verb",
+   "seq": 69,
+   "en": "speak",
+   "ru": "говорить",
+   "past": [
+    "spoke"
+   ],
+   "pp": [
+    "spoken"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/069-speak-88a90681a9.webp"
+  },
+  {
+   "id": "v-break",
+   "type": "verb",
+   "seq": 70,
+   "en": "break",
+   "ru": "ломать",
+   "past": [
+    "broke"
+   ],
+   "pp": [
+    "broken"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/070-break-25c2080509.webp"
+  },
+  {
+   "id": "v-choose",
+   "type": "verb",
+   "seq": 71,
+   "en": "choose",
+   "ru": "выбирать",
+   "past": [
+    "chose"
+   ],
+   "pp": [
+    "chosen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/071-choose-99d45c42f7.webp"
+  },
+  {
+   "id": "v-drive",
+   "type": "verb",
+   "seq": 72,
+   "en": "drive",
+   "ru": "водить (машину)",
+   "past": [
+    "drove"
+   ],
+   "pp": [
+    "driven"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/072-drive-31394670d9.webp"
+  },
+  {
+   "id": "v-ride",
+   "type": "verb",
+   "seq": 73,
+   "en": "ride",
+   "ru": "ездить (на велосипеде, лошади)",
+   "past": [
+    "rode"
+   ],
+   "pp": [
+    "ridden"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/073-ride-9f7cbac9db.webp"
+  },
+  {
+   "id": "v-rise",
+   "type": "verb",
+   "seq": 74,
+   "en": "rise",
+   "ru": "подниматься",
+   "past": [
+    "rose"
+   ],
+   "pp": [
+    "risen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/074-rise-90bf10f01f.webp"
+  },
+  {
+   "id": "v-fall",
+   "type": "verb",
+   "seq": 75,
+   "en": "fall",
+   "ru": "падать",
+   "past": [
+    "fell"
+   ],
+   "pp": [
+    "fallen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/075-fall-09308eb6e6.webp"
+  },
+  {
+   "id": "v-forget",
+   "type": "verb",
+   "seq": 76,
+   "en": "forget",
+   "ru": "забывать",
+   "past": [
+    "forgot"
+   ],
+   "pp": [
+    "forgotten"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/076-forget-ecccb95292.webp"
+  },
+  {
+   "id": "v-know",
+   "type": "verb",
+   "seq": 77,
+   "en": "know",
+   "ru": "знать",
+   "past": [
+    "knew"
+   ],
+   "pp": [
+    "known"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/077-know-1e284f148a.webp"
+  },
+  {
+   "id": "v-grow",
+   "type": "verb",
+   "seq": 78,
+   "en": "grow",
+   "ru": "расти",
+   "past": [
+    "grew"
+   ],
+   "pp": [
+    "grown"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/078-grow-e473b70231.webp"
+  },
+  {
+   "id": "v-throw",
+   "type": "verb",
+   "seq": 79,
+   "en": "throw",
+   "ru": "бросать",
+   "past": [
+    "threw"
+   ],
+   "pp": [
+    "thrown"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/079-throw-ce72266401.webp"
+  },
+  {
+   "id": "v-blow",
+   "type": "verb",
+   "seq": 80,
+   "en": "blow",
+   "ru": "дуть",
+   "past": [
+    "blew"
+   ],
+   "pp": [
+    "blown"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/080-blow-9ae698901f.webp"
+  },
+  {
+   "id": "v-fly",
+   "type": "verb",
+   "seq": 81,
+   "en": "fly",
+   "ru": "летать",
+   "past": [
+    "flew"
+   ],
+   "pp": [
+    "flown"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/081-fly-37d6d5c05d.webp"
+  },
+  {
+   "id": "v-draw",
+   "type": "verb",
+   "seq": 82,
+   "en": "draw",
+   "ru": "рисовать",
+   "past": [
+    "drew"
+   ],
+   "pp": [
+    "drawn"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/082-draw-7c43bcb91a.webp"
+  },
+  {
+   "id": "v-show",
+   "type": "verb",
+   "seq": 83,
+   "en": "show",
+   "ru": "показывать",
+   "past": [
+    "showed"
+   ],
+   "pp": [
+    "shown"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/083-show-d12e8161d7.webp"
+  },
+  {
+   "id": "v-wear",
+   "type": "verb",
+   "seq": 84,
+   "en": "wear",
+   "ru": "носить (одежду)",
+   "past": [
+    "wore"
+   ],
+   "pp": [
+    "worn"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/084-wear-ee7909b4bf.webp"
+  },
+  {
+   "id": "v-tear",
+   "type": "verb",
+   "seq": 85,
+   "en": "tear",
+   "ru": "рвать",
+   "past": [
+    "tore"
+   ],
+   "pp": [
+    "torn"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/085-tear-77fdf7cb38.webp"
+  },
+  {
+   "id": "v-steal",
+   "type": "verb",
+   "seq": 86,
+   "en": "steal",
+   "ru": "красть",
+   "past": [
+    "stole"
+   ],
+   "pp": [
+    "stolen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/086-steal-6cb19fd3dd.webp"
+  },
+  {
+   "id": "v-freeze",
+   "type": "verb",
+   "seq": 87,
+   "en": "freeze",
+   "ru": "замерзать",
+   "past": [
+    "froze"
+   ],
+   "pp": [
+    "frozen"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/087-freeze-d1335beb0a.webp"
+  },
+  {
+   "id": "v-wake",
+   "type": "verb",
+   "seq": 88,
+   "en": "wake",
+   "ru": "просыпаться",
+   "past": [
+    "woke"
+   ],
+   "pp": [
+    "woken"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/088-wake-4b97e43f87.webp"
+  },
+  {
+   "id": "v-hide",
+   "type": "verb",
+   "seq": 89,
+   "en": "hide",
+   "ru": "прятать",
+   "past": [
+    "hid"
+   ],
+   "pp": [
+    "hidden"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/089-hide-c06e4ad6e3.webp"
+  },
+  {
+   "id": "v-bite",
+   "type": "verb",
+   "seq": 90,
+   "en": "bite",
+   "ru": "кусать",
+   "past": [
+    "bit"
+   ],
+   "pp": [
+    "bitten"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/090-bite-b04943cf7f.webp"
+  },
+  {
+   "id": "v-begin",
+   "type": "verb",
+   "seq": 91,
+   "en": "begin",
+   "ru": "начинать",
+   "past": [
+    "began"
+   ],
+   "pp": [
+    "begun"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/091-begin-2f405d7fd6.webp"
+  },
+  {
+   "id": "v-drink",
+   "type": "verb",
+   "seq": 92,
+   "en": "drink",
+   "ru": "пить",
+   "past": [
+    "drank"
+   ],
+   "pp": [
+    "drunk"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/092-drink-a2c6cbd746.webp"
+  },
+  {
+   "id": "v-swim",
+   "type": "verb",
+   "seq": 93,
+   "en": "swim",
+   "ru": "плавать",
+   "past": [
+    "swam"
+   ],
+   "pp": [
+    "swum"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/093-swim-9ee33fdf96.webp"
+  },
+  {
+   "id": "v-sing",
+   "type": "verb",
+   "seq": 94,
+   "en": "sing",
+   "ru": "петь",
+   "past": [
+    "sang"
+   ],
+   "pp": [
+    "sung"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/094-sing-20fa3efe87.webp"
+  },
+  {
+   "id": "v-ring",
+   "type": "verb",
+   "seq": 95,
+   "en": "ring",
+   "ru": "звонить",
+   "past": [
+    "rang"
+   ],
+   "pp": [
+    "rung"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/095-ring-d6688ac1cc.webp"
+  },
+  {
+   "id": "v-sink",
+   "type": "verb",
+   "seq": 96,
+   "en": "sink",
+   "ru": "тонуть",
+   "past": [
+    "sank"
+   ],
+   "pp": [
+    "sunk"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/096-sink-26151712d8.webp"
+  },
+  {
+   "id": "v-shake",
+   "type": "verb",
+   "seq": 97,
+   "en": "shake",
+   "ru": "трясти",
+   "past": [
+    "shook"
+   ],
+   "pp": [
+    "shaken"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/097-shake-ab63de4f3a.webp"
+  },
+  {
+   "id": "v-forgive",
+   "type": "verb",
+   "seq": 98,
+   "en": "forgive",
+   "ru": "прощать",
+   "past": [
+    "forgave"
+   ],
+   "pp": [
+    "forgiven"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/098-forgive-9d4cb302c2.webp"
+  },
+  {
+   "id": "v-beat",
+   "type": "verb",
+   "seq": 99,
+   "en": "beat",
+   "ru": "бить, побеждать",
+   "past": [
+    "beat"
+   ],
+   "pp": [
+    "beaten"
+   ],
+   "note": "",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/099-beat-639b96820d.webp"
+  },
+  {
+   "id": "v-lie",
+   "type": "verb",
+   "seq": 100,
+   "en": "lie",
+   "ru": "лежать",
+   "past": [
+    "lay"
+   ],
+   "pp": [
+    "lain"
+   ],
+   "note": "not 'lie, lied' = врать",
+   "ipa": "",
+   "example": "",
+   "updated": 1,
+   "image": "content/verbs/100-lie-41d1a4f334.webp"
+  }
+ ],
+ "media": {
+  "home": "content/media/home-a4d36b9e8f.mp4",
+  "done": "content/media/done-2ccdcd9755.mp4",
+  "ok": "content/media/ok-7cd858f9f9.mp4",
+  "bad": "content/media/bad-a6d99a59d2.mp4",
+  "levels": {
+   "1": "content/levels/level-01-43eb3a1c6f.webp",
+   "2": "content/levels/level-02-69045e8ca4.webp",
+   "3": "content/levels/level-03-1958e4bb5e.webp",
+   "4": "content/levels/level-04-539039c359.webp",
+   "5": "content/levels/level-05-742032869b.webp",
+   "6": "content/levels/level-06-8bc6e1293c.webp",
+   "7": "content/levels/level-07-7f9d5b5789.webp",
+   "8": "content/levels/level-08-d33e004ae0.webp",
+   "9": "content/levels/level-09-dc0e77319a.webp",
+   "10": "content/levels/level-10-a05f4ec199.webp",
+   "11": "content/levels/level-11-3d6286576f.webp",
+   "12": "content/levels/level-12-f124923121.webp",
+   "13": "content/levels/level-13-8f45dcee08.webp",
+   "14": "content/levels/level-14-e2e1984904.webp",
+   "15": "content/levels/level-15-0cb4fbebe3.webp"
+  },
+  "avatars": {},
+  "levelNames": [
+   "Rental Boots",
+   "Bunny Slope Tourist",
+   "Falls Off the Lift",
+   "Hot Chocolate Enthusiast",
+   "Accidentally Went Down a Blue",
+   "Carves Occasionally",
+   "Knows What Wax Is",
+   "Red Run Regular",
+   "Chairlift Philosopher",
+   "Powder Hound",
+   "Black Diamond, Allegedly",
+   "Off-Piste Menace",
+   "Avalanche Whisperer",
+   "Santa's Snowboard Instructor",
+   "Legend of the Lodge"
+  ]
+ }
+}
