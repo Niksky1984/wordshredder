@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1722">
+<link rel="icon" href="icons/icon-192.png">
+<title>Word Shredder · Dad's desk</title>
+<style>
+:root{
+  --bg:#0b1722; --bg2:#10202f; --surface:#14283a; --surface2:#1c3449; --line:rgba(255,255,255,.1);
+  --text:#f6f1e7; --muted:#9db3c4; --faint:#62798c;
+  --gold:#e9a85a; --gold2:#ffe2ae; --red:#d8473f; --red2:#a8262a; --pine:#2f7d57; --mint:#7fe0b0; --bad:#ff9aa6;
+  --serif: ui-serif, "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:22px; --st: env(safe-area-inset-top,0px); --sb: env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overscroll-behavior:none}
+body{background:linear-gradient(180deg,#17344d 0%,#10202f 45%,var(--bg) 100%) fixed;-webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.hidden{display:none!important}
+h1,h2,h3{margin:0;font-weight:700}
+.kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* falling snow. App: drawn flake by flake on a canvas (see snow() in app.js). Admin page: simple drifting dots. */
+canvas#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
+  background-image:radial-gradient(#fff 1.3px,transparent 1.8px),radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#fff 1.8px,transparent 2.4px);
+  background-size:64px 78px,96px 110px,170px 190px;animation:snow 16s linear infinite}
+@keyframes snow{from{background-position:0 0,30px 20px,60px 0}to{background-position:26px 156px,-18px 240px,20px 190px}}
+@media (prefers-reduced-motion:reduce){div#snow{animation:none}}
+
+/* ---------- layout ---------- */
+#views{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--st) + 16px) 16px calc(var(--sb) + 96px);z-index:2}
+.view{display:none;max-width:560px;margin:0 auto;animation:rise .3s ease}
+.view.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:8px 6px calc(var(--sb) + 6px);background:rgba(11,23,34,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:5}
+#tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;color:var(--faint);padding:4px 0}
+#tabbar button b{font-size:21px;line-height:1;filter:grayscale(1) opacity(.6)}
+#tabbar button.on{color:var(--gold2)}
+#tabbar button.on b{filter:none}
+.v-head{margin:4px 0 14px}
+.v-head h1{font-family:var(--serif);font-size:31px;letter-spacing:-.01em;margin-top:4px}
+.panel{background:rgba(20,40,58,.86);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:18px;font-weight:800;font-size:17px;color:#fff;background:linear-gradient(135deg,#e2574e,var(--red) 50%,var(--red2));box-shadow:0 10px 26px -10px rgba(216,71,63,.8)}
+.primary.gold{color:#3a2208;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 10px 26px -10px rgba(233,168,90,.7)}
+.primary:active{transform:scale(.98)}
+.primary[disabled]{opacity:.45;box-shadow:none}
+.ghost{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border-radius:15px;font-weight:700;background:var(--surface2);border:1px solid var(--line)}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.1);white-space:nowrap}
+.pill.ok{background:var(--pine);color:#eafff3}.pill.wait{background:#c98a2b;color:#2a1700}.pill.no{background:#7a3038;color:#ffe3e6}.pill.dim{color:var(--muted)}
+
+/* placeholder that marks where the user's own media goes */
+.ph{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;border-radius:16px;border:2px dashed rgba(255,226,174,.5);background:repeating-linear-gradient(135deg,rgba(255,226,174,.07) 0 12px,rgba(255,226,174,.02) 12px 24px);color:var(--gold2);padding:8px;overflow:hidden}
+.ph b{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.ph span{font-size:11px;color:var(--muted);line-height:1.3}
+.media{border-radius:16px;overflow:hidden;background:#0c1620}
+.media img,.media video{width:100%;height:100%;object-fit:cover;display:block}
+.r169{aspect-ratio:16/9}.r11{aspect-ratio:1/1}
+.r169>.ph,.r169>.media,.r11>.ph,.r11>.media{width:100%;height:100%}
+
+/* ---------- home ---------- */
+.h-top{display:flex;justify-content:space-between;align-items:flex-start;margin:2px 0 12px}
+.h-top h1{font-family:var(--serif);font-size:32px;line-height:1.05;margin-top:4px}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.avatar{width:60px;height:60px;flex:none;border-radius:50%;overflow:hidden;border:2px solid var(--gold);box-shadow:0 0 0 3px rgba(233,168,90,.18),0 8px 18px -8px rgba(0,0,0,.7);background:#16324a;display:grid;place-items:center;font-size:30px;position:relative}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar.empty{border-style:dashed;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gold2);line-height:1.15;text-align:center}
+.av-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 14px}
+.av-grid button{aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid transparent;background:#16324a;font-size:26px}
+.av-grid button.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(233,168,90,.25)}
+.av-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.streak{padding:7px 12px;border-radius:999px;background:rgba(20,40,58,.86);border:1px solid var(--line);font-weight:800;font-size:13.5px;white-space:nowrap}
+.lights{display:flex;justify-content:space-between;margin:-2px 4px 12px;height:10px}
+.lights i{width:9px;height:9px;border-radius:50%;animation:tw 2.4s ease-in-out infinite}
+.lights i:nth-child(4n+1){background:#ff5d5d;box-shadow:0 0 8px #ff5d5d}.lights i:nth-child(4n+2){background:#ffd166;box-shadow:0 0 8px #ffd166;animation-delay:.6s}
+.lights i:nth-child(4n+3){background:#6fe3a5;box-shadow:0 0 8px #6fe3a5;animation-delay:1.2s}.lights i:nth-child(4n){background:#6fb8ff;box-shadow:0 0 8px #6fb8ff;animation-delay:1.8s}
+@keyframes tw{50%{opacity:.35}}
+.slots{display:flex;gap:8px;margin-top:10px}
+.slot{flex:1;border-radius:14px;padding:9px 4px 8px;text-align:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+.slot b{display:block;font-size:20px;line-height:1.2}
+.slot small{display:block;font-weight:600;font-size:10px;margin-top:1px;opacity:.85}
+.slot.done{background:rgba(47,125,87,.35);border-color:#52b788;color:#dff7ea}
+.slot.open{border-color:var(--gold);color:var(--gold2);box-shadow:0 0 0 2px rgba(233,168,90,.18)}
+.slot.missed{background:rgba(122,48,56,.35);border-color:#a8454f;color:#ffd9dd}
+.row{display:flex;gap:12px;align-items:center}
+.row .ico{font-size:28px;flex:none}
+.row .tx{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.35}
+.row .tx b{display:block;color:var(--text);font-size:15px}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--red),var(--gold2))}
+.lvl-art{width:58px;height:58px;flex:none;border-radius:14px;overflow:hidden}
+.lvl-art .ph{width:100%;height:100%;border-radius:14px;padding:2px}.lvl-art .ph b{font-size:8px}.lvl-art .ph span{display:none}
+.lvl-art img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- rewards ---------- */
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:10.5px;color:var(--muted);margin-top:10px}
+.wk .d{background:rgba(255,255,255,.05);border-radius:10px;padding:6px 0 5px;border:1px solid transparent}
+.wk .d.today{border-color:var(--gold)}
+.dots{display:flex;justify-content:center;gap:2px;margin-top:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#3b5165}
+.dots i.g{background:#52b788}.dots i.x{background:#d8473f}.dots i.o{background:var(--gold)}
+.rw{display:flex;gap:12px;align-items:center}
+.rw .anim{width:74px;height:74px;flex:none}
+.rw .anim .ph{width:100%;height:100%;padding:3px}.rw .anim .ph b{font-size:8.5px}.rw .anim .ph span{font-size:8.5px}
+.rw .tx{flex:1;min-width:0;font-size:12.5px;color:var(--muted);line-height:1.35}
+.rw .tx b{display:block;color:var(--text);font-size:15px}
+.rw .tx em{color:var(--gold2);font-style:normal;font-weight:700}
+.hist{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.hist:last-child{border:0}
+
+/* ---------- progress / words ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:rgba(20,40,58,.86);border:1px solid var(--line);border-radius:18px;padding:12px}
+.stat b{font-size:26px;font-family:var(--serif)}.stat span{display:block;font-size:12px;color:var(--muted)}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.node{text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.node .art{aspect-ratio:1;border-radius:16px;overflow:hidden;margin-bottom:5px;position:relative}
+.node .art .ph{width:100%;height:100%}.node .art img{width:100%;height:100%;object-fit:cover}
+.node.locked{opacity:.45}.node.cur .art{box-shadow:0 0 0 2px var(--gold)}
+.node.done .art:after{content:"✓";position:absolute;right:6px;top:4px;font-weight:900;color:var(--mint)}
+.wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.wrow:last-child{border:0}
+.wrow .tx{flex:1;min-width:0}.wrow .tx b{display:block;font-size:15.5px;font-family:var(--serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrow .tx span{font-size:12.5px;color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pips{display:flex;gap:4px}.pips i{width:16px;height:6px;border-radius:9px;background:rgba(255,255,255,.14)}.pips i.on{background:linear-gradient(90deg,var(--red),var(--gold2))}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:3px;gap:2px;margin-bottom:12px}
+.seg button{flex:1;height:34px;border-radius:11px;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--surface2);color:var(--text)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);font-weight:600;font-size:15px}
+.set-row:last-child{border:0}
+.set-row select{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:12px;height:40px;padding:0 10px;font-size:15px;max-width:60%}
+.hint{font-size:12.5px;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.4}
+.foot{text-align:center;font-size:12px;color:var(--faint);margin:18px 0 6px}
+
+/* ---------- session ---------- */
+#session{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;background:linear-gradient(180deg,#17344d 0%,#10202f 50%,var(--bg) 100%);padding:calc(var(--st) + 8px) 12px calc(var(--sb) + 10px)}
+.s-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;height:44px}
+.s-x{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:17px}
+.s-time{font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.s-count{font-size:13px;color:var(--muted);text-align:right;min-width:74px}.s-count b{color:var(--text);font-size:16px}
+.abar{height:6px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin:8px 0 8px;flex:none}
+.abar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--mint),var(--gold2));transform-origin:left}
+.abar i.low{background:linear-gradient(90deg,#ff6b6b,#ffb199)}
+.s-stage{flex:1;min-height:0;display:flex;flex-direction:column}
+.tcard{flex:1;min-height:0;border-radius:24px;border:1px solid var(--line);background:rgba(20,40,58,.9);padding:14px 14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;overflow:hidden;position:relative}
+.tcard>*{flex-shrink:0}
+.t-kick{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--gold2)}
+.t-q{font-family:var(--serif);font-size:clamp(24px,7.4vw,38px);line-height:1.12;word-break:break-word}
+.t-q.sm{font-size:clamp(19px,5.6vw,26px)}
+.t-sub{font-size:14px;color:var(--muted);margin-top:-4px}
+.t-pic{flex-shrink:1;min-height:48px;height:min(20vh,150px);max-width:70%;aspect-ratio:4/3;border-radius:14px;object-fit:cover}
+.t-speak{width:64px;height:64px;border-radius:50%;background:rgba(233,168,90,.16);color:var(--gold2);font-size:28px}
+.t-in{width:100%;min-height:52px;border-radius:15px;border:1.5px solid rgba(233,168,90,.55);background:rgba(255,255,255,.05);font-family:var(--serif);font-size:21px;line-height:1.25;padding:10px 12px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;word-break:break-word}
+.t-in .caret{display:inline-block;width:2px;height:1.1em;background:var(--gold2);margin-left:1px;animation:blink 1s steps(1) infinite;vertical-align:-3px}
+.t-in .phd{color:var(--faint)}
+@keyframes blink{50%{opacity:0}}
+.t-in.ok{border-color:var(--mint);background:rgba(127,224,176,.14)}.t-in.no{border-color:var(--bad);background:rgba(255,120,140,.12);animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.opt{min-height:54px;padding:8px 6px;border-radius:14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);font-weight:700;font-size:15px;line-height:1.2;transition:transform .1s}
+.opt:active{transform:scale(.95)}
+.opt.ok{background:rgba(127,224,176,.22);border-color:var(--mint)}.opt.no{background:rgba(255,120,140,.2);border-color:var(--bad);animation:shake .35s}.opt.dim{opacity:.35}
+.tiles{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;width:100%}
+.tile{padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);font-weight:700;font-size:16px}
+.tile.used{opacity:.22}
+.built{width:100%;min-height:56px;border-radius:15px;border:1.5px dashed rgba(233,168,90,.55);padding:8px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.built .tile{background:rgba(233,168,90,.18);border-color:var(--gold)}
+.built.ok{border-style:solid;border-color:var(--mint)}.built.no{border-style:solid;border-color:var(--bad);animation:shake .35s}
+/* own keyboard: no autocorrect, no suggestions, no paste, no voice typing */
+.kb{flex:none;padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.kb .kr{display:flex;gap:4px;justify-content:center}
+.kb button{flex:1;max-width:42px;height:46px;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);font-size:18px;font-weight:600;text-transform:lowercase}
+.kb button:active{background:rgba(233,168,90,.4)}
+.kb button.w{flex:1.6;max-width:66px;font-size:15px}
+.kb button.sp{flex:5;max-width:none;font-size:13px;color:var(--muted)}
+.kb button.go{flex:2.4;max-width:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2208;font-weight:800;font-size:15px;text-transform:none}
+/* result */
+.chip{font-weight:800;font-size:13px;padding:6px 12px;border-radius:99px}
+.chip.up{background:var(--pine);color:#eafff3}.chip.down{background:#8d2f3a;color:#ffe3e6}.chip.win{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2208}
+.r-en{font-family:var(--serif);font-size:clamp(24px,7vw,34px);line-height:1.12;word-break:break-word}
+.r-ru{font-size:18px;color:var(--gold2);font-weight:600}
+.r-ex{font-size:14.5px;color:#cfdbe5;font-style:italic;font-family:var(--serif);line-height:1.4}
+.r-ex mark{background:none;color:var(--gold2);font-weight:700;font-style:normal}
+.r-yours{font-size:13.5px;color:var(--bad)}
+.react{flex:none;margin-top:8px;position:relative;width:100%;border-radius:18px;overflow:hidden;display:block}
+.react .lbl{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;font-weight:800;font-size:16px;background:linear-gradient(transparent,rgba(6,12,18,.85));text-align:center}
+.react .ph{width:100%;height:100%;border-radius:18px}
+.react.r-h{height:min(22vh,150px)}
+.react.r-h .media,.react.r-h .ph{position:absolute;inset:0}
+
+/* ---------- overlays ---------- */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(5,10,16,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.scrim.center{align-items:center}
+.dlg{width:100%;max-width:420px;background:#12263a;border:1px solid var(--line);border-radius:24px;padding:20px;text-align:center}
+.dlg h2{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.dlg p{color:var(--muted);margin:0 0 16px;line-height:1.45;font-size:14.5px}
+.btn-row{display:flex;gap:10px}
+#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 104px);transform:translateX(-50%) translateY(16px);opacity:0;background:#213a52;border:1px solid rgba(255,255,255,.16);padding:11px 16px;border-radius:14px;font-weight:700;font-size:14px;transition:.3s;z-index:60;pointer-events:none;max-width:82vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ---------- irregular verbs ---------- */
+.vf{width:100%;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;text-align:left}
+.vf-l{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.vf .t-in{min-height:46px;font-size:19px;border-color:rgba(255,255,255,.16);justify-content:flex-start}
+.vf .t-in.on{border-color:var(--gold);background:rgba(233,168,90,.1)}
+.vsets{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.vsets button{height:50px;border-radius:13px;background:rgba(20,40,58,.86);border:1px solid var(--line);font-weight:800;font-size:16px;line-height:1.05}
+.vsets button small{display:block;font-size:10px;color:var(--muted);font-weight:700}
+.vsets button.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(233,168,90,.2)}
+.vsets button.full{background:rgba(47,125,87,.35);border-color:#52b788}
+.vrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.vrow:last-child{border:0}
+.vrow .vpic{width:52px;height:39px;border-radius:9px;overflow:hidden;flex:none;background:#0c1620;display:grid;place-items:center;color:var(--faint);font-weight:800}
+.vrow .vpic img{width:100%;height:100%;object-fit:cover}
+.vrow .tx{flex:1;min-width:0}.vrow .tx b{display:block;font-size:15px;font-family:var(--serif)}.vrow .tx span{font-size:12.5px;color:var(--muted)}
+.vrow.new{opacity:.6}
+.vsay{width:36px;height:36px;border-radius:50%;background:rgba(233,168,90,.14);flex:none}
+#tabbar button{font-size:10px}
+
+/* ---------- irregular verbs: own button, own window, own score ---------- */
+.vbtn{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;padding:14px 16px 18px;border-radius:18px;border:1.5px solid rgba(120,200,255,.45);background:linear-gradient(135deg,#123a5a,#0e2840);color:var(--text);text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.vbtn:active{transform:scale(.985)}
+.vb-ico{font-size:26px;flex:none}
+.vb-tx{flex:1;min-width:0}.vb-tx b{display:block;font-size:17px}.vb-tx small{color:var(--muted);font-size:12.5px}
+.vb-sc{flex:none;color:var(--muted);font-size:13px}.vb-sc b{color:#8fd3ff;font-size:22px}
+.vbtn>i{position:absolute;left:0;bottom:0;height:4px;background:linear-gradient(90deg,#5ab8ff,#9fe6ff);border-radius:0 4px 4px 0}
+#v-verbs .vbtn{margin:0 0 12px}
+.vstats{margin-bottom:12px}
+.s-mid{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.s-mode{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fd3ff}
+.s-mode:empty{display:none}
+#session.verbs{background:linear-gradient(180deg,#0f3550 0%,#0b2236 50%,#08141f 100%)}
+#session.verbs .s-head{border-bottom:1px solid rgba(120,200,255,.25)}
+#session.verbs .s-count b{color:#8fd3ff}
+.vdone .vd-score{display:flex;align-items:baseline;gap:10px;margin:12px 0 6px}.vdone .vd-score b{font-size:44px;color:#8fd3ff;line-height:1}.vdone .vd-score span{color:var(--muted)}
+#session.verbs .abar i:not(.low){background:linear-gradient(90deg,#5ab8ff,#9fe6ff)}
+.vdone .vd-score{justify-content:center}.vdone .bar i,#v-verbs .bar i{background:linear-gradient(90deg,#5ab8ff,#9fe6ff)}
+#session.verbs .primary{background:linear-gradient(135deg,#2f8fd8,#1d6aa8)}
+
+/* admin page additions (on top of app.css) */
+body{user-select:text;-webkit-user-select:text}
+#wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:18px 16px 110px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.top h1{font-family:var(--serif);font-size:28px}
+#tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--line)}
+#tabs button{padding:10px 14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+#tabs button.on{color:var(--text);border-color:var(--gold)}
+.btn{height:38px;padding:0 14px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);font-weight:700;font-size:14px;white-space:nowrap}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2208;border:0}
+.btn.x{color:var(--bad);padding:0 10px}
+.btn[disabled]{opacity:.4}
+.panel h2{font-family:var(--serif);font-size:22px;margin-bottom:6px}
+.panel.alert{border-color:#c98a2b;background:rgba(201,138,43,.14)}
+.stats.four{grid-template-columns:repeat(4,1fr)}
+@media(max-width:640px){.stats.four{grid-template-columns:1fr 1fr}}
+.set-row input,.times input,.times select,input.wide{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:11px;height:40px;padding:0 10px;font-size:15px;font-family:inherit;outline:none}
+.set-row input[type=number]{width:96px;text-align:center}
+.set-row input[type=text],.set-row input[type=password]{width:58%}
+input.wide{width:100%}
+.times{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.times select{max-width:100%}
+textarea{width:100%;margin-top:10px;background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:10px;font-size:12px;font-family:ui-monospace,monospace;word-break:break-all}
+.tbl{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.warnc{color:var(--gold2);font-weight:700}
+#savebar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 16px calc(var(--sb) + 12px);background:rgba(11,23,34,.94);border-top:1px solid var(--gold);backdrop-filter:blur(12px)}
+#busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;background:#213a52;border:1px solid rgba(255,255,255,.16);padding:8px 14px;border-radius:12px;font-weight:700;font-size:13px}
+#toast{bottom:84px}
+.rw .anim{width:92px;height:92px}
+
+.pill.verb{background:rgba(90,184,255,.18);color:#8fd3ff}
+
+</style>
+</head>
+<body>
+<div id="snow"></div>
+<div id="wrap">
+  <div class="top"><div><div class="kicker">Word Shredder</div><h1>Dad's desk 🔐</h1></div><button class="btn" data-act="reload">Refresh</button></div>
+  <nav id="tabs"><button data-tab="overview">Overview</button><button data-tab="sessions">Sessions</button><button data-tab="words">Words</button><button data-tab="rules">Rules</button><button data-tab="rewards">Rewards</button><button data-tab="setup">Setup</button></nav>
+  <main id="main"></main>
+</div>
+<div id="savebar" class="hidden"><span>You have unsaved changes</span><button class="btn gold" data-act="save">Save &amp; send to his phone</button></div>
+<div id="busy" class="hidden"></div>
+<div id="toast"></div>
+<input type="file" id="f-any" hidden>
+<script>
+'use strict';
+/* =========================================================
+   Shared by the app and the admin page: rules, schedule and reward maths.
+   Both must calculate exactly the same way.
+   Needs globals: CFG (rules), LOG (sessions), peakLearned(), peakVerbs() and clock().
+   ========================================================= */
+const DATA_REPO = 'wordshredder-data';                    // private repo: rules.json (signed by Dad) + log/
+const DEFAULT_LEVEL_NAMES = ['Rental Boots', 'Bunny Slope Tourist', 'Falls Off the Lift', 'Hot Chocolate Enthusiast', 'Accidentally Went Down a Blue',
+  'Carves Occasionally', 'Knows What Wax Is', 'Red Run Regular', 'Chairlift Philosopher', 'Powder Hound',
+  'Black Diamond, Allegedly', 'Off-Piste Menace', 'Avalanche Whisperer', "Santa's Snowboard Instructor", 'Legend of the Lodge'];
+const LEVELS = DEFAULT_LEVEL_NAMES.length;               // 15
+const CFG_DEFAULT = {
+  v: 0,                   // version: goes up every time Dad saves
+  name: 'Dobrynia',
+  slots: [{ from: '07:00', to: '12:00' }, { from: '12:00', to: '17:00' }, { from: '17:00', to: '21:30' }],
+  minutes: 10,            // session length
+  minCorrect: 15,         // correct answers needed for a session to count
+  target: 5,              // correct tests to learn an item
+  missPenalty: 3,         // points lost on a miss
+  perLevel: 30,           // learned items per level
+  verbMinutes: 5,         // length of an irregular-verb practice (its own button, its own score)
+  verbActive: 6,          // verbs in rotation at a time in verb practice, in order
+  time: { choose: 9, type: 10, perChar: 1.6, order: 8, perWord: 2.5, hear: 6 },   // seconds
+  rewards: [
+    { id: 'r-week', title: 'Perfect week', text: 'Reward: set by Dad', rule: { type: 'perfect_week' } },
+    { id: 'r-extra', title: 'Extra mile', text: 'Reward: set by Dad', rule: { type: 'extra', n: 3 } },
+    { id: 'r-words', title: 'Every 30 words learned', text: 'Reward: set by Dad', rule: { type: 'words', n: 30 } },
+  ],
+  paid: {},               // rewardKey -> time Dad tapped "Payment done"
+};
+const RULE_TYPES = {
+  perfect_week: { label: 'Perfect week: every session, all 7 days', n: false },
+  extra: { label: 'Extra sessions in one week', n: 'How many extra sessions' },
+  words: { label: 'Every N items learned', n: 'N items' },
+  verbs: { label: 'Every N irregular verbs learned', n: 'N verbs' },
+  streak: { label: 'Perfect days in a row', n: 'How many days' },
+  manual: { label: 'Special: I give it by hand', n: false },
+};
+
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const ymd = (d = clock()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const hm = s => { const [h, m] = String(s).split(':').map(Number); return h * 60 + (m || 0); };
+const nowMin = (d = clock()) => d.getHours() * 60 + d.getMinutes();
+const addDays = (d, n) => { const x = new Date(d + 'T12:00'); x.setDate(x.getDate() + n); return ymd(x); };
+
+/* ---------- schedule ---------- */
+const slotName = s => { const m = hm(s.from); return m < 12 * 60 ? 'Morning' : m < 17 * 60 ? 'Day' : 'Evening'; };
+const slotIcon = s => { const m = hm(s.from); return m < 12 * 60 ? '☀️' : m < 17 * 60 ? '🏂' : '🌙'; };
+const sessOn = d => LOG.filter(x => x.day === d && x.ok && x.kind !== 'verbs');   // verb practice never fills a word slot
+// How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
+const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && x.kind !== 'verbs'); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
+// status of every slot on a given day: done / open (now) / later / missed
+function dayStatus(d = ymd(), now = clock()) {
+  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
+  return Array.from({ length: slotsOn(d) }, (_, i) => {
+    if (done.has(i)) return 'done';
+    if (d < today) return 'missed';
+    if (d > today) return 'later';
+    const s = CFG.slots[i], m = nowMin(now);
+    return !s ? 'missed' : m < hm(s.from) ? 'later' : m <= hm(s.to) ? 'open' : 'missed';
+  });
+}
+const openSlot = (now = clock()) => dayStatus(ymd(now), now).indexOf('open');
+const extrasOn = d => sessOn(d).filter(x => x.slot < 0).length;
+const perfectDay = d => { const s = dayStatus(d); return s.length > 0 && s.every(x => x === 'done'); };
+function mondayOf(d = clock()) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function weekDays(mon = mondayOf()) { return Array.from({ length: 7 }, (_, i) => { const x = new Date(mon); x.setDate(mon.getDate() + i); return ymd(x); }); }
+const firstDay = () => LOG.length ? LOG.reduce((m, x) => x.day < m ? x.day : m, ymd()) : ymd();
+// every run of perfect days: [{start, len}], oldest first; the last one may still be running
+function perfectRuns() {
+  const runs = []; let cur = null;
+  for (let d = firstDay(); d <= ymd(); d = addDays(d, 1)) {
+    if (perfectDay(d)) { if (cur) cur.len++; else runs.push(cur = { start: d, len: 1 }); }
+    else if (d < ymd()) cur = null;                       // today not perfect yet does not break the run
+  }
+  return runs;
+}
+function streakDays() { const r = perfectRuns().at(-1); return r && addDays(r.start, r.len) >= ymd() ? r.len : 0; }
+
+/* ---------- rewards ---------- */
+// For one reward: progress now + every earned instance {key,label}. Keys never change, so "paid" marks stay attached.
+function rewardState(r) {
+  const t = r.rule?.type, n = Math.max(1, r.rule?.n || 1), out = { cur: '', pct: 0, status: 'progress', earned: [] };
+  if (t === 'perfect_week' || t === 'extra') {
+    for (let mon = mondayOf(new Date(firstDay() + 'T12:00')); mon <= mondayOf(); mon.setDate(mon.getDate() + 7)) {
+      const days = weekDays(mon), isCur = ymd(mon) === ymd(mondayOf()), label = `week of ${days[0].slice(8)}.${days[0].slice(5, 7)}`;
+      if (t === 'perfect_week') {
+        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done').length, missed = st.filter(s => s === 'missed').length;
+        if (st.length && done === st.length) out.earned.push({ key: `${r.id}@${days[0]}`, label });
+        if (isCur) { out.cur = `${done} of ${st.length} sessions`; out.pct = st.length ? done / st.length : 0; out.status = done === st.length ? 'earned' : missed ? 'lost' : 'progress'; if (missed) out.cur += ` · ${missed} missed`; }
+      } else {
+        const ex = days.reduce((a, d) => a + extrasOn(d), 0);
+        if (ex >= n) out.earned.push({ key: `${r.id}@${days[0]}`, label });
+        if (isCur) { out.cur = `${Math.min(ex, n)} of ${n} extra sessions this week`; out.pct = Math.min(1, ex / n); out.status = ex >= n ? 'earned' : 'progress'; }
+      }
+    }
+  } else if (t === 'words') {
+    const L = peakLearned(), got = Math.floor(L / n);
+    for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} learned` });
+    out.cur = `${L % n} of ${n} to the next one`; out.pct = (L % n) / n;
+  } else if (t === 'verbs') {
+    const L = peakVerbs(), got = Math.floor(L / n);
+    for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} verbs learned` });
+    out.cur = `${L % n} of ${n} verbs to the next one`; out.pct = (L % n) / n;
+  } else if (t === 'streak') {
+    for (const run of perfectRuns()) for (let k = 1; k <= Math.floor(run.len / n); k++) out.earned.push({ key: `${r.id}@${run.start}#${k}`, label: `${n} perfect days from ${addDays(run.start, (k - 1) * n).slice(5)}` });
+    const s = streakDays(); out.cur = `${s % n} of ${n} perfect days in a row`; out.pct = (s % n) / n;
+  } else if (t === 'manual') {
+    for (const g of r.granted || []) out.earned.push({ key: `${r.id}@${g.at}`, label: g.note || 'special' });
+    out.cur = 'Given by Dad'; out.pct = 0; out.status = 'manual';
+  }
+  return out;
+}
+const paidAt = key => CFG.paid?.[key] || 0;
+
+/* ---------- signed rules: only Dad's key can change them ---------- */
+const b64 = { enc: buf => btoa(String.fromCharCode(...new Uint8Array(buf))), dec: s => Uint8Array.from(atob(s), c => c.charCodeAt(0)),
+  utf8: t => { const u = new TextEncoder().encode(t); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); },
+  text: s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0))) };
+const SIG = { name: 'ECDSA', namedCurve: 'P-256' }, SIGH = { name: 'ECDSA', hash: 'SHA-256' };
+async function verifyRules(file, pubJwk) {                // file = {text, sig}; returns the rules or null
+  try {
+    const key = await crypto.subtle.importKey('jwk', pubJwk, SIG, false, ['verify']);
+    const good = await crypto.subtle.verify(SIGH, key, b64.dec(file.sig), new TextEncoder().encode(file.text));
+    return good ? JSON.parse(file.text) : null;
+  } catch { return null; }
+}
+
+/* ---------- GitHub contents API (private data repo) ---------- */
+function ghClient(get) {                                  // get() -> {owner, token, api}
+  const base = p => `${(get().api || 'https://api.github.com').replace(/\/$/, '')}/repos/${get().owner}/${DATA_REPO}/contents/${p}`;
+  const call = async (p, opt = {}, accept = 'application/vnd.github+json') => fetch(base(p), { cache: 'no-store', ...opt, headers: { Accept: accept, Authorization: 'Bearer ' + get().token, ...(opt.body ? { 'Content-Type': 'application/json' } : {}) } });
+  return {
+    async meta(p) { const r = await call(p); if (r.status === 404) return null; if (!r.ok) throw new Error('GitHub ' + r.status); return r.json(); },
+    async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
+    async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
+    // create or replace; finds the current sha itself and retries once if someone wrote in between
+    async put(p, content64, message, sha) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (sha === undefined) sha = (await this.meta(p))?.sha || null;
+        const r = await call(p, { method: 'PUT', body: JSON.stringify({ message, content: content64, ...(sha ? { sha } : {}) }) });
+        if (r.ok) return (await r.json()).content.sha;
+        if (r.status !== 409 && r.status !== 422) throw new Error('GitHub ' + r.status);
+        sha = undefined;
+      }
+      throw new Error('GitHub conflict');
+    },
+  };
+}
+
+/* =========================================================
+   Word Shredder — Dad's desk (admin page)
+   Reads his log from the private data repo; writes the signed rules.
+   The signing key lives only in this browser (back it up in Setup).
+   ========================================================= */
+const ADMIN_VERSION = '0.2';
+const DAY = 86400000;
+let A = JSON.parse(localStorage.getItem('ws-admin') || 'null');     // {owner, token, api?}
+let KEY = JSON.parse(localStorage.getItem('ws-key') || 'null');     // {priv: JWK, pub: JWK}
+let CFG = structuredClone(CFG_DEFAULT), LOG = [], STATE = null, rulesSha, foreignRules = false;
+let tab = 'overview', dirty = false, busy = '';
+const gh = ghClient(() => A);
+// "now" on HIS phone's clock, so slots and days match what he sees
+const clock = () => new Date(Date.now() + (STATE ? (new Date().getTimezoneOffset() - STATE.tz) * 60000 : 0));
+const peakLearned = () => STATE?.peak || 0;
+const peakVerbs = () => STATE?.vpeak || 0;
+const fmtT = t => new Date(t + (STATE ? (new Date().getTimezoneOffset() - STATE.tz) * 60000 : 0)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+let toastT; function toast(msg, ms = 3000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms); }
+
+/* ---------- key & signing ---------- */
+async function newKey() {
+  const k = await crypto.subtle.generateKey(SIG, true, ['sign', 'verify']);
+  KEY = { priv: await crypto.subtle.exportKey('jwk', k.privateKey), pub: await crypto.subtle.exportKey('jwk', k.publicKey) };
+  localStorage.setItem('ws-key', JSON.stringify(KEY));
+}
+async function signText(text) {
+  const k = await crypto.subtle.importKey('jwk', KEY.priv, SIG, false, ['sign']);
+  return b64.enc(await crypto.subtle.sign(SIGH, k, new TextEncoder().encode(text)));
+}
+
+/* ---------- load & save ---------- */
+async function repoExists() {
+  const r = await fetch(`${(A.api || 'https://api.github.com').replace(/\/$/, '')}/repos/${A.owner}/${DATA_REPO}`, { headers: { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + A.token } });
+  if (r.status === 401) throw new Error('Token not accepted.');
+  if (r.status === 404 || r.status === 403) throw new Error(`Cannot open the private repo "${DATA_REPO}". Create it, and give this token access to it (Contents: Read and write).`);
+  if (!r.ok) throw new Error('GitHub ' + r.status);
+}
+async function loadAll() {
+  busy = 'Loading…'; render();
+  try {
+    await repoExists();
+    const f = await gh.text('rules.json').catch(() => null);
+    foreignRules = false;
+    if (f) {
+      rulesSha = f.sha; let file = null; try { file = JSON.parse(f.text); } catch {}
+      const cfg = file && KEY && await verifyRules(file, KEY.pub);
+      if (cfg) CFG = { ...structuredClone(CFG_DEFAULT), ...cfg };
+      else { foreignRules = true; const mine = JSON.parse(localStorage.getItem('ws-last') || 'null'); if (mine) CFG = { ...structuredClone(CFG_DEFAULT), ...mine }; }   // not signed with this browser's key: fall back to my own last saved rules
+    } else rulesSha = null;
+    const dir = await gh.meta('log').catch(() => null);
+    LOG = [];
+    for (const e of Array.isArray(dir) ? dir : []) if (/^sessions-\d{4}-\d{2}\.json$/.test(e.name)) { const t = await gh.text('log/' + e.name); try { LOG.push(...JSON.parse(t.text)); } catch {} }
+    LOG.sort((a, b) => a.start - b.start);
+    const st = await gh.text('log/state.json').catch(() => null); STATE = null; if (st) try { STATE = JSON.parse(st.text); } catch {}
+    busy = ''; dirty = false;
+  } catch (e) { busy = ''; toast(e.message, 7000); if (/Token|repo/.test(e.message)) tab = 'setup'; }
+  render();
+}
+async function saveRules(msg = 'rules') {
+  if (!KEY) return toast('No signing key in this browser. See Setup.');
+  if (foreignRules && !confirm('The rules file on GitHub is not signed with the key in this browser. Either someone changed it, or it was saved from another PC with a different key.\n\nSaving now replaces it with the rules shown here. (If this browser has a different key than his phone was linked with, link his phone again.)')) return;
+  busy = 'Saving…'; render();
+  try {
+    CFG.v = Math.max(CFG.v || 0, Date.now());            // always newer than anything he could put back
+    const text = JSON.stringify(CFG, (k, x) => k === 'animURL' ? undefined : x), file = { text, sig: await signText(text) };   // animURL is only a local preview
+    rulesSha = await gh.put('rules.json', b64.utf8(JSON.stringify(file)), msg, rulesSha || undefined);
+    localStorage.setItem('ws-last', text);
+    dirty = false; foreignRules = false; busy = ''; toast('Saved ✓ His phone gets it next time the app opens.');
+  } catch (e) { busy = ''; toast('Could not save: ' + e.message, 6000); }
+  render();
+}
+const touch = () => { dirty = true; render(); };
+
+/* ---------- views ---------- */
+function render() {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  $('#savebar').classList.toggle('hidden', !dirty);
+  $('#busy').textContent = busy; $('#busy').classList.toggle('hidden', !busy);
+  if (!A && tab !== 'setup') tab = 'setup';
+  $('#main').innerHTML = ({ overview: vOverview, sessions: vSessions, words: vWords, rules: vRules, rewards: vRewards, setup: vSetup })[tab]();
+}
+const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
+function toPay() { return CFG.rewards.flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }
+const flags = x => [x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : ''].filter(Boolean).join(' · ');
+
+function vOverview() {
+  if (!STATE && !LOG.length) return `<div class="panel"><h2>No data from his phone yet</h2><p class="hint">Link his phone in <b>Setup</b>. After his first session (with internet), it shows up here.</p></div>`;
+  const today = ymd(), wk = weekDays(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], cls = { done: 'g', missed: 'x', open: 'o', later: '' };
+  const all7 = LOG.filter(x => x.start > Date.now() - 7 * DAY), last7 = all7.filter(x => x.kind !== 'verbs'), v7 = all7.filter(x => x.kind === 'verbs'), sum = k => last7.reduce((a, x) => a + (x[k] || 0), 0);
+  const ev = (STATE?.events || []).filter(e => e.t > Date.now() - 7 * DAY), bad = ev.filter(e => e.kind === 'tamper' || e.kind === 'rollback');
+  const due = toPay().filter(e => !paidAt(e.key));
+  const lvl = Math.min(LEVELS, Math.floor(peakLearned() / (CFG.perLevel || 30)) + 1);
+  return `
+    <div class="panel"><div class="kicker">His phone · ${STATE ? 'last sync ' + ago(STATE.updated) + ' · app ' + esc(STATE.app || '?') + (STATE.cfgV === CFG.v ? ' · has your latest rules ✓' : ' · <b style="color:var(--gold2)">has not picked up your latest rules yet</b>') : 'no state yet'}</div>
+      <div class="kicker" style="margin-top:14px">Today (${today}) · his time ${String(clock().getHours()).padStart(2, '0')}:${String(clock().getMinutes()).padStart(2, '0')}</div><div class="slots">${slotRow(today)}</div>
+      <div class="wk">${wk.map((d, i) => `<div class="d ${d === today ? 'today' : ''}">${names[i]}<div class="dots">${dayStatus(d).map(s => `<i class="${cls[s]}"></i>`).join('')}</div>${extrasOn(d) ? `<div style="color:var(--gold2);font-weight:800;margin-top:2px">+${extrasOn(d)}</div>` : ''}</div>`).join('')}</div></div>
+    <div class="stats four"><div class="stat"><b>${streakDays()}</b><span>perfect days in a row</span></div><div class="stat"><b>${STATE?.learned ?? '–'}</b><span>words learned</span></div>
+      <div class="stat"><b>${STATE ? STATE.items.filter(i => !i.verb && i.seen && !i.learned).length : '–'}</b><span>words in progress</span></div><div class="stat"><b>${lvl}</b><span>level · ${esc(DEFAULT_LEVEL_NAMES[lvl - 1])}</span></div></div>
+    <div class="panel"><div class="kicker">🔁 Irregular verbs · separate practice, own score</div>
+      <div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${STATE?.verbs ?? '–'}${STATE?.verbTotal ? ' / ' + STATE.verbTotal : ''}</b><span>verbs learned</span></div><div class="stat"><b>${STATE ? STATE.items.filter(i => i.verb && i.seen && !i.learned).length : '–'}</b><span>verbs in progress</span></div>
+        <div class="stat"><b>${v7.filter(x => !x.quit).length}${v7.filter(x => x.quit).length ? ` <small class="hint">(+${v7.filter(x => x.quit).length} quit)</small>` : ''}</b><span>verb practices · last 7 days</span></div><div class="stat"><b>${v7.reduce((a, x) => a + x.cards, 0) ? Math.round(v7.reduce((a, x) => a + x.correct, 0) / v7.reduce((a, x) => a + x.cards, 0) * 100) + '%' : '–'}</b><span>verb answers correct</span></div></div></div>
+    ${bad.length ? `<div class="panel alert"><b>⚠ The rules file on GitHub was changed by someone other than you</b><div class="hint">His app refused it ${bad.length} time(s) this week (${[...new Set(bad.map(e => e.kind === 'tamper' ? 'wrong signature' : 'older copy put back'))].join(', ')}). Your rules were not affected. Check the repo history on GitHub.</div></div>` : ''}
+    <div class="panel"><div class="kicker">To pay</div>${due.length ? due.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}<br><span class="hint">${esc(e.r.text || '')}</span></span><button class="btn gold" data-pay="${esc(e.key)}">Payment done</button></div>`).join('') : '<div class="hint">Nothing waiting.</div>'}</div>
+    <div class="panel"><div class="kicker">Honesty · word sessions · last 7 days</div>
+      <div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${last7.filter(x => x.ok).length}</b><span>sessions that counted</span></div><div class="stat"><b>${last7.filter(x => !x.ok && !x.quit).length} / ${last7.filter(x => x.quit).length}</b><span>not enough correct / quit early</span></div>
+        <div class="stat"><b>${sum('cards') ? Math.round(sum('correct') / sum('cards') * 100) + '%' : '–'}</b><span>answers correct</span></div><div class="stat"><b>${sum('timeouts')} · ${sum('left')} · ${sum('fast')}</b><span>timed out · left the app · fast guesses</span></div></div></div>`;
+}
+function vSessions() {
+  const rows = [...LOG].reverse().slice(0, 200);
+  return `<div class="panel"><div class="kicker">Sessions (${LOG.length}) · times are his local time</div>${rows.length ? `<div class="tbl"><table><thead><tr><th>Day</th><th>Time</th><th>Result</th><th>Correct</th><th>Flags</th></tr></thead><tbody>
+    ${rows.map(x => `<tr><td>${x.day.slice(5)}</td><td>${fmtT(x.start)}–${fmtT(x.end)}</td>
+      <td>${x.kind === 'verbs' ? (x.quit ? '<span class="pill no">verbs · quit</span>' : '<span class="pill verb">🔁 verbs</span>') : x.ok ? (x.slot >= 0 ? `<span class="pill ok">slot ${x.slot + 1}</span>` : '<span class="pill wait">extra</span>') : x.quit ? '<span class="pill no">quit</span>' : '<span class="pill no">not counted</span>'}</td>
+      <td>${x.correct} / ${x.cards}${x.need ? ` <span class="hint">(needs ${x.need})</span>` : ''}</td><td class="${flags(x) ? 'warnc' : 'hint'}">${flags(x) || '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="hint">No sessions yet.</div>'}</div>`;
+}
+function vWords() {
+  if (!STATE) return '<div class="panel"><div class="hint">No data yet.</div></div>';
+  const items = [...STATE.items].sort((a, b) => (b.wrong || 0) - (a.wrong || 0));
+  return `<div class="panel"><div class="kicker">Items (${items.length}) · most missed first</div><div class="tbl"><table><thead><tr><th>Item</th><th>Status</th><th>Seen</th><th>Missed</th></tr></thead><tbody>
+    ${items.map(i => `<tr><td>${esc(i.en)}</td><td>${i.learned ? '<span class="pill ok">learned</span>' : i.seen ? `${i.count} / ${CFG.target}` : '<span class="hint">new</span>'}</td><td>${i.seen}</td><td class="${i.wrong >= 3 ? 'warnc' : ''}">${i.wrong}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+const num = (k, label, hint, min, max, step = 1, obj = 'CFG') => `<div class="set-row"><span>${label}<div class="hint">${hint}</div></span><input type="number" data-num="${obj}.${k}" min="${min}" max="${max}" step="${step}" value="${k.split('.').reduce((o, p) => o[p], CFG)}"></div>`;
+function vRules() {
+  return `<div class="panel"><div class="kicker">Schedule · every day, no exceptions</div>
+      ${CFG.slots.map((s, i) => `<div class="set-row"><span>Session ${i + 1}<div class="hint">He must start it inside this time window</div></span><span class="times"><input type="time" data-slot="${i}.from" value="${s.from}"> – <input type="time" data-slot="${i}.to" value="${s.to}">${CFG.slots.length > 1 ? `<button class="btn x" data-delslot="${i}" title="Remove">✕</button>` : ''}</span></div>`).join('')}
+      ${CFG.slots.length < 4 ? '<button class="btn" data-act="addslot" style="margin-top:10px">+ Add a session</button>' : ''}</div>
+    <div class="panel"><div class="kicker">What counts</div>
+      <div class="set-row"><span>His name<div class="hint">Shown on the home screen</div></span><input type="text" data-str="name" value="${esc(CFG.name)}"></div>
+      ${num('minutes', 'Session length (minutes)', 'The timer he has to finish', 3, 45)}
+      ${num('minCorrect', 'Correct answers needed', 'Fewer than this and the session does not count', 1, 200)}
+      ${num('target', 'Correct tests to learn an item', 'The last one is always typed', 2, 12)}
+      ${num('missPenalty', 'Points lost on a miss', 'Wrong answer, time out or leaving the app', 1, 12)}
+      ${num('perLevel', 'Learned items per level', '15 levels in total', 5, 500)}
+      ${num('verbMinutes', 'Verb practice length (minutes)', 'Irregular verbs have their own button. Practice never counts as a word session.', 2, 30)}
+      ${num('verbActive', 'Irregular verbs in rotation', 'How many new verbs he practises at a time, in order', 2, 15)}</div>
+    <div class="panel"><div class="kicker">Time limits per answer (seconds)</div>
+      ${num('time.choose', 'Choose from 6', 'Total time', 3, 60)}
+      ${num('time.type', 'Typing: base time', 'Plus the time per letter below', 3, 60)}
+      ${num('time.perChar', 'Typing: extra per letter', 'A 10-letter word gets base + 10 × this', 0.5, 5, 0.1)}
+      ${num('time.order', 'Build the sentence: base time', 'Plus the time per word below', 3, 60)}
+      ${num('time.perWord', 'Build the sentence: extra per word', '', 0.5, 10, 0.5)}
+      ${num('time.hear', 'Listen and type: extra time', 'Added to the typing time', 0, 30)}</div>`;
+}
+function vRewards() {
+  const cards = CFG.rewards.map((r, i) => { const s = rewardState(r), rt = RULE_TYPES[r.rule.type] || {};
+    return `<div class="panel"><div class="rw"><div class="anim r11">${r.animURL ? (/\.(mp4|webm|mov)$/i.test(r.anim) ? `<div class="media" style="width:100%;height:100%"><video src="${r.animURL}" autoplay muted loop playsinline></video></div>` : `<div class="media" style="width:100%;height:100%"><img src="${r.animURL}"></div>`) : r.anim ? '<div class="ph"><b>animation set ✓</b></div>' : '<div class="ph"><b>no animation</b><span>1:1</span></div>'}</div>
+      <div class="tx" style="flex:1"><input type="text" class="wide" data-rw="${i}.title" value="${esc(r.title)}" placeholder="Title, e.g. Perfect week">
+        <input type="text" class="wide" data-rw="${i}.text" value="${esc(r.text || '')}" placeholder="What he gets, e.g. Fishing trip with Dad" style="margin-top:6px">
+        <div class="times" style="margin-top:6px"><select data-rw="${i}.type">${Object.entries(RULE_TYPES).map(([k, v]) => `<option value="${k}" ${r.rule.type === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select>${rt.n ? `<input type="number" min="1" max="999" data-rw="${i}.n" value="${r.rule.n || 1}" title="${rt.n}">` : ''}</div></div></div>
+      <div class="times" style="margin-top:10px;justify-content:space-between"><span class="hint">Now: ${esc(s.cur)} · earned ${s.earned.length}×</span><span><button class="btn" data-anim="${i}">${r.anim ? 'Change animation' : 'Add animation (1:1)'}</button>${r.rule.type === 'manual' ? ` <button class="btn gold" data-grant="${i}">Give it now</button>` : ''} <button class="btn x" data-delrw="${i}">Delete</button></span></div></div>`; }).join('');
+  const all = toPay().sort((a, b) => (paidAt(a.key) ? 1 : 0) - (paidAt(b.key) ? 1 : 0));
+  return `${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
+    <div class="panel"><div class="kicker">Earned</div>${all.length ? all.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}${paidAt(e.key) ? `<br><span class="hint">paid ${new Date(paidAt(e.key)).toLocaleDateString()}</span>` : ''}</span>${paidAt(e.key) ? `<span><span class="pill ok">paid ✓</span> <button class="btn x" data-unpay="${esc(e.key)}">undo</button></span>` : `<button class="btn gold" data-pay="${esc(e.key)}">Payment done</button>`}</div>`).join('') : '<div class="hint">Nothing earned yet.</div>'}</div>`;
+}
+function vSetup() {
+  const site = /\.github\.io$/.test(location.hostname) ? new URL('./', location.href).href : `https://${(A?.owner || 'YOUR-NAME').toLowerCase()}.github.io/wordshredder/`;
+  return `<div class="panel"><div class="kicker">1 · Connect this page to GitHub</div>
+      <div class="hint" style="margin:8px 0">Needs the private repo <b>${DATA_REPO}</b> and <b>your</b> token with <i>Contents: Read and write</i> on it. Both stay in this browser.</div>
+      <div class="set-row"><span>GitHub user</span><input type="text" id="a-owner" value="${esc(A?.owner || 'Niksky1984')}"></div>
+      <div class="set-row"><span>Your token</span><input type="password" id="a-token" value="${esc(A?.token || '')}" placeholder="github_pat_…"></div>
+      <button class="btn gold" data-act="connect" style="margin-top:10px">Connect</button> ${A ? '<span class="pill ok">connected</span>' : ''}</div>
+    <div class="panel"><div class="kicker">2 · Signing key</div>
+      <div class="hint" style="margin:8px 0">${KEY ? 'This browser has your signing key ✓. Only rules signed with it are accepted by his phone. <b>Back it up</b>: without it, on another PC you would have to link his phone again.' : 'No key in this browser yet. Create one (first time), or restore your backup.'}${foreignRules ? '<br><b style="color:var(--gold2)">The rules file on GitHub is not signed with this key. If you did not save from another PC, someone edited it. Press Save on any tab to put your rules back.</b>' : ''}</div>
+      ${KEY ? '<button class="btn" data-act="keybackup">Back up the key (file)</button>' : '<button class="btn gold" data-act="keynew">Create a key</button>'} <button class="btn" data-act="keyrestore">Restore from backup</button></div>
+    <div class="panel"><div class="kicker">3 · Link his phone</div>
+      <div class="hint" style="margin:8px 0">Paste <b>his phone's</b> token (a second token with <i>Contents: Read and write</i> on <b>${DATA_REPO}</b> only). You get a link. Open it once on his phone in Chrome, then delete the message you sent it in.</div>
+      <div class="set-row"><span>His phone's token</span><input type="password" id="a-son" placeholder="github_pat_…"></div>
+      <button class="btn gold" data-act="makelink" style="margin-top:10px" ${A && KEY ? '' : 'disabled'}>Make the link</button>
+      <textarea id="a-link" readonly class="hidden" rows="5" data-site="${esc(site)}"></textarea><button class="btn hidden" id="a-copy" data-act="copylink" style="margin-top:8px">Copy the link</button></div>
+    <div class="foot">Dad's desk ${ADMIN_VERSION}</div>`;
+}
+
+/* ---------- events ---------- */
+const setPath = (path, val) => { const ks = path.split('.'), last = ks.pop(); ks.reduce((o, k) => o[k], CFG)[last] = val; };
+document.addEventListener('change', e => {
+  const t = e.target, d = t.dataset;
+  if (d.num) { const v = parseFloat(t.value); if (isFinite(v)) { setPath(d.num.replace(/^CFG\./, ''), Math.min(+t.max, Math.max(+t.min, v))); touch(); } }
+  else if (d.str) { CFG[d.str] = t.value.trim() || CFG[d.str]; touch(); }
+  else if (d.slot) { const [i, k] = d.slot.split('.'); if (t.value) { CFG.slots[i][k] = t.value; CFG.slots.sort((a, b) => hm(a.from) - hm(b.from)); touch(); } }
+  else if (d.rw) { const [i, k] = d.rw.split('.'), r = CFG.rewards[i];
+    if (k === 'type') { r.rule = { type: t.value, ...(RULE_TYPES[t.value].n ? { n: r.rule.n || 3 } : {}) }; } else if (k === 'n') r.rule.n = Math.max(1, parseInt(t.value) || 1); else r[k] = t.value.trim();
+    touch(); }
+});
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button'); if (!t) return; const d = t.dataset;
+  if (t.closest('#tabs')) { tab = d.tab; return render(); }
+  if (d.pay) { CFG.paid = { ...CFG.paid, [d.pay]: Date.now() }; return saveRules('payment done'); }
+  if (d.unpay) { delete CFG.paid[d.unpay]; return saveRules('payment undone'); }
+  if (d.delslot) { CFG.slots.splice(d.delslot, 1); return touch(); }
+  if (d.delrw) { if (confirm(`Delete the reward "${CFG.rewards[d.delrw].title}"?`)) { CFG.rewards.splice(d.delrw, 1); touch(); } return; }
+  if (d.grant) { const r = CFG.rewards[d.grant], note = prompt('What is it for? (he sees this)', ''); if (note === null) return; (r.granted = r.granted || []).push({ at: Date.now(), note: note.trim() || 'special' }); return saveRules('reward given'); }
+  if (d.anim) return pickAnim(+d.anim);
+  switch (d.act) {
+    case 'save': return saveRules();
+    case 'reload': return loadAll();
+    case 'addslot': { const last = CFG.slots.at(-1); CFG.slots.push({ from: last ? last.to : '08:00', to: '22:00' }); return touch(); }
+    case 'addrw': CFG.rewards.push({ id: 'r-' + uid().slice(0, 8), title: 'New reward', text: '', rule: { type: 'perfect_week' } }); return touch();
+    case 'connect': { A = { ...(A || {}), owner: $('#a-owner').value.trim(), token: $('#a-token').value.trim() }; localStorage.setItem('ws-admin', JSON.stringify(A)); await loadAll(); if (A && !busy && tab === 'setup') toast('Connected ✓'); return; }
+    case 'keynew': await newKey(); toast('Key created. Back it up now.'); return render();
+    case 'keybackup': { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ wordshredderKey: 1, ...KEY })], { type: 'application/json' })); a.download = 'wordshredder-signing-key.json'; a.click(); return; }
+    case 'keyrestore': { const f = $('#f-any'); f.accept = '.json'; f.onchange = async () => { try { const j = JSON.parse(await f.files[0].text()); if (!j.priv || !j.pub) throw 0; KEY = { priv: j.priv, pub: j.pub }; localStorage.setItem('ws-key', JSON.stringify(KEY)); toast('Key restored ✓'); if (A) loadAll(); else render(); } catch { toast('That is not a key backup.'); } }; f.value = ''; return f.click(); }
+    case 'makelink': { const tok = $('#a-son').value.trim(); if (!tok) return toast("Paste his phone's token first.");
+      if (tok === A.token) return toast('That is YOUR token. His phone needs its own, weaker one.', 6000);
+      const pay = b64.utf8(JSON.stringify({ o: A.owner, t: tok, k: KEY.pub, ...(A.api ? { a: A.api } : {}) })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const box = $('#a-link'); box.value = box.dataset.site + '#link=' + pay; box.classList.remove('hidden'); $('#a-copy').classList.remove('hidden'); return; }
+    case 'copylink': { const box = $('#a-link'); box.select(); try { await navigator.clipboard.writeText(box.value); toast('Copied. Send it to his phone, open it once, then delete the message.', 6000); } catch { document.execCommand('copy'); } return; }
+  }
+});
+async function pickAnim(i) {
+  const f = $('#f-any'); f.accept = 'image/gif,image/webp,image/png,video/mp4,video/webm';
+  f.onchange = async () => {
+    const file = f.files[0]; if (!file) return;
+    if (file.size > 8 * 1048576) return toast('Too large. Keep reward animations under 8 MB.', 5000);
+    busy = 'Uploading…'; render();
+    try {
+      const buf = await file.arrayBuffer(), h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].slice(0, 5).map(x => x.toString(16).padStart(2, '0')).join('');
+      const ext = (file.name.split('.').pop() || 'bin').toLowerCase(), r = CFG.rewards[i], path = `rewards/${r.id}-${h}.${ext}`;
+      let bin = ''; const u = new Uint8Array(buf); for (let k = 0; k < u.length; k += 0x8000) bin += String.fromCharCode(...u.subarray(k, k + 0x8000));
+      await gh.put(path, btoa(bin), 'reward animation');
+      r.anim = path; r.animURL = URL.createObjectURL(file); busy = ''; dirty = true; toast('Uploaded. Press Save to send it to his phone.');
+    } catch (e) { busy = ''; toast('Upload failed: ' + e.message, 6000); }
+    render();
+  };
+  f.value = ''; f.click();
+}
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+(async function boot() { render(); if (A) await loadAll(); })();
+
+</script>
+</body>
+</html>

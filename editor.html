@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Shredder Studio</title>
+<link rel="icon" href="icons/icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0b1722;--surface:#14283a;--surface2:#1c3449;--line:rgba(255,255,255,.09);--text:#f5effc;--muted:#a798bf;--faint:#6f6388;--gold:#ecbf7a;--gold2:#f7dcae;--rose:#f2a0ba;--bad:#ff9a9a;--ok:#86e3bd;
+--serif:ui-serif,"New York",Georgia,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{background:#0b1722}
+body{margin:0;background:linear-gradient(180deg,#17344d,var(--bg) 60%) fixed;color:var(--text);font-family:var(--sans);font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:14px 24px;background:rgba(11,23,34,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;margin-right:auto}
+.brand img{width:34px;height:34px;border-radius:9px}
+.brand small{font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-left:2px}
+.btn{height:38px;padding:0 14px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);font-weight:600;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{border-color:rgba(255,255,255,.2)}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#24170a;border:0}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+main{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.tabs button{padding:10px 16px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--text);border-color:var(--gold)}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toolbar input{height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:0 12px;width:260px;outline:none}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:3px}
+.seg button{padding:6px 12px;border-radius:8px;color:var(--muted);font-weight:600;font-size:13px}
+.seg button.on{background:var(--surface2);color:var(--text)}
+.stats{margin-left:auto;color:var(--muted)}
+.stats b{color:var(--text)}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);background:#183047}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:rgba(255,255,255,.02)}
+td.num{color:var(--faint);width:44px;font-variant-numeric:tabular-nums}
+.th{width:56px;height:56px;border-radius:12px;background:var(--surface2) center/cover no-repeat;display:grid;place-items:center;color:var(--bad);font-size:10px;font-weight:700;text-align:center;line-height:1.1}
+.th.missing{border:1.5px dashed var(--bad)}
+.en{font-family:var(--serif);font-size:17px}
+.ipa{color:var(--muted)}
+.ex{color:#cfc4e2;font-style:italic;max-width:360px}
+.warn{color:#ffcf8a;font-size:12px}
+.bad{color:var(--bad);font-size:12px;font-weight:600}
+.row-act{white-space:nowrap;text-align:right}
+.row-act button{padding:6px 8px;border-radius:8px;color:var(--muted)}
+.row-act button:hover{background:var(--surface2);color:var(--text)}
+.drop{border:2px dashed rgba(236,191,122,.35);border-radius:16px;padding:18px;text-align:center;color:var(--muted);margin-bottom:14px}
+.drop.over{background:rgba(236,191,122,.08);border-color:var(--gold)}
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(5,3,10,.65);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:20;padding:20px}
+.modal{width:100%;max-width:860px;max-height:92vh;overflow:auto;background:#12263a;border:1px solid var(--line);border-radius:22px;padding:22px}
+.modal h2{font-family:var(--serif);font-size:24px;margin:0 0 16px;font-weight:600}
+.grid2{display:grid;grid-template-columns:300px 1fr;gap:20px}
+.imgbox{aspect-ratio:4/3;border-radius:16px;border:2px dashed rgba(255,255,255,.18);background:var(--surface) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:14px;cursor:pointer;position:relative}
+.imgbox.has{border-style:solid;border-color:var(--line);color:transparent}
+.imgbox.req{border-color:var(--bad)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:5px}
+.field input,.field textarea{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:10px 12px;font-size:15px;font-family:inherit;outline:none;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:rgba(236,191,122,.5)}
+.field input.big{font-family:var(--serif);font-size:20px}
+.m-foot{display:flex;gap:10px;align-items:center;margin-top:16px}
+.m-foot .msg{margin-right:auto;font-size:13px}
+/* media */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:22px}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px}
+.mcard h3{margin:0 0 4px;font-size:15px}
+.mcard p{margin:0 0 12px;color:var(--muted);font-size:12.5px;line-height:1.4}
+.prev{border-radius:14px;background:#0c1620;overflow:hidden;display:grid;place-items:center;color:var(--faint);margin-bottom:10px;position:relative}
+.prev video,.prev img{width:100%;height:100%;object-fit:cover;display:block}
+.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.lv{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px}
+.lv .prev{aspect-ratio:1;margin-bottom:8px;cursor:pointer}
+.lv .prev b{font-size:26px;color:var(--faint)}
+.lv input{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:6px 8px;font-size:12.5px;outline:none}
+.lv .lvh{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:700;letter-spacing:.06em}
+.lv .lvh button{color:var(--bad);font-size:11px}
+.h2{font-family:var(--serif);font-size:22px;margin:6px 0 12px;font-weight:600}
+.note{color:var(--muted);line-height:1.5;margin:0 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.opt input{margin-top:3px;accent-color:var(--gold)}
+.opt small{display:block;color:var(--muted);margin-top:2px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:#213a52;border:1px solid rgba(255,255,255,.14);padding:12px 18px;border-radius:14px;font-weight:600;transition:.3s;z-index:50;pointer-events:none;max-width:80vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty h3{font-family:var(--serif);font-size:24px;color:var(--text);margin:0 0 8px;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img src="icons/icon-192.png" alt="">Word Shredder <small>Studio</small></div>
+  <button class="btn" data-a="load-site" title="Load the words, pictures and media that are on the website now">Load from site</button>
+  <button class="btn gold" data-a="publish" title="Put the current words and media on the website">Publish to site</button>
+</header>
+<main>
+  <div class="tabs"><button class="on" data-tab="words">Words</button><button data-tab="verbs">Irregular verbs</button><button data-tab="media">Media &amp; levels</button></div>
+
+  <section id="t-words">
+    <div class="toolbar">
+      <button class="btn gold" data-a="add">+ Add word</button>
+      <button class="btn" data-a="excel">Import Excel</button>
+      <button class="btn" data-a="images">Add images</button>
+      <button class="btn" data-a="template">Excel template</button>
+      <input id="q" type="search" placeholder="Search…">
+      <div class="seg" id="flt"></div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="drop" id="drop">Drop images here. Files named like the word (<b>apple.jpg</b>, <b>ice_cream.png</b>) or like the Excel “Image” column are matched automatically.</div>
+    <div id="tbl"></div>
+  </section>
+
+  <section id="t-verbs" class="hidden">
+    <div class="toolbar">
+      <button class="btn gold" data-a="verb-images">Add verb pictures</button>
+      <label class="note" style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="verbs-on" style="width:18px;height:18px;accent-color:var(--gold)"> Publish the verbs to his app</label>
+      <div class="stats" id="vstats"></div>
+    </div>
+    <div class="drop" id="vdrop">Drop all the verb pictures here at once. Files named like the verb (<b>go.png</b>, <b>cut.jpg</b>, or <b>062_go.png</b>) are matched automatically.</div>
+    <div id="vtbl"></div>
+  </section>
+  <section id="t-media" class="hidden">
+    <div class="cards">
+      <div class="mcard"><h3>Home scene</h3><p>The cozy scene at the top of the home screen. 16:9, silent loop, 6–10 s. MP4 or GIF.</p>
+        <div class="prev" style="aspect-ratio:16/9" id="pv-home">Placeholder shown in the app</div>
+        <button class="btn" data-pick="home">Choose file</button> <button class="btn danger" data-clear="home">Remove</button><div id="info-home" class="warn" style="margin-top:8px"></div></div>
+      <div class="mcard"><h3>Session finished video</h3><p>Plays when a session that counts is finished. 16:9, MP4 with sound, about 10 s.</p>
+        <div class="prev" style="aspect-ratio:16/9" id="pv-done">Placeholder shown in the app</div>
+        <button class="btn" data-pick="done">Choose file</button> <button class="btn danger" data-clear="done">Remove</button><div id="info-done" class="warn" style="margin-top:8px"></div></div>
+      <div class="mcard"><h3>“Correct” reaction</h3><p>Shown on the Next button after a right answer. 16:9, silent, 2–3 s. MP4 or GIF.</p>
+        <div class="prev" style="aspect-ratio:16/9" id="pv-ok">Placeholder shown in the app</div>
+        <button class="btn" data-pick="ok">Choose file</button> <button class="btn danger" data-clear="ok">Remove</button><div id="info-ok" class="warn" style="margin-top:8px"></div></div>
+      <div class="mcard"><h3>“Wrong” reaction</h3><p>Shown on the Next button after a miss. 16:9, silent, 2–3 s. MP4 or GIF.</p>
+        <div class="prev" style="aspect-ratio:16/9" id="pv-bad">Placeholder shown in the app</div>
+        <button class="btn" data-pick="bad">Choose file</button> <button class="btn danger" data-clear="bad">Remove</button><div id="info-bad" class="warn" style="margin-top:8px"></div></div>
+    </div>
+    <div class="h2">Avatars</div>
+    <p class="note">Up to 12 avatars he can choose from on the home screen (1:1, PNG or JPG; shown as a circle). He can also use a photo from his own phone.</p>
+    <div class="levels" id="avatars" style="grid-template-columns:repeat(6,1fr);margin-bottom:22px"></div>
+    <div class="h2">Levels</div>
+    <p class="note">15 levels. Click a tile to set its picture (1:1, PNG or GIF) and edit the name. Until a picture is set, the app shows a labelled placeholder. How many learned items a level takes is one of the rules in the admin page.</p>
+    <div class="levels" id="levels"></div>
+  </section>
+</main>
+<div id="toast"></div>
+<input type="file" id="f-any" hidden>
+
+<script>
+'use strict';
+const DEFAULT_LEVEL_NAMES = ['Rental Boots','Bunny Slope Tourist','Falls Off the Lift','Hot Chocolate Enthusiast','Accidentally Went Down a Blue','Carves Occasionally','Knows What Wax Is','Red Run Regular','Chairlift Philosopher','Powder Hound','Black Diamond, Allegedly','Off-Piste Menace','Avalanche Whisperer',"Santa's Snowboard Instructor",'Legend of the Lodge'];
+const LEVELS = DEFAULT_LEVEL_NAMES.length;   // 15
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const stemKey = s => norm(String(s || '').replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[_\-]+/g, ' '));
+const ymd = (d = new Date()) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+const fmtMB = n => (n / 1048576).toFixed(1) + ' MB';
+let toastT; function toast(m, ms = 3200) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms); }
+
+/* ---------- storage ---------- */
+let db;
+const openDB = () => new Promise((res, rej) => { const r = indexedDB.open('wordshredder-studio', 1); r.onupgradeneeded = () => { r.result.createObjectStore('words', { keyPath: 'id' }); r.result.createObjectStore('kv'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+function tx(store, mode, fn) { return new Promise((res, rej) => { const t = db.transaction(store, mode); const o = fn(t.objectStore(store)); t.oncomplete = () => res(o instanceof IDBRequest ? o.result : o); t.onerror = () => rej(t.error); }); }
+const kvGet = k => tx('kv', 'readonly', s => s.get(k));
+const kvSet = (k, v) => tx('kv', 'readwrite', s => { s.put(v, k); });
+const putWords = ws => tx('words', 'readwrite', s => { ws.forEach(w => s.put(w)); });
+
+let words = [];   // {id,en,ipa,ru,example,image(dataURL),imageName,order,updated}
+const VERBS = [["cut",["cut"],["cut"],"резать",""],["put",["put"],["put"],"класть, ставить",""],["let",["let"],["let"],"позволять",""],["hit",["hit"],["hit"],"ударять",""],["set",["set"],["set"],"ставить, устанавливать",""],["shut",["shut"],["shut"],"закрывать",""],["cost",["cost"],["cost"],"стоить",""],["hurt",["hurt"],["hurt"],"причинять боль",""],["read",["read"],["read"],"читать","past and participle sound like 'red'"],["quit",["quit"],["quit"],"бросать (занятие)",""],["spread",["spread"],["spread"],"распространять, намазывать",""],["bet",["bet"],["bet"],"спорить (на что-то)",""],["burst",["burst"],["burst"],"лопаться",""],["split",["split"],["split"],"раскалывать, делить",""],["have",["had"],["had"],"иметь",""],["make",["made"],["made"],"делать, создавать",""],["say",["said"],["said"],"сказать",""],["get",["got"],["got","gotten"],"получать","British: got · American: gotten"],["find",["found"],["found"],"находить",""],["tell",["told"],["told"],"рассказывать",""],["think",["thought"],["thought"],"думать",""],["buy",["bought"],["bought"],"покупать",""],["bring",["brought"],["brought"],"приносить",""],["teach",["taught"],["taught"],"учить (кого-то)",""],["catch",["caught"],["caught"],"ловить",""],["fight",["fought"],["fought"],"драться",""],["sell",["sold"],["sold"],"продавать",""],["pay",["paid"],["paid"],"платить",""],["lay",["laid"],["laid"],"класть, накрывать (стол)",""],["hold",["held"],["held"],"держать",""],["stand",["stood"],["stood"],"стоять",""],["understand",["understood"],["understood"],"понимать",""],["sit",["sat"],["sat"],"сидеть",""],["win",["won"],["won"],"выигрывать",""],["lose",["lost"],["lost"],"терять, проигрывать",""],["send",["sent"],["sent"],"отправлять",""],["spend",["spent"],["spent"],"тратить",""],["build",["built"],["built"],"строить",""],["lend",["lent"],["lent"],"одалживать (кому-то)",""],["leave",["left"],["left"],"уходить, оставлять",""],["feel",["felt"],["felt"],"чувствовать",""],["keep",["kept"],["kept"],"хранить, держать",""],["sleep",["slept"],["slept"],"спать",""],["meet",["met"],["met"],"встречать",""],["lead",["led"],["led"],"вести",""],["feed",["fed"],["fed"],"кормить",""],["hear",["heard"],["heard"],"слышать",""],["mean",["meant"],["meant"],"значить",""],["light",["lit"],["lit"],"зажигать",""],["shoot",["shot"],["shot"],"стрелять",""],["dig",["dug"],["dug"],"копать",""],["hang",["hung"],["hung"],"вешать",""],["stick",["stuck"],["stuck"],"приклеивать, застревать",""],["learn",["learnt","learned"],["learnt","learned"],"учить, узнавать","learned is also correct"],["burn",["burnt","burned"],["burnt","burned"],"гореть, жечь","burned is also correct"],["shine",["shone"],["shone"],"светить, сиять",""],["slide",["slid"],["slid"],"скользить",""],["come",["came"],["come"],"приходить",""],["become",["became"],["become"],"становиться",""],["run",["ran"],["run"],"бежать",""],["be",["was","were"],["been"],"быть","was: I/he/she/it · were: you/we/they"],["go",["went"],["gone"],"идти, ехать",""],["do",["did"],["done"],"делать",""],["see",["saw"],["seen"],"видеть",""],["eat",["ate"],["eaten"],"есть",""],["give",["gave"],["given"],"давать",""],["take",["took"],["taken"],"брать",""],["write",["wrote"],["written"],"писать",""],["speak",["spoke"],["spoken"],"говорить",""],["break",["broke"],["broken"],"ломать",""],["choose",["chose"],["chosen"],"выбирать",""],["drive",["drove"],["driven"],"водить (машину)",""],["ride",["rode"],["ridden"],"ездить (на велосипеде, лошади)",""],["rise",["rose"],["risen"],"подниматься",""],["fall",["fell"],["fallen"],"падать",""],["forget",["forgot"],["forgotten"],"забывать",""],["know",["knew"],["known"],"знать",""],["grow",["grew"],["grown"],"расти",""],["throw",["threw"],["thrown"],"бросать",""],["blow",["blew"],["blown"],"дуть",""],["fly",["flew"],["flown"],"летать",""],["draw",["drew"],["drawn"],"рисовать",""],["show",["showed"],["shown"],"показывать",""],["wear",["wore"],["worn"],"носить (одежду)",""],["tear",["tore"],["torn"],"рвать",""],["steal",["stole"],["stolen"],"красть",""],["freeze",["froze"],["frozen"],"замерзать",""],["wake",["woke"],["woken"],"просыпаться",""],["hide",["hid"],["hidden"],"прятать",""],["bite",["bit"],["bitten"],"кусать",""],["begin",["began"],["begun"],"начинать",""],["drink",["drank"],["drunk"],"пить",""],["swim",["swam"],["swum"],"плавать",""],["sing",["sang"],["sung"],"петь",""],["ring",["rang"],["rung"],"звонить",""],["sink",["sank"],["sunk"],"тонуть",""],["shake",["shook"],["shaken"],"трясти",""],["forgive",["forgave"],["forgiven"],"прощать",""],["beat",["beat"],["beaten"],"бить, побеждать",""],["lie",["lay"],["lain"],"лежать","not 'lie, lied' = врать"]];   // [base, past forms, participle forms, Russian, note] in learning order
+const MEDIA_KEYS = ['home', 'done', 'ok', 'bad'];   // home scene · finished video · correct / wrong reaction
+let media = { home: null, done: null, ok: null, bad: null, avatars: {}, levels: {}, levelNames: DEFAULT_LEVEL_NAMES.slice(), wordsPerLevel: 100, updated: 0 };
+let VIMG = {}, VON = true;   // verb pictures {base: dataURL}; publish verbs or not
+let lastExport = 0, filter = 'all', query = '';
+const complete = w => !!(w.en && w.ru);   // a picture is optional
+const saveMedia = () => { media.updated = Date.now(); return kvSet('media', media); };
+
+/* ---------- image processing ---------- */
+function loadImg(src) { return new Promise((r, j) => { const i = new Image(); i.onload = () => r(i); i.onerror = j; i.src = src; }); }
+async function processImage(file, max = 800) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImg(url);
+    const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    let out = c.toDataURL('image/webp', .82);
+    if (!out.startsWith('data:image/webp')) { const x = c.getContext('2d'); x.globalCompositeOperation = 'destination-over'; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); out = c.toDataURL('image/jpeg', .85); }
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function squareImage(file, size) {                 // centre-crop to a square
+  const url = URL.createObjectURL(file);
+  try { const img = await loadImg(url), side = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement('canvas'); c.width = c.height = size;
+    c.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+    const out = c.toDataURL('image/webp', .86); return out.startsWith('data:image/webp') ? out : c.toDataURL('image/jpeg', .88); }
+  finally { URL.revokeObjectURL(url); }
+}
+const fileToDataURL = f => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(f); });
+function pickFile(accept, multiple = false) {
+  return new Promise(res => { const f = $('#f-any'); f.accept = accept; f.multiple = multiple; f.value = ''; f.onchange = () => res([...f.files]); f.click(); });
+}
+
+/* ---------- words table ---------- */
+function renderWords() {
+  const nAll = words.length, nNoImg = words.filter(w => !w.image).length, nWarn = words.filter(w => w.image && (!w.ipa || !w.example)).length;
+  const nChanged = words.filter(w => complete(w) && w.updated > lastExport).length;
+  $('#flt').innerHTML = [['all', `All ${nAll}`], ['noimg', `No picture ${nNoImg}`], ['warn', `Missing IPA/example ${nWarn}`], ['changed', `Changed since last publish ${nChanged}`]]
+    .map(([k, l]) => `<button data-f="${k}" class="${filter === k ? 'on' : ''}">${l}</button>`).join('');
+  $('#stats').innerHTML = `<b>${words.filter(complete).length}</b> ready to publish`;
+  const q = norm(query);
+  const list = words.filter(w => (filter === 'all' || (filter === 'noimg' && !w.image) || (filter === 'warn' && w.image && (!w.ipa || !w.example)) || (filter === 'changed' && complete(w) && w.updated > lastExport))
+    && (!q || norm(w.en).includes(q) || norm(w.ru).includes(q)));
+  if (!words.length) { $('#tbl').innerHTML = `<div class="empty"><h3>No words yet</h3>Add words one by one, or import your Excel list and drop the images in.</div>`; return; }
+  $('#tbl').innerHTML = `<table><thead><tr><th>#</th><th>Image</th><th>English</th><th>IPA</th><th>Russian</th><th>Example</th><th></th></tr></thead><tbody>
+    ${list.map(w => `<tr data-id="${w.id}">
+      <td class="num">${words.indexOf(w) + 1}</td>
+      <td><div class="th" style="${w.image ? `background-image:url('${w.image}')` : ''}">${w.image ? '' : 'no<br>picture'}</div></td>
+      <td><div class="en">${esc(w.en)}</div>${w.imageName && !w.image ? `<div class="bad">needs ${esc(w.imageName)}</div>` : ''}</td>
+      <td class="ipa">${esc(w.ipa) || '<span class="warn">missing</span>'}</td>
+      <td>${esc(w.ru)}</td>
+      <td class="ex">${esc(w.example) || '<span class="warn">missing</span>'}</td>
+      <td class="row-act"><button data-r="say" title="Listen">🔊</button><button data-r="up" title="Move up">↑</button><button data-r="down" title="Move down">↓</button><button data-r="edit">Edit</button><button data-r="del" title="Delete">✕</button></td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+/* ---------- irregular verbs ---------- */
+const verbKey = name => String(name).toLowerCase().replace(/\.[a-z0-9]{2,5}$/, '').replace(/^\d+[_\- ]*/, '').trim();
+function renderVerbs() {
+  const have = VERBS.filter(v => VIMG[v[0]]).length;
+  $('#verbs-on').checked = VON;
+  $('#vstats').innerHTML = `<b>${have}</b> of 100 pictures`;
+  $('#vtbl').innerHTML = `<table><thead><tr><th>#</th><th>Picture</th><th>Base</th><th>Past simple</th><th>Past participle</th><th>Russian</th><th></th></tr></thead><tbody>
+    ${VERBS.map((v, i) => `<tr><td class="num">${i + 1}${i % 10 === 0 ? `<div class="hint" style="font-size:10px">set ${i / 10 + 1}</div>` : ''}</td>
+      <td><div class="th ${VIMG[v[0]] ? '' : 'missing'}" data-vpick="${v[0]}" style="cursor:pointer;${VIMG[v[0]] ? `background-image:url('${VIMG[v[0]]}')` : ''}">${VIMG[v[0]] ? '' : 'add'}</div></td>
+      <td class="en">${esc(v[0])}</td><td>${esc(v[1].join(' / '))}</td><td>${esc(v[2].join(' / '))}</td><td>${esc(v[3])}${v[4] ? `<div class="hint" style="font-size:11.5px">${esc(v[4])}</div>` : ''}</td>
+      <td class="row-act">${VIMG[v[0]] ? `<button data-vdel="${v[0]}" title="Remove picture">✕</button>` : ''}</td></tr>`).join('')}</tbody></table>`;
+}
+async function addVerbImages(files) {
+  files = files.filter(f => f.type.startsWith('image/')); if (!files.length) return;
+  const known = new Set(VERBS.map(v => v[0])); let ok = 0; const miss = [];
+  toast(`Processing ${files.length} picture(s)…`, 60000);
+  for (const f of files) { const k = verbKey(f.name); if (!known.has(k)) { miss.push(f.name); continue; } VIMG[k] = await processImage(f); ok++; }
+  await kvSet('verbImgs', VIMG); renderVerbs();
+  toast(`${ok} picture(s) matched${miss.length ? ` · not matched: ${miss.slice(0, 5).join(', ')}${miss.length > 5 ? '…' : ''}` : ''}`, 7000);
+}
+
+/* ---------- word modal ---------- */
+function openWord(id) {
+  const w = id ? words.find(x => x.id === id) : null;
+  let image = w?.image || null;
+  const sc = document.createElement('div'); sc.className = 'scrim';
+  sc.innerHTML = `<div class="modal"><h2>${w ? 'Edit word' : 'New word'}</h2><div class="grid2">
+    <div><div class="imgbox ${image ? 'has' : ''}" id="ib" style="${image ? `background-image:url('${image}')` : ''}"><div>Click, drop or paste an image<br><small>(optional)</small></div></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn" id="ib-pick">Choose image</button><button class="btn" id="say">🔊 Listen</button></div></div>
+    <div><div class="field"><label>English word</label><input class="big" id="m-en" value="${esc(w?.en)}"></div>
+      <div class="field"><label>Transcription (IPA)</label><input id="m-ipa" value="${esc(w?.ipa)}" placeholder="/ˈæp.əl/"></div>
+      <div class="field"><label>Russian translation</label><input class="big" id="m-ru" value="${esc(w?.ru)}"></div>
+      <div class="field"><label>Example sentence</label><textarea id="m-ex" rows="3">${esc(w?.example)}</textarea></div></div></div>
+    <div class="m-foot"><span class="msg" id="m-msg"></span><button class="btn" id="m-cancel">Cancel</button>${w ? '' : '<button class="btn" id="m-save-next">Save &amp; add another</button>'}<button class="btn gold" id="m-save">Save</button></div></div>`;
+  document.body.appendChild(sc);
+  const ib = $('#ib', sc);
+  const setImg = async f => { if (!f || !f.type.startsWith('image/')) return; image = await processImage(f); ib.style.backgroundImage = `url('${image}')`; ib.classList.add('has'); ib.classList.remove('req'); validate(); };
+  const validate = () => {
+    const en = $('#m-en', sc).value.trim(), ru = $('#m-ru', sc).value.trim();
+    const dup = words.find(x => x !== w && norm(x.en) === norm(en));
+    let err = !en ? 'English word is required.' : !ru ? 'Translation is required.' : dup ? `"${en}" is already in the pool.` : '';
+    const warn = !err && !$('#m-ex', sc).value.trim() && en.split(/\s+/).length < 4 ? 'Tip: an example sentence that contains the word unlocks the "type the missing part" test.' : '';
+    $('#m-msg', sc).innerHTML = err ? `<span class="bad">${err}</span>` : `<span class="warn">${warn}</span>`;
+    sc.querySelectorAll('#m-save,#m-save-next').forEach(b => b.disabled = !!err);
+    return !err;
+  };
+  ib.onclick = () => pickFile('image/*').then(f => setImg(f[0]));
+  $('#ib-pick', sc).onclick = ib.onclick;
+  ib.ondragover = e => { e.preventDefault(); }; ib.ondrop = e => { e.preventDefault(); setImg(e.dataTransfer.files[0]); };
+  sc.onpaste = e => { const it = [...e.clipboardData.items].find(i => i.type.startsWith('image/')); if (it) { e.preventDefault(); setImg(it.getAsFile()); } };
+  sc.addEventListener('input', validate);
+  $('#say', sc).onclick = () => speak($('#m-en', sc).value + '. ' + $('#m-ex', sc).value);
+  $('#m-cancel', sc).onclick = () => sc.remove();
+  const save = async again => {
+    if (!validate()) return;
+    const data = { en: $('#m-en', sc).value.trim(), ipa: $('#m-ipa', sc).value.trim(), ru: $('#m-ru', sc).value.trim(), example: $('#m-ex', sc).value.trim(), image, updated: Date.now() };
+    let rec;
+    if (w) { Object.assign(w, data); rec = w; } else { rec = { id: uid(), order: nextOrder(), imageName: '', ...data }; words.push(rec); }
+    await putWords([rec]); sc.remove(); renderWords(); toast('Saved');
+    if (again) openWord();
+  };
+  $('#m-save', sc).onclick = () => save(false);
+  const sn = $('#m-save-next', sc); if (sn) sn.onclick = () => save(true);
+  validate(); setTimeout(() => $('#m-en', sc).focus(), 50);
+}
+const nextOrder = () => words.reduce((m, w) => Math.max(m, w.order || 0), 0) + 1;
+
+/* ---------- speech ---------- */
+function speak(t) { if (!('speechSynthesis' in window) || !t.trim()) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); const v = speechSynthesis.getVoices().find(v => /^en[-_]GB/i.test(v.lang)); if (v) u.voice = v; u.lang = 'en-GB'; u.rate = .9; speechSynthesis.speak(u); }
+
+/* ---------- Excel import ---------- */
+async function importExcel() {
+  if (!window.XLSX) return toast('Excel reader needs an internet connection the first time. Check the connection and reload.');
+  const [f] = await pickFile('.xlsx,.xls,.csv,.ods'); if (!f) return;
+  const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' }).filter(r => r.some(c => String(c).trim()));
+  if (!rows.length) return toast('The sheet is empty.');
+  const head = rows[0].map(h => norm(h));
+  const find = re => head.findIndex(h => re.test(h));
+  let col = { en: find(/^(en|eng|english|word)/), ipa: find(/ipa|transcr|pronun/), ru: find(/^(ru|rus|russian|translation)/), ex: find(/example|sentence/), img: find(/image|picture|photo|file/) };
+  let start = 1;
+  if (col.en < 0 || col.ru < 0) { col = { en: 0, ipa: 1, ru: 2, ex: 3, img: 4 }; start = 0; }
+  const mapEn = new Map(words.map(w => [norm(w.en), w]));
+  let added = 0, updated = 0; const changed = [];
+  let order = nextOrder() - 1;
+  for (const r of rows.slice(start)) {
+    const g = i => i >= 0 ? String(r[i] ?? '').trim() : '';
+    const en = g(col.en), ru = g(col.ru); if (!en || !ru) continue;
+    const rec = { en, ipa: g(col.ipa), ru, example: g(col.ex), imageName: g(col.img) };
+    const w = mapEn.get(norm(en));
+    if (w) { Object.assign(w, rec, { imageName: rec.imageName || w.imageName, ipa: rec.ipa || w.ipa, example: rec.example || w.example, updated: Date.now() }); changed.push(w); updated++; }
+    else { const nw = { id: uid(), order: ++order, image: null, updated: Date.now(), ...rec }; words.push(nw); mapEn.set(norm(en), nw); changed.push(nw); added++; }
+  }
+  await putWords(changed);
+  const missing = words.filter(w => !w.image).length;
+  filter = 'all'; renderWords();
+  toast(`${added} added · ${updated} updated${missing ? ` · ${missing} without a picture (optional)` : ''}`, 5000);
+}
+
+/* ---------- bulk image matching ---------- */
+async function addImages(files) {
+  files = files.filter(f => f.type.startsWith('image/')); if (!files.length) return;
+  const byKey = new Map();
+  words.forEach(w => { if (w.imageName) byKey.set(stemKey(w.imageName), w); byKey.set(stemKey(w.en), byKey.get(stemKey(w.en)) || w); });
+  let ok = 0; const miss = [], changed = [];
+  toast(`Processing ${files.length} image(s)…`, 60000);
+  for (const f of files) {
+    const w = byKey.get(stemKey(f.name));
+    if (!w) { miss.push(f.name); continue; }
+    w.image = await processImage(f); w.updated = Date.now(); changed.push(w); ok++;
+  }
+  await putWords(changed); renderWords();
+  toast(`${ok} image(s) matched${miss.length ? ` · not matched: ${miss.slice(0, 5).join(', ')}${miss.length > 5 ? '…' : ''}` : ''}`, 6000);
+}
+
+/* ---------- template ---------- */
+function downloadTemplate() {
+  if (!window.XLSX) return toast('Needs an internet connection the first time.');
+  const ws = XLSX.utils.aoa_to_sheet([['English', 'IPA', 'Russian', 'Example', 'Image'], ['apple', '/ˈæp.əl/', 'яблоко', 'She eats an apple every morning.', 'apple.jpg'], ['brave', '/breɪv/', 'смелый', 'It was a brave decision.', 'brave.jpg']]);
+  ws['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 18 }, { wch: 48 }, { wch: 18 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Words'); XLSX.writeFile(wb, 'WordShredder_words_template.xlsx');
+}
+
+/* ---------- media ---------- */
+function mediaHTML(u, fit = 'cover') { if (!u) return null; return u.startsWith('data:video') ? `<video src="${u}" controls playsinline style="object-fit:${fit}"></video>` : `<img src="${u}" alt="">`; }
+function renderMedia() {
+  MEDIA_KEYS.forEach(k => { $('#pv-' + k).innerHTML = mediaHTML(media[k]) || 'Placeholder shown in the app';
+    const v = $('#pv-' + k + ' video'); if (v && k !== 'done') { v.controls = false; v.muted = true; v.loop = true; v.autoplay = true; v.play().catch(() => {}); } });
+  media.avatars = media.avatars || {};
+  $('#avatars').innerHTML = Array.from({ length: 12 }, (_, i) => { const n = i + 1, u = media.avatars[n];
+    return `<div class="lv"><div class="lvh"><span>AVATAR ${n}</span>${u ? `<button data-avclear="${n}">remove</button>` : ''}</div><div class="prev" data-av="${n}" style="border-radius:50%">${u ? `<img src="${u}" alt="">` : `<b>+</b>`}</div></div>`; }).join('');
+  $('#levels').innerHTML = Array.from({ length: LEVELS }, (_, i) => {
+    const n = i + 1, u = media.levels[n];
+    return `<div class="lv"><div class="lvh"><span>LEVEL ${n}</span>${u ? `<button data-lvclear="${n}">remove</button>` : ''}</div>
+      <div class="prev" data-lv="${n}">${u ? `<img src="${u}" alt="">` : `<b>${n}</b>`}</div>
+      <input data-lvname="${n}" value="${esc(media.levelNames[i])}"></div>`;
+  }).join('');
+}
+async function pickMedia(k) {
+  const [f] = await pickFile(k === 'done' ? 'video/mp4,video/*' : 'image/gif,image/webp,image/png,video/mp4,video/*'); if (!f) return;
+  const url = await fileToDataURL(f);
+  let info = `${f.name} · ${fmtMB(f.size)}`, w = 0, h = 0;
+  if (f.type.startsWith('video')) {
+    const meta = await new Promise(r => { const v = document.createElement('video'); v.preload = 'metadata'; v.onloadedmetadata = () => r({ w: v.videoWidth, h: v.videoHeight, d: v.duration }); v.onerror = () => r(null); v.src = url; });
+    if (meta) { w = meta.w; h = meta.h; info += ` · ${w}×${h} · ${meta.d.toFixed(1)} s`; }
+  } else { const img = await loadImg(url); w = img.naturalWidth; h = img.naturalHeight; info += ` · ${w}×${h}`; }
+  if (w && Math.abs(w / h - 16 / 9) > .05) info += ' · ⚠ not 16:9, the edges will be cropped';
+  if (f.size > 6 * 1048576) info += ' · ⚠ large file: his phone downloads it once, but smaller is better';
+  media[k] = url; await saveMedia(); renderMedia(); $('#info-' + k).textContent = info; toast('Saved');
+}
+
+/* ---------- export ---------- */
+function exportDialog() {
+  const ready = words.filter(complete), changed = ready.filter(w => w.updated > lastExport), skipped = words.length - ready.length;
+  const mediaSize = MEDIA_KEYS.reduce((a, k) => a + (media[k]?.length || 0), 0) + Object.values(media.levels).reduce((a, u) => a + (u?.length || 0), 0);
+  const mediaChanged = media.updated > lastExport;
+  const sc = document.createElement('div'); sc.className = 'scrim';
+  sc.innerHTML = `<div class="modal" style="max-width:560px"><h2>Export pool</h2>
+    ${skipped ? `<p class="bad" style="margin:0 0 12px">${skipped} word(s) have no image and will not be exported.</p>` : ''}
+    <label class="opt"><input type="radio" name="which" value="all" checked><div><b>All words</b> (${ready.length})<small>Best for the first send, or as your own backup.</small></div></label>
+    <label class="opt"><input type="radio" name="which" value="changed" ${changed.length ? '' : 'disabled'}><div><b>Only new &amp; changed since last export</b> (${changed.length})<small>${lastExport ? 'Last export: ' + new Date(lastExport).toLocaleString() : 'No export yet.'} Smaller file; her progress is kept either way.</small></div></label>
+    <label class="opt"><input type="checkbox" id="x-media" ${mediaChanged || !lastExport ? 'checked' : ''}><div><b>Include video, button animations, level pictures &amp; names</b><small>${fmtMB(mediaSize * .75)}${mediaChanged ? ' · changed since last export' : ' · unchanged since last export'}</small></div></label>
+    <div class="m-foot"><span class="msg"></span><button class="btn" id="x-cancel">Cancel</button><button class="btn gold" id="x-go">Download</button></div></div>`;
+  document.body.appendChild(sc);
+  $('#x-cancel', sc).onclick = () => sc.remove();
+  $('#x-go', sc).onclick = async () => {
+    const which = $('input[name=which]:checked', sc).value, incMedia = $('#x-media', sc).checked;
+    const list = which === 'all' ? ready : changed;
+    if (!list.length && !incMedia) return toast('Nothing to export.');
+    const out = { format: 'wordcrown', version: 1, kind: 'pool', exported: new Date().toISOString(),
+      words: list.map(w => ({ id: w.id, en: w.en, ipa: w.ipa, ru: w.ru, example: w.example, image: w.image, updated: w.updated })) };
+    if (incMedia) out.media = { reward: media.reward, know: media.know, recall: media.recall, next: media.next, oops: media.oops, levels: media.levels, levelNames: media.levelNames, wordsPerLevel: media.wordsPerLevel };
+    const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'pool.json'; a.click();
+    lastExport = Date.now(); await kvSet('lastExport', lastExport);
+    sc.remove(); renderWords(); toast(`Exported ${list.length} words · ${fmtMB(blob.size)}`);
+  };
+}
+
+/* ---------- open pool / backup into the editor ---------- */
+async function openPool() {
+  const [f] = await pickFile('.json,application/json'); if (!f) return;
+  let d; try { d = JSON.parse(await f.text()); } catch { return toast('Not a WordCrown file.'); }
+  if (d.format !== 'wordcrown' || !Array.isArray(d.words)) return toast('Not a WordCrown file.');
+  await mergeIntoStudio(d);
+}
+async function mergeIntoStudio(d) {
+  const mapId = new Map(words.map(w => [w.id, w])), mapEn = new Map(words.map(w => [norm(w.en), w]));
+  let order = nextOrder() - 1, added = 0, updated = 0; const changed = [];
+  for (const p of d.words) {
+    if (!p.en) continue;
+    if (p.type === 'verb') { if (p.image) VIMG[p.en] = p.image; VON = true; continue; }
+    const rec = { en: p.en, ipa: p.ipa || '', ru: p.ru || '', example: p.example || '', image: p.image || null, updated: p.updated || Date.now() };
+    const w = mapId.get(p.id) || mapEn.get(norm(p.en));
+    if (w) { Object.assign(w, rec); changed.push(w); updated++; }
+    else { const nw = { id: p.id || uid(), order: ++order, imageName: '', ...rec }; words.push(nw); changed.push(nw); added++; }
+  }
+  await putWords(changed); await kvSet('verbImgs', VIMG); await kvSet('verbsOn', VON);
+  if (d.media) {
+    MEDIA_KEYS.forEach(k => { if (d.media[k]) media[k] = d.media[k]; });
+    Object.assign(media.levels, d.media.levels || {}); media.avatars = { ...(media.avatars || {}), ...(d.media.avatars || {}) };
+    if (Array.isArray(d.media.levelNames) && d.media.levelNames.length === LEVELS) media.levelNames = d.media.levelNames;
+    if (d.media.wordsPerLevel) media.wordsPerLevel = d.media.wordsPerLevel;
+    await saveMedia(); renderMedia();
+  }
+  words.sort((a, b) => a.order - b.order); renderWords();
+  toast(`Opened · ${added} added · ${updated} updated`);
+}
+
+/* ---------- website: load from it and publish to it (GitHub) ---------- */
+// Layout on the site: content/words.json + one file per picture/video. File names carry a content
+// hash, so a changed picture gets a new name and phones download only what is new.
+const GH_DEFAULT = { owner: 'Niksky1984', repo: 'wordshredder', branch: 'main', token: '', api: 'https://api.github.com' };
+let GH = { ...GH_DEFAULT };
+const siteBase = () => GH.site || (/\.github\.io$/.test(location.hostname) ? new URL('./', location.href).href : `https://${GH.owner.toLowerCase()}.github.io/${GH.repo}/`);
+const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'x';
+const EXT = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm' };
+const b64ToBytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+const utf8ToB64 = t => { const u = new TextEncoder().encode(t); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+const blobToDataURL = b => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(b); });
+async function hash10(bytes) { const d = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)); return [...d.slice(0, 5)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+async function fileFor(dataURL, folder, name) {
+  const m = /^data:([^;]+);base64,(.*)$/s.exec(dataURL || ''); if (!m) return null;
+  const path = `content/${folder}/${name}-${await hash10(b64ToBytes(m[2]))}.${EXT[m[1]] || 'bin'}`;
+  return { path, b64: m[2] };
+}
+// Build every file the site needs from what is in Studio now
+async function buildSite() {
+  const files = new Map(), ready = words.filter(complete);
+  const out = { format: 'wordcrown', version: 2, kind: 'site', updated: new Date().toISOString(), words: [], media: {} };
+  for (const w of ready) {
+    const f = w.image ? await fileFor(w.image, 'img', slugify(w.en)) : null; if (f) files.set(f.path, f.b64);
+    out.words.push({ id: w.id, en: w.en, ipa: w.ipa || '', ru: w.ru, example: w.example || '', updated: w.updated || 0, image: f ? f.path : '' });
+  }
+  for (const k of MEDIA_KEYS) if (media[k]) { const f = await fileFor(media[k], 'media', k); if (f) { files.set(f.path, f.b64); out.media[k] = f.path; } }
+  out.media.levels = {};
+  for (const [n, u] of Object.entries(media.levels || {})) if (u) { const f = await fileFor(u, 'levels', 'level-' + String(n).padStart(2, '0')); if (f) { files.set(f.path, f.b64); out.media.levels[n] = f.path; } }
+  if (VON) VERBS.forEach((v, i) => { out.words.push({ id: 'v-' + v[0], type: 'verb', seq: i + 1, en: v[0], ru: v[3], past: v[1], pp: v[2], note: v[4], ipa: '', example: '', updated: 1, image: '' }); });
+  for (const w of out.words) if (w.type === 'verb' && VIMG[w.en]) { const f = await fileFor(VIMG[w.en], 'verbs', String(w.seq).padStart(3, '0') + '-' + slugify(w.en)); files.set(f.path, f.b64); w.image = f.path; }
+  out.media.avatars = {};
+  for (const [n, u] of Object.entries(media.avatars || {})) if (u) { const f = await fileFor(u, 'avatars', 'avatar-' + String(n).padStart(2, '0')); if (f) { files.set(f.path, f.b64); out.media.avatars[n] = f.path; } }
+  out.media.levelNames = media.levelNames;
+  return { files, manifest: out, skipped: words.length - ready.length };
+}
+async function gh(path, opt = {}) {
+  const r = await fetch(GH.api.replace(/\/$/, '') + path, { ...opt, headers: { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + GH.token, 'Content-Type': 'application/json', ...(opt.headers || {}) } });
+  if (!r.ok) { let msg = r.status + ''; try { msg += ' ' + (await r.json()).message; } catch {} throw new Error(msg); }
+  return r.status === 204 ? null : r.json();
+}
+const repoPath = p => `/repos/${GH.owner}/${GH.repo}${p}`;
+async function remoteTree() {
+  const ref = await gh(repoPath(`/git/ref/heads/${GH.branch}`));
+  const commit = await gh(repoPath(`/git/commits/${ref.object.sha}`));
+  const tree = await gh(repoPath(`/git/trees/${commit.tree.sha}?recursive=1`));
+  return { head: ref.object.sha, treeSha: commit.tree.sha, paths: new Set(tree.tree.filter(t => t.type === 'blob').map(t => t.path)) };
+}
+const LEGACY = p => false;
+
+function settingsDialog(after) {
+  const sc = document.createElement('div'); sc.className = 'scrim';
+  sc.innerHTML = `<div class="modal" style="max-width:560px"><h2>Website settings</h2>
+    <p class="note">Studio puts your words on your GitHub site with a <b>GitHub token</b>. It is saved only in this browser on this PC, never in the files it publishes.</p>
+    <div class="field"><label>GitHub user</label><input id="g-owner" value="${esc(GH.owner)}"></div>
+    <div class="field"><label>Repository</label><input id="g-repo" value="${esc(GH.repo)}"></div>
+    <div class="field"><label>Token (starts with github_pat_)</label><input id="g-token" type="password" value="${esc(GH.token)}" placeholder="paste the token here"></div>
+    <p class="note" style="font-size:12.5px">No token yet? <a style="color:var(--gold)" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create one</a>: Repository access → <i>Only select repositories</i> → <b>wordshredder</b> and <b>wordshredder-data</b>; Permissions → <b>Contents: Read and write</b>.</p>
+    <div class="m-foot"><span class="msg" id="g-msg"></span><button class="btn" id="g-cancel">Cancel</button><button class="btn gold" id="g-save">Save &amp; test</button></div></div>`;
+  document.body.appendChild(sc);
+  $('#g-cancel', sc).onclick = () => sc.remove();
+  $('#g-save', sc).onclick = async () => {
+    GH = { ...GH, owner: $('#g-owner', sc).value.trim(), repo: $('#g-repo', sc).value.trim(), token: $('#g-token', sc).value.trim() };
+    $('#g-msg', sc).innerHTML = 'Testing…';
+    try { await remoteTree(); await kvSet('gh', GH); sc.remove(); toast('Connected to GitHub ✓'); if (after) after(); }
+    catch (e) { $('#g-msg', sc).innerHTML = `<span class="bad">${/401|403/.test(e.message) ? 'Token not accepted. Check it has Contents: Read and write for this repository.' : /404/.test(e.message) ? 'Repository not found. Check the user, repository name and the token’s repository access.' : esc(e.message)}</span>`; }
+  };
+}
+
+async function publishDialog() {
+  if (!GH.token) return settingsDialog(publishDialog);
+  toast('Checking the site…', 60000);
+  let site, remote;
+  try { [site, remote] = await Promise.all([buildSite(), remoteTree()]); }
+  catch (e) { $('#toast').classList.remove('on'); return /401|403|404/.test(e.message) ? settingsDialog(publishDialog) : toast('Could not reach GitHub: ' + e.message, 6000); }
+  $('#toast').classList.remove('on');
+  if (!site.manifest.words.length) return toast('No words with pictures to publish.');
+  const upload = [...site.files.keys()].filter(p => !remote.paths.has(p));
+  const remove = [...remote.paths].filter(p => (p.startsWith('content/') && !site.files.has(p) && p !== 'content/words.json') || LEGACY(p));
+  const upMB = upload.reduce((a, p) => a + site.files.get(p).length * .75, 0) / 1048576;
+  const sc = document.createElement('div'); sc.className = 'scrim';
+  sc.innerHTML = `<div class="modal" style="max-width:560px"><h2>Publish to site</h2>
+    ${site.skipped ? `<p class="bad" style="margin:0 0 12px">${site.skipped} item(s) have no English or no translation and are left out.</p>` : ''}
+    <p class="note"><b>${site.manifest.words.filter(w => w.type !== 'verb').length}</b> words · <b>${site.manifest.words.filter(w => w.type === 'verb').length}</b> verbs (${site.manifest.words.filter(w => w.type === 'verb' && w.image).length} with pictures) · <b>${Object.keys(site.manifest.media.levels).length}</b> level pictures · <b>${Object.keys(site.manifest.media.avatars).length}</b> avatars${MEDIA_KEYS.filter(k => site.manifest.media[k]).length ? ' · ' + MEDIA_KEYS.filter(k => site.manifest.media[k]).length + ' of 4 media' : ''}</p>
+    <p class="note">New files to upload: <b>${upload.length}</b> (${upMB.toFixed(1)} MB)${remove.length ? ` · old files to remove: <b>${remove.length}</b>` : ''}</p>
+    <p class="note" style="font-size:12.5px">His phone downloads only the new files, next time he opens Word Shredder with internet. His progress is kept. Items you deleted here are removed from his phone too.</p>
+    <div class="m-foot"><span class="msg" id="p-msg"></span><button class="btn" id="p-set">Settings</button><button class="btn" id="p-cancel">Cancel</button><button class="btn gold" id="p-go">Publish</button></div></div>`;
+  document.body.appendChild(sc);
+  $('#p-cancel', sc).onclick = () => sc.remove();
+  $('#p-set', sc).onclick = () => { sc.remove(); settingsDialog(publishDialog); };
+  $('#p-go', sc).onclick = async () => {
+    const btn = $('#p-go', sc), msg = $('#p-msg', sc); btn.disabled = true;
+    try {
+      const tree = [];
+      let n = 0, i = 0;
+      await Promise.all(Array.from({ length: 4 }, async () => { while (i < upload.length) { const p = upload[i++];
+        const b = await gh(repoPath('/git/blobs'), { method: 'POST', body: JSON.stringify({ content: site.files.get(p), encoding: 'base64' }) });
+        tree.push({ path: p, mode: '100644', type: 'blob', sha: b.sha }); msg.textContent = `Uploading ${++n}/${upload.length}…`; } }));
+      const man = await gh(repoPath('/git/blobs'), { method: 'POST', body: JSON.stringify({ content: utf8ToB64(JSON.stringify(site.manifest, null, 1)), encoding: 'base64' }) });
+      tree.push({ path: 'content/words.json', mode: '100644', type: 'blob', sha: man.sha });
+      remove.forEach(p => tree.push({ path: p, mode: '100644', type: 'blob', sha: null }));
+      msg.textContent = 'Saving…';
+      const t = await gh(repoPath('/git/trees'), { method: 'POST', body: JSON.stringify({ base_tree: remote.treeSha, tree }) });
+      const c = await gh(repoPath('/git/commits'), { method: 'POST', body: JSON.stringify({ message: `Word Shredder: ${site.manifest.words.length} items (Studio)`, tree: t.sha, parents: [remote.head] }) });
+      await gh(repoPath(`/git/refs/heads/${GH.branch}`), { method: 'PATCH', body: JSON.stringify({ sha: c.sha }) });
+      lastExport = Date.now(); await kvSet('lastExport', lastExport);
+      sc.remove(); renderWords(); toast('Published ✓ The site updates in about a minute.', 6000);
+    } catch (e) { btn.disabled = false; msg.innerHTML = `<span class="bad">${esc(/409|422/.test(e.message) ? 'The site changed meanwhile. Close and publish again.' : e.message)}</span>`; }
+  };
+}
+
+// Pull what is on the website into Studio (first time on a new PC, or to start from the live version)
+async function loadFromSite() {
+  const base = siteBase();
+  if (words.length && !confirm(`Load the words and media from ${base}?\nWords with the same English word are updated; your other words stay.`)) return;
+  toast('Loading from the site…', 120000);
+  try {
+    let r = await fetch(base + 'content/words.json', { cache: 'no-cache' }), data;
+    if (r.ok) {
+      const man = await r.json(), get = async p => blobToDataURL(await (await fetch(base + p)).blob());
+      let n = 0; const all = man.words.length;
+      data = { format: 'wordcrown', words: [], media: { levels: {} } };
+      for (const p of man.words) { data.words.push({ ...p, image: p.image ? await get(p.image) : null }); toast(`Loading from the site… ${++n}/${all}`, 120000); }
+      const m = man.media || {};
+      for (const k of MEDIA_KEYS) if (m[k]) data.media[k] = await get(m[k]);
+      for (const [lv, p] of Object.entries(m.levels || {})) data.media.levels[lv] = await get(p);
+      data.media.avatars = {}; for (const [n, p] of Object.entries(m.avatars || {})) data.media.avatars[n] = await get(p);
+      data.media.levelNames = m.levelNames; data.media.wordsPerLevel = m.wordsPerLevel;
+    } else {
+      r = await fetch(base + 'pool.json', { cache: 'no-cache' });
+      if (!r.ok) return toast('Nothing found on the site yet.');
+      data = await r.json();
+    }
+    await mergeIntoStudio(data);
+  } catch (e) { toast('Could not load from the site: ' + e.message, 6000); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const t = e.target;
+  const tabB = t.closest('[data-tab]');
+  if (tabB) { document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b === tabB)); for (const k of ['words', 'verbs', 'media']) $('#t-' + k).classList.toggle('hidden', tabB.dataset.tab !== k); if (tabB.dataset.tab === 'media') renderMedia(); if (tabB.dataset.tab === 'verbs') renderVerbs(); return; }
+  const fb = t.closest('[data-f]'); if (fb) { filter = fb.dataset.f; return renderWords(); }
+  const r = t.closest('[data-r]');
+  if (r) {
+    const id = r.closest('tr').dataset.id, w = words.find(x => x.id === id), i = words.indexOf(w);
+    if (r.dataset.r === 'edit') return openWord(id);
+    if (r.dataset.r === 'say') return speak(w.en + '. ' + (w.example || ''));
+    if (r.dataset.r === 'del') { if (!confirm(`Delete "${w.en}"? (After the next Publish it is removed from his phone too.)`)) return; words.splice(i, 1); await tx('words', 'readwrite', s => { s.delete(id); }); return renderWords(); }
+    if (r.dataset.r === 'up' || r.dataset.r === 'down') {
+      const j = r.dataset.r === 'up' ? i - 1 : i + 1; if (j < 0 || j >= words.length) return;
+      [words[i].order, words[j].order] = [words[j].order, words[i].order]; [words[i], words[j]] = [words[j], words[i]];
+      await putWords([words[i], words[j]]); return renderWords();
+    }
+  }
+  if (t.closest('tr[data-id] .en')) return openWord(t.closest('tr').dataset.id);
+  const pk = t.closest('[data-pick]'); if (pk) return pickMedia(pk.dataset.pick);
+  const cl = t.closest('[data-clear]'); if (cl) { media[cl.dataset.clear] = null; await saveMedia(); $('#info-' + cl.dataset.clear).textContent = ''; return renderMedia(); }
+  const lv = t.closest('[data-lv]'); if (lv) { const [f] = await pickFile('image/*'); if (!f) return; media.levels[lv.dataset.lv] = await processImage(f, 700); await saveMedia(); return renderMedia(); }
+  const av = t.closest('[data-av]'); if (av) { const [f] = await pickFile('image/*'); if (!f) return; media.avatars[av.dataset.av] = await squareImage(f, 320); await saveMedia(); return renderMedia(); }
+  const ac = t.closest('[data-avclear]'); if (ac) { delete media.avatars[ac.dataset.avclear]; await saveMedia(); return renderMedia(); }
+  const lc = t.closest('[data-lvclear]'); if (lc) { delete media.levels[lc.dataset.lvclear]; await saveMedia(); return renderMedia(); }
+  const a = t.closest('[data-a]')?.dataset.a;
+  const vp = t.closest('[data-vpick]'); if (vp) { const [f] = await pickFile('image/*'); if (!f) return; VIMG[vp.dataset.vpick] = await processImage(f); await kvSet('verbImgs', VIMG); return renderVerbs(); }
+  const vd = t.closest('[data-vdel]'); if (vd) { delete VIMG[vd.dataset.vdel]; await kvSet('verbImgs', VIMG); return renderVerbs(); }
+  if (a === 'verb-images') return addVerbImages(await pickFile('image/*', true));
+  if (a === 'add') openWord();
+  if (a === 'excel') importExcel();
+  if (a === 'images') addImages(await pickFile('image/*', true));
+  if (a === 'template') downloadTemplate();
+  if (a === 'export') exportDialog();
+  if (a === 'open-pool') openPool();
+  if (a === 'load-site') loadFromSite();
+  if (a === 'publish') publishDialog();
+});
+document.addEventListener('change', async e => {
+  if (e.target.id === 'verbs-on') { VON = e.target.checked; await kvSet('verbsOn', VON); return; }
+  const n = e.target.dataset?.lvname; if (n) { media.levelNames[n - 1] = e.target.value.trim() || DEFAULT_LEVEL_NAMES[n - 1]; await saveMedia(); }
+  if (e.target.id === 'per') { media.wordsPerLevel = Math.max(10, parseInt(e.target.value) || 100); await saveMedia(); renderMedia(); }
+});
+$('#q').oninput = e => { query = e.target.value; renderWords(); };
+const drop = $('#drop');
+['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => { if ($('.scrim')) return; e.preventDefault(); drop.classList.add('over'); $('#vdrop').classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { if (ev === 'dragleave' && e.relatedTarget) return; drop.classList.remove('over'); $('#vdrop').classList.remove('over'); }));
+document.addEventListener('drop', e => { if ($('.scrim')) return; e.preventDefault(); const fs = [...e.dataTransfer.files]; if (!$('#t-verbs').classList.contains('hidden')) addVerbImages(fs); else addImages(fs); });
+
+(async () => {
+  db = await openDB();
+  words = ((await tx('words', 'readonly', s => s.getAll())) || []).sort((a, b) => a.order - b.order);
+  media = { ...media, ...((await kvGet('media')) || {}) };
+  if (!Array.isArray(media.levelNames) || media.levelNames.length !== LEVELS) media.levelNames = DEFAULT_LEVEL_NAMES.slice();
+  lastExport = (await kvGet('lastExport')) || 0;
+  GH = { ...GH_DEFAULT, ...((await kvGet('gh')) || {}) };
+  VIMG = (await kvGet('verbImgs')) || {}; VON = (await kvGet('verbsOn')) ?? true;
+  renderWords();
+})();
+</script>
+</body>
+</html>

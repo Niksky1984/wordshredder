@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Word Shredder">
+<meta name="theme-color" content="#0b1722">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>Word Shredder</title>
+<style>
+:root{
+  --bg:#0b1722; --bg2:#10202f; --surface:#14283a; --surface2:#1c3449; --line:rgba(255,255,255,.1);
+  --text:#f6f1e7; --muted:#9db3c4; --faint:#62798c;
+  --gold:#e9a85a; --gold2:#ffe2ae; --red:#d8473f; --red2:#a8262a; --pine:#2f7d57; --mint:#7fe0b0; --bad:#ff9aa6;
+  --serif: ui-serif, "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:22px; --st: env(safe-area-inset-top,0px); --sb: env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overscroll-behavior:none}
+body{background:linear-gradient(180deg,#17344d 0%,#10202f 45%,var(--bg) 100%) fixed;-webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.hidden{display:none!important}
+h1,h2,h3{margin:0;font-weight:700}
+.kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* falling snow. App: drawn flake by flake on a canvas (see snow() in app.js). Admin page: simple drifting dots. */
+canvas#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
+  background-image:radial-gradient(#fff 1.3px,transparent 1.8px),radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#fff 1.8px,transparent 2.4px);
+  background-size:64px 78px,96px 110px,170px 190px;animation:snow 16s linear infinite}
+@keyframes snow{from{background-position:0 0,30px 20px,60px 0}to{background-position:26px 156px,-18px 240px,20px 190px}}
+@media (prefers-reduced-motion:reduce){div#snow{animation:none}}
+
+/* ---------- layout ---------- */
+#views{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--st) + 16px) 16px calc(var(--sb) + 96px);z-index:2}
+.view{display:none;max-width:560px;margin:0 auto;animation:rise .3s ease}
+.view.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:8px 6px calc(var(--sb) + 6px);background:rgba(11,23,34,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:5}
+#tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;color:var(--faint);padding:4px 0}
+#tabbar button b{font-size:21px;line-height:1;filter:grayscale(1) opacity(.6)}
+#tabbar button.on{color:var(--gold2)}
+#tabbar button.on b{filter:none}
+.v-head{margin:4px 0 14px}
+.v-head h1{font-family:var(--serif);font-size:31px;letter-spacing:-.01em;margin-top:4px}
+.panel{background:rgba(20,40,58,.86);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:18px;font-weight:800;font-size:17px;color:#fff;background:linear-gradient(135deg,#e2574e,var(--red) 50%,var(--red2));box-shadow:0 10px 26px -10px rgba(216,71,63,.8)}
+.primary.gold{color:#3a2208;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 10px 26px -10px rgba(233,168,90,.7)}
+.primary:active{transform:scale(.98)}
+.primary[disabled]{opacity:.45;box-shadow:none}
+.ghost{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border-radius:15px;font-weight:700;background:var(--surface2);border:1px solid var(--line)}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.1);white-space:nowrap}
+.pill.ok{background:var(--pine);color:#eafff3}.pill.wait{background:#c98a2b;color:#2a1700}.pill.no{background:#7a3038;color:#ffe3e6}.pill.dim{color:var(--muted)}
+
+/* placeholder that marks where the user's own media goes */
+.ph{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;border-radius:16px;border:2px dashed rgba(255,226,174,.5);background:repeating-linear-gradient(135deg,rgba(255,226,174,.07) 0 12px,rgba(255,226,174,.02) 12px 24px);color:var(--gold2);padding:8px;overflow:hidden}
+.ph b{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.ph span{font-size:11px;color:var(--muted);line-height:1.3}
+.media{border-radius:16px;overflow:hidden;background:#0c1620}
+.media img,.media video{width:100%;height:100%;object-fit:cover;display:block}
+.r169{aspect-ratio:16/9}.r11{aspect-ratio:1/1}
+.r169>.ph,.r169>.media,.r11>.ph,.r11>.media{width:100%;height:100%}
+
+/* ---------- home ---------- */
+.h-top{display:flex;justify-content:space-between;align-items:flex-start;margin:2px 0 12px}
+.h-top h1{font-family:var(--serif);font-size:32px;line-height:1.05;margin-top:4px}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.avatar{width:60px;height:60px;flex:none;border-radius:50%;overflow:hidden;border:2px solid var(--gold);box-shadow:0 0 0 3px rgba(233,168,90,.18),0 8px 18px -8px rgba(0,0,0,.7);background:#16324a;display:grid;place-items:center;font-size:30px;position:relative}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar.empty{border-style:dashed;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gold2);line-height:1.15;text-align:center}
+.av-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 14px}
+.av-grid button{aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid transparent;background:#16324a;font-size:26px}
+.av-grid button.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(233,168,90,.25)}
+.av-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.streak{padding:7px 12px;border-radius:999px;background:rgba(20,40,58,.86);border:1px solid var(--line);font-weight:800;font-size:13.5px;white-space:nowrap}
+.lights{display:flex;justify-content:space-between;margin:-2px 4px 12px;height:10px}
+.lights i{width:9px;height:9px;border-radius:50%;animation:tw 2.4s ease-in-out infinite}
+.lights i:nth-child(4n+1){background:#ff5d5d;box-shadow:0 0 8px #ff5d5d}.lights i:nth-child(4n+2){background:#ffd166;box-shadow:0 0 8px #ffd166;animation-delay:.6s}
+.lights i:nth-child(4n+3){background:#6fe3a5;box-shadow:0 0 8px #6fe3a5;animation-delay:1.2s}.lights i:nth-child(4n){background:#6fb8ff;box-shadow:0 0 8px #6fb8ff;animation-delay:1.8s}
+@keyframes tw{50%{opacity:.35}}
+.slots{display:flex;gap:8px;margin-top:10px}
+.slot{flex:1;border-radius:14px;padding:9px 4px 8px;text-align:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+.slot b{display:block;font-size:20px;line-height:1.2}
+.slot small{display:block;font-weight:600;font-size:10px;margin-top:1px;opacity:.85}
+.slot.done{background:rgba(47,125,87,.35);border-color:#52b788;color:#dff7ea}
+.slot.open{border-color:var(--gold);color:var(--gold2);box-shadow:0 0 0 2px rgba(233,168,90,.18)}
+.slot.missed{background:rgba(122,48,56,.35);border-color:#a8454f;color:#ffd9dd}
+.row{display:flex;gap:12px;align-items:center}
+.row .ico{font-size:28px;flex:none}
+.row .tx{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.35}
+.row .tx b{display:block;color:var(--text);font-size:15px}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--red),var(--gold2))}
+.lvl-art{width:58px;height:58px;flex:none;border-radius:14px;overflow:hidden}
+.lvl-art .ph{width:100%;height:100%;border-radius:14px;padding:2px}.lvl-art .ph b{font-size:8px}.lvl-art .ph span{display:none}
+.lvl-art img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- rewards ---------- */
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:10.5px;color:var(--muted);margin-top:10px}
+.wk .d{background:rgba(255,255,255,.05);border-radius:10px;padding:6px 0 5px;border:1px solid transparent}
+.wk .d.today{border-color:var(--gold)}
+.dots{display:flex;justify-content:center;gap:2px;margin-top:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#3b5165}
+.dots i.g{background:#52b788}.dots i.x{background:#d8473f}.dots i.o{background:var(--gold)}
+.rw{display:flex;gap:12px;align-items:center}
+.rw .anim{width:74px;height:74px;flex:none}
+.rw .anim .ph{width:100%;height:100%;padding:3px}.rw .anim .ph b{font-size:8.5px}.rw .anim .ph span{font-size:8.5px}
+.rw .tx{flex:1;min-width:0;font-size:12.5px;color:var(--muted);line-height:1.35}
+.rw .tx b{display:block;color:var(--text);font-size:15px}
+.rw .tx em{color:var(--gold2);font-style:normal;font-weight:700}
+.hist{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.hist:last-child{border:0}
+
+/* ---------- progress / words ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:rgba(20,40,58,.86);border:1px solid var(--line);border-radius:18px;padding:12px}
+.stat b{font-size:26px;font-family:var(--serif)}.stat span{display:block;font-size:12px;color:var(--muted)}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.node{text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.node .art{aspect-ratio:1;border-radius:16px;overflow:hidden;margin-bottom:5px;position:relative}
+.node .art .ph{width:100%;height:100%}.node .art img{width:100%;height:100%;object-fit:cover}
+.node.locked{opacity:.45}.node.cur .art{box-shadow:0 0 0 2px var(--gold)}
+.node.done .art:after{content:"✓";position:absolute;right:6px;top:4px;font-weight:900;color:var(--mint)}
+.wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.wrow:last-child{border:0}
+.wrow .tx{flex:1;min-width:0}.wrow .tx b{display:block;font-size:15.5px;font-family:var(--serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrow .tx span{font-size:12.5px;color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pips{display:flex;gap:4px}.pips i{width:16px;height:6px;border-radius:9px;background:rgba(255,255,255,.14)}.pips i.on{background:linear-gradient(90deg,var(--red),var(--gold2))}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:3px;gap:2px;margin-bottom:12px}
+.seg button{flex:1;height:34px;border-radius:11px;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--surface2);color:var(--text)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);font-weight:600;font-size:15px}
+.set-row:last-child{border:0}
+.set-row select{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:12px;height:40px;padding:0 10px;font-size:15px;max-width:60%}
+.hint{font-size:12.5px;color:var(--muted);font-weight:400;margin-top:3px;line-height:1.4}
+.foot{text-align:center;font-size:12px;color:var(--faint);margin:18px 0 6px}
+
+/* ---------- session ---------- */
+#session{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;background:linear-gradient(180deg,#17344d 0%,#10202f 50%,var(--bg) 100%);padding:calc(var(--st) + 8px) 12px calc(var(--sb) + 10px)}
+.s-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;height:44px}
+.s-x{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:17px}
+.s-time{font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.s-count{font-size:13px;color:var(--muted);text-align:right;min-width:74px}.s-count b{color:var(--text);font-size:16px}
+.abar{height:6px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin:8px 0 8px;flex:none}
+.abar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--mint),var(--gold2));transform-origin:left}
+.abar i.low{background:linear-gradient(90deg,#ff6b6b,#ffb199)}
+.s-stage{flex:1;min-height:0;display:flex;flex-direction:column}
+.tcard{flex:1;min-height:0;border-radius:24px;border:1px solid var(--line);background:rgba(20,40,58,.9);padding:14px 14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;overflow:hidden;position:relative}
+.tcard>*{flex-shrink:0}
+.t-kick{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--gold2)}
+.t-q{font-family:var(--serif);font-size:clamp(24px,7.4vw,38px);line-height:1.12;word-break:break-word}
+.t-q.sm{font-size:clamp(19px,5.6vw,26px)}
+.t-sub{font-size:14px;color:var(--muted);margin-top:-4px}
+.t-pic{flex-shrink:1;min-height:48px;height:min(20vh,150px);max-width:70%;aspect-ratio:4/3;border-radius:14px;object-fit:cover}
+.t-speak{width:64px;height:64px;border-radius:50%;background:rgba(233,168,90,.16);color:var(--gold2);font-size:28px}
+.t-in{width:100%;min-height:52px;border-radius:15px;border:1.5px solid rgba(233,168,90,.55);background:rgba(255,255,255,.05);font-family:var(--serif);font-size:21px;line-height:1.25;padding:10px 12px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;word-break:break-word}
+.t-in .caret{display:inline-block;width:2px;height:1.1em;background:var(--gold2);margin-left:1px;animation:blink 1s steps(1) infinite;vertical-align:-3px}
+.t-in .phd{color:var(--faint)}
+@keyframes blink{50%{opacity:0}}
+.t-in.ok{border-color:var(--mint);background:rgba(127,224,176,.14)}.t-in.no{border-color:var(--bad);background:rgba(255,120,140,.12);animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.opt{min-height:54px;padding:8px 6px;border-radius:14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);font-weight:700;font-size:15px;line-height:1.2;transition:transform .1s}
+.opt:active{transform:scale(.95)}
+.opt.ok{background:rgba(127,224,176,.22);border-color:var(--mint)}.opt.no{background:rgba(255,120,140,.2);border-color:var(--bad);animation:shake .35s}.opt.dim{opacity:.35}
+.tiles{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;width:100%}
+.tile{padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);font-weight:700;font-size:16px}
+.tile.used{opacity:.22}
+.built{width:100%;min-height:56px;border-radius:15px;border:1.5px dashed rgba(233,168,90,.55);padding:8px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.built .tile{background:rgba(233,168,90,.18);border-color:var(--gold)}
+.built.ok{border-style:solid;border-color:var(--mint)}.built.no{border-style:solid;border-color:var(--bad);animation:shake .35s}
+/* own keyboard: no autocorrect, no suggestions, no paste, no voice typing */
+.kb{flex:none;padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.kb .kr{display:flex;gap:4px;justify-content:center}
+.kb button{flex:1;max-width:42px;height:46px;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);font-size:18px;font-weight:600;text-transform:lowercase}
+.kb button:active{background:rgba(233,168,90,.4)}
+.kb button.w{flex:1.6;max-width:66px;font-size:15px}
+.kb button.sp{flex:5;max-width:none;font-size:13px;color:var(--muted)}
+.kb button.go{flex:2.4;max-width:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2208;font-weight:800;font-size:15px;text-transform:none}
+/* result */
+.chip{font-weight:800;font-size:13px;padding:6px 12px;border-radius:99px}
+.chip.up{background:var(--pine);color:#eafff3}.chip.down{background:#8d2f3a;color:#ffe3e6}.chip.win{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2208}
+.r-en{font-family:var(--serif);font-size:clamp(24px,7vw,34px);line-height:1.12;word-break:break-word}
+.r-ru{font-size:18px;color:var(--gold2);font-weight:600}
+.r-ex{font-size:14.5px;color:#cfdbe5;font-style:italic;font-family:var(--serif);line-height:1.4}
+.r-ex mark{background:none;color:var(--gold2);font-weight:700;font-style:normal}
+.r-yours{font-size:13.5px;color:var(--bad)}
+.react{flex:none;margin-top:8px;position:relative;width:100%;border-radius:18px;overflow:hidden;display:block}
+.react .lbl{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;font-weight:800;font-size:16px;background:linear-gradient(transparent,rgba(6,12,18,.85));text-align:center}
+.react .ph{width:100%;height:100%;border-radius:18px}
+.react.r-h{height:min(22vh,150px)}
+.react.r-h .media,.react.r-h .ph{position:absolute;inset:0}
+
+/* ---------- overlays ---------- */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(5,10,16,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.scrim.center{align-items:center}
+.dlg{width:100%;max-width:420px;background:#12263a;border:1px solid var(--line);border-radius:24px;padding:20px;text-align:center}
+.dlg h2{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.dlg p{color:var(--muted);margin:0 0 16px;line-height:1.45;font-size:14.5px}
+.btn-row{display:flex;gap:10px}
+#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 104px);transform:translateX(-50%) translateY(16px);opacity:0;background:#213a52;border:1px solid rgba(255,255,255,.16);padding:11px 16px;border-radius:14px;font-weight:700;font-size:14px;transition:.3s;z-index:60;pointer-events:none;max-width:82vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ---------- irregular verbs ---------- */
+.vf{width:100%;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;text-align:left}
+.vf-l{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.vf .t-in{min-height:46px;font-size:19px;border-color:rgba(255,255,255,.16);justify-content:flex-start}
+.vf .t-in.on{border-color:var(--gold);background:rgba(233,168,90,.1)}
+.vsets{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.vsets button{height:50px;border-radius:13px;background:rgba(20,40,58,.86);border:1px solid var(--line);font-weight:800;font-size:16px;line-height:1.05}
+.vsets button small{display:block;font-size:10px;color:var(--muted);font-weight:700}
+.vsets button.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(233,168,90,.2)}
+.vsets button.full{background:rgba(47,125,87,.35);border-color:#52b788}
+.vrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.vrow:last-child{border:0}
+.vrow .vpic{width:52px;height:39px;border-radius:9px;overflow:hidden;flex:none;background:#0c1620;display:grid;place-items:center;color:var(--faint);font-weight:800}
+.vrow .vpic img{width:100%;height:100%;object-fit:cover}
+.vrow .tx{flex:1;min-width:0}.vrow .tx b{display:block;font-size:15px;font-family:var(--serif)}.vrow .tx span{font-size:12.5px;color:var(--muted)}
+.vrow.new{opacity:.6}
+.vsay{width:36px;height:36px;border-radius:50%;background:rgba(233,168,90,.14);flex:none}
+#tabbar button{font-size:10px}
+
+/* ---------- irregular verbs: own button, own window, own score ---------- */
+.vbtn{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;padding:14px 16px 18px;border-radius:18px;border:1.5px solid rgba(120,200,255,.45);background:linear-gradient(135deg,#123a5a,#0e2840);color:var(--text);text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.vbtn:active{transform:scale(.985)}
+.vb-ico{font-size:26px;flex:none}
+.vb-tx{flex:1;min-width:0}.vb-tx b{display:block;font-size:17px}.vb-tx small{color:var(--muted);font-size:12.5px}
+.vb-sc{flex:none;color:var(--muted);font-size:13px}.vb-sc b{color:#8fd3ff;font-size:22px}
+.vbtn>i{position:absolute;left:0;bottom:0;height:4px;background:linear-gradient(90deg,#5ab8ff,#9fe6ff);border-radius:0 4px 4px 0}
+#v-verbs .vbtn{margin:0 0 12px}
+.vstats{margin-bottom:12px}
+.s-mid{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.s-mode{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fd3ff}
+.s-mode:empty{display:none}
+#session.verbs{background:linear-gradient(180deg,#0f3550 0%,#0b2236 50%,#08141f 100%)}
+#session.verbs .s-head{border-bottom:1px solid rgba(120,200,255,.25)}
+#session.verbs .s-count b{color:#8fd3ff}
+.vdone .vd-score{display:flex;align-items:baseline;gap:10px;margin:12px 0 6px}.vdone .vd-score b{font-size:44px;color:#8fd3ff;line-height:1}.vdone .vd-score span{color:var(--muted)}
+#session.verbs .abar i:not(.low){background:linear-gradient(90deg,#5ab8ff,#9fe6ff)}
+.vdone .vd-score{justify-content:center}.vdone .bar i,#v-verbs .bar i{background:linear-gradient(90deg,#5ab8ff,#9fe6ff)}
+#session.verbs .primary{background:linear-gradient(135deg,#2f8fd8,#1d6aa8)}
+
+</style>
+</head>
+<body>
+<canvas id="snow"></canvas>
+<div id="views">
+  <section class="view active" id="v-home"></section>
+  <section class="view" id="v-words"></section>
+  <section class="view" id="v-verbs"></section>
+  <section class="view" id="v-rewards"></section>
+  <section class="view" id="v-progress"></section>
+  <section class="view" id="v-settings"></section>
+</div>
+<nav id="tabbar">
+  <button class="on" data-tab="home"><b>🏠</b>Home</button>
+  <button data-tab="words"><b>📖</b>Words</button>
+  <button data-tab="verbs"><b>🔁</b>Verbs</button>
+  <button data-tab="rewards"><b>🎁</b>Rewards</button>
+  <button data-tab="progress"><b>🏔️</b>Progress</button>
+  <button data-tab="settings"><b>⚙️</b>Settings</button>
+</nav>
+<div id="session" class="hidden">
+  <header class="s-head"><button class="s-x" data-action="quit">✕</button><div class="s-mid"><div class="s-mode" id="s-mode"></div><div class="s-time" id="s-time">0:00</div></div><div class="s-count" id="s-count"></div></header>
+  <div class="s-stage" id="stage"></div>
+</div>
+<div id="toast"></div>
+<input type="file" id="f-avatar" accept="image/*" hidden>
+<script>
+'use strict';
+/* =========================================================
+   Shared by the app and the admin page: rules, schedule and reward maths.
+   Both must calculate exactly the same way.
+   Needs globals: CFG (rules), LOG (sessions), peakLearned(), peakVerbs() and clock().
+   ========================================================= */
+const DATA_REPO = 'wordshredder-data';                    // private repo: rules.json (signed by Dad) + log/
+const DEFAULT_LEVEL_NAMES = ['Rental Boots', 'Bunny Slope Tourist', 'Falls Off the Lift', 'Hot Chocolate Enthusiast', 'Accidentally Went Down a Blue',
+  'Carves Occasionally', 'Knows What Wax Is', 'Red Run Regular', 'Chairlift Philosopher', 'Powder Hound',
+  'Black Diamond, Allegedly', 'Off-Piste Menace', 'Avalanche Whisperer', "Santa's Snowboard Instructor", 'Legend of the Lodge'];
+const LEVELS = DEFAULT_LEVEL_NAMES.length;               // 15
+const CFG_DEFAULT = {
+  v: 0,                   // version: goes up every time Dad saves
+  name: 'Dobrynia',
+  slots: [{ from: '07:00', to: '12:00' }, { from: '12:00', to: '17:00' }, { from: '17:00', to: '21:30' }],
+  minutes: 10,            // session length
+  minCorrect: 15,         // correct answers needed for a session to count
+  target: 5,              // correct tests to learn an item
+  missPenalty: 3,         // points lost on a miss
+  perLevel: 30,           // learned items per level
+  verbMinutes: 5,         // length of an irregular-verb practice (its own button, its own score)
+  verbActive: 6,          // verbs in rotation at a time in verb practice, in order
+  time: { choose: 9, type: 10, perChar: 1.6, order: 8, perWord: 2.5, hear: 6 },   // seconds
+  rewards: [
+    { id: 'r-week', title: 'Perfect week', text: 'Reward: set by Dad', rule: { type: 'perfect_week' } },
+    { id: 'r-extra', title: 'Extra mile', text: 'Reward: set by Dad', rule: { type: 'extra', n: 3 } },
+    { id: 'r-words', title: 'Every 30 words learned', text: 'Reward: set by Dad', rule: { type: 'words', n: 30 } },
+  ],
+  paid: {},               // rewardKey -> time Dad tapped "Payment done"
+};
+const RULE_TYPES = {
+  perfect_week: { label: 'Perfect week: every session, all 7 days', n: false },
+  extra: { label: 'Extra sessions in one week', n: 'How many extra sessions' },
+  words: { label: 'Every N items learned', n: 'N items' },
+  verbs: { label: 'Every N irregular verbs learned', n: 'N verbs' },
+  streak: { label: 'Perfect days in a row', n: 'How many days' },
+  manual: { label: 'Special: I give it by hand', n: false },
+};
+
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const ymd = (d = clock()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const hm = s => { const [h, m] = String(s).split(':').map(Number); return h * 60 + (m || 0); };
+const nowMin = (d = clock()) => d.getHours() * 60 + d.getMinutes();
+const addDays = (d, n) => { const x = new Date(d + 'T12:00'); x.setDate(x.getDate() + n); return ymd(x); };
+
+/* ---------- schedule ---------- */
+const slotName = s => { const m = hm(s.from); return m < 12 * 60 ? 'Morning' : m < 17 * 60 ? 'Day' : 'Evening'; };
+const slotIcon = s => { const m = hm(s.from); return m < 12 * 60 ? '☀️' : m < 17 * 60 ? '🏂' : '🌙'; };
+const sessOn = d => LOG.filter(x => x.day === d && x.ok && x.kind !== 'verbs');   // verb practice never fills a word slot
+// How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
+const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && x.kind !== 'verbs'); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
+// status of every slot on a given day: done / open (now) / later / missed
+function dayStatus(d = ymd(), now = clock()) {
+  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
+  return Array.from({ length: slotsOn(d) }, (_, i) => {
+    if (done.has(i)) return 'done';
+    if (d < today) return 'missed';
+    if (d > today) return 'later';
+    const s = CFG.slots[i], m = nowMin(now);
+    return !s ? 'missed' : m < hm(s.from) ? 'later' : m <= hm(s.to) ? 'open' : 'missed';
+  });
+}
+const openSlot = (now = clock()) => dayStatus(ymd(now), now).indexOf('open');
+const extrasOn = d => sessOn(d).filter(x => x.slot < 0).length;
+const perfectDay = d => { const s = dayStatus(d); return s.length > 0 && s.every(x => x === 'done'); };
+function mondayOf(d = clock()) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function weekDays(mon = mondayOf()) { return Array.from({ length: 7 }, (_, i) => { const x = new Date(mon); x.setDate(mon.getDate() + i); return ymd(x); }); }
+const firstDay = () => LOG.length ? LOG.reduce((m, x) => x.day < m ? x.day : m, ymd()) : ymd();
+// every run of perfect days: [{start, len}], oldest first; the last one may still be running
+function perfectRuns() {
+  const runs = []; let cur = null;
+  for (let d = firstDay(); d <= ymd(); d = addDays(d, 1)) {
+    if (perfectDay(d)) { if (cur) cur.len++; else runs.push(cur = { start: d, len: 1 }); }
+    else if (d < ymd()) cur = null;                       // today not perfect yet does not break the run
+  }
+  return runs;
+}
+function streakDays() { const r = perfectRuns().at(-1); return r && addDays(r.start, r.len) >= ymd() ? r.len : 0; }
+
+/* ---------- rewards ---------- */
+// For one reward: progress now + every earned instance {key,label}. Keys never change, so "paid" marks stay attached.
+function rewardState(r) {
+  const t = r.rule?.type, n = Math.max(1, r.rule?.n || 1), out = { cur: '', pct: 0, status: 'progress', earned: [] };
+  if (t === 'perfect_week' || t === 'extra') {
+    for (let mon = mondayOf(new Date(firstDay() + 'T12:00')); mon <= mondayOf(); mon.setDate(mon.getDate() + 7)) {
+      const days = weekDays(mon), isCur = ymd(mon) === ymd(mondayOf()), label = `week of ${days[0].slice(8)}.${days[0].slice(5, 7)}`;
+      if (t === 'perfect_week') {
+        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done').length, missed = st.filter(s => s === 'missed').length;
+        if (st.length && done === st.length) out.earned.push({ key: `${r.id}@${days[0]}`, label });
+        if (isCur) { out.cur = `${done} of ${st.length} sessions`; out.pct = st.length ? done / st.length : 0; out.status = done === st.length ? 'earned' : missed ? 'lost' : 'progress'; if (missed) out.cur += ` · ${missed} missed`; }
+      } else {
+        const ex = days.reduce((a, d) => a + extrasOn(d), 0);
+        if (ex >= n) out.earned.push({ key: `${r.id}@${days[0]}`, label });
+        if (isCur) { out.cur = `${Math.min(ex, n)} of ${n} extra sessions this week`; out.pct = Math.min(1, ex / n); out.status = ex >= n ? 'earned' : 'progress'; }
+      }
+    }
+  } else if (t === 'words') {
+    const L = peakLearned(), got = Math.floor(L / n);
+    for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} learned` });
+    out.cur = `${L % n} of ${n} to the next one`; out.pct = (L % n) / n;
+  } else if (t === 'verbs') {
+    const L = peakVerbs(), got = Math.floor(L / n);
+    for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} verbs learned` });
+    out.cur = `${L % n} of ${n} verbs to the next one`; out.pct = (L % n) / n;
+  } else if (t === 'streak') {
+    for (const run of perfectRuns()) for (let k = 1; k <= Math.floor(run.len / n); k++) out.earned.push({ key: `${r.id}@${run.start}#${k}`, label: `${n} perfect days from ${addDays(run.start, (k - 1) * n).slice(5)}` });
+    const s = streakDays(); out.cur = `${s % n} of ${n} perfect days in a row`; out.pct = (s % n) / n;
+  } else if (t === 'manual') {
+    for (const g of r.granted || []) out.earned.push({ key: `${r.id}@${g.at}`, label: g.note || 'special' });
+    out.cur = 'Given by Dad'; out.pct = 0; out.status = 'manual';
+  }
+  return out;
+}
+const paidAt = key => CFG.paid?.[key] || 0;
+
+/* ---------- signed rules: only Dad's key can change them ---------- */
+const b64 = { enc: buf => btoa(String.fromCharCode(...new Uint8Array(buf))), dec: s => Uint8Array.from(atob(s), c => c.charCodeAt(0)),
+  utf8: t => { const u = new TextEncoder().encode(t); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); },
+  text: s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0))) };
+const SIG = { name: 'ECDSA', namedCurve: 'P-256' }, SIGH = { name: 'ECDSA', hash: 'SHA-256' };
+async function verifyRules(file, pubJwk) {                // file = {text, sig}; returns the rules or null
+  try {
+    const key = await crypto.subtle.importKey('jwk', pubJwk, SIG, false, ['verify']);
+    const good = await crypto.subtle.verify(SIGH, key, b64.dec(file.sig), new TextEncoder().encode(file.text));
+    return good ? JSON.parse(file.text) : null;
+  } catch { return null; }
+}
+
+/* ---------- GitHub contents API (private data repo) ---------- */
+function ghClient(get) {                                  // get() -> {owner, token, api}
+  const base = p => `${(get().api || 'https://api.github.com').replace(/\/$/, '')}/repos/${get().owner}/${DATA_REPO}/contents/${p}`;
+  const call = async (p, opt = {}, accept = 'application/vnd.github+json') => fetch(base(p), { cache: 'no-store', ...opt, headers: { Accept: accept, Authorization: 'Bearer ' + get().token, ...(opt.body ? { 'Content-Type': 'application/json' } : {}) } });
+  return {
+    async meta(p) { const r = await call(p); if (r.status === 404) return null; if (!r.ok) throw new Error('GitHub ' + r.status); return r.json(); },
+    async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
+    async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
+    // create or replace; finds the current sha itself and retries once if someone wrote in between
+    async put(p, content64, message, sha) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (sha === undefined) sha = (await this.meta(p))?.sha || null;
+        const r = await call(p, { method: 'PUT', body: JSON.stringify({ message, content: content64, ...(sha ? { sha } : {}) }) });
+        if (r.ok) return (await r.json()).content.sha;
+        if (r.status !== 409 && r.status !== 422) throw new Error('GitHub ' + r.status);
+        sha = undefined;
+      }
+      throw new Error('GitHub conflict');
+    },
+  };
+}
+
+/* =========================================================
+   Word Shredder — strict word trainer (PWA)
+   Words/media: content/words.json (published from Studio)
+   Storage: IndexedDB · Rules (schedule, rewards): CFG
+   ========================================================= */
+const APP_VERSION = '0.5';   // 0.1 app + Studio · 0.2 online link, signed rules, admin page · 0.3 avatar, real snow · 0.4 irregular verbs
+const DAY = 86400000;
+const REVIEW_DAYS = [2, 5, 12, 30, 60, 120];
+const ACTIVE_CAP = 12;                                   // items in rotation at a time
+const MEDIA_KEYS = ['home', 'done', 'ok', 'bad'];        // home scene · session-finished video · correct / wrong reaction
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const clock = () => new Date();                          // the phone's own time
+
+/* ---------- IndexedDB ---------- */
+let db;
+function openDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('wordshredder', 1);
+    r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('words', { keyPath: 'id' }); d.createObjectStore('kv'); d.createObjectStore('blobs'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+function tx(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const t = db.transaction(store, mode); let out;
+    const s = Array.isArray(store) ? store.map(n => t.objectStore(n)) : t.objectStore(store);
+    out = fn(s); t.oncomplete = () => res(out instanceof IDBRequest ? out.result : out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+  });
+}
+const kvGet = k => tx('kv', 'readonly', s => s.get(k));
+const kvSet = (k, v) => tx('kv', 'readwrite', s => { s.put(v, k); });
+const blobGet = k => tx('blobs', 'readonly', s => s.get(k));
+const saveWord = w => tx('words', 'readwrite', s => { s.put(w); });
+
+/* ---------- state ---------- */
+let words = [];                       // items (word / phrase / sentence), sorted by order
+let S = {};                           // device settings (voice only)
+let CFG = structuredClone(CFG_DEFAULT);
+let LOG = [];                         // finished sessions
+let EV = [];                          // honesty events
+let LV = { names: DEFAULT_LEVEL_NAMES.slice() };
+let PEAK = 0;                         // most items ever learned at once (rewards never go backwards)
+let VPEAK = 0;                        // same for irregular verbs (their own score)
+let LINK = null;                      // {owner, token, pub}: link to Dad's private data repo
+let SYNC = { at: 0, err: '' };
+let AV = [];                          // numbers of the avatars Dad published in Studio
+const peakLearned = () => Math.max(PEAK, learnedCount());
+const peakVerbs = () => Math.max(VPEAK, verbLearned());
+const imgCache = new Map();
+let tab = 'home', wordFilter = 'all';
+const DEFAULTS = { voiceURI: '', rate: 0.9, avatar: '' };   // avatar: 'a:3' (one of Dad's) or 'own' (his photo)
+const byId = id => words.find(w => w.id === id);
+const learnedCount = () => words.reduce((n, w) => n + (w.learned && !isVerb(w) ? 1 : 0), 0);   // words, phrases, sentences
+const verbLearned = () => words.reduce((n, w) => n + (w.learned && isVerb(w) ? 1 : 0), 0);
+const verbList = () => words.filter(isVerb).sort((a, b) => a.seq - b.seq);
+const wordList = () => words.filter(w => !isVerb(w));
+const isVerb = w => w.type === 'verb';
+const kindOf = w => { if (isVerb(w)) return 'verb'; const n = norm(w.en).split(' ').length; return n >= 4 ? 'sentence' : n >= 2 ? 'phrase' : 'word'; };
+function levelInfo(n = learnedCount()) {
+  const per = CFG.perLevel || 30, lvl = Math.min(LEVELS, Math.floor(n / per) + 1), done = n >= per * LEVELS;
+  return { lvl, per, done, inLvl: done ? per : n - (lvl - 1) * per, name: LV.names[lvl - 1] || `Level ${lvl}`, total: n };
+}
+
+/* ---------- media & placeholders ---------- */
+async function imgURL(key) {
+  if (imgCache.has(key)) return imgCache.get(key);
+  const b = await blobGet(key); const u = b ? URL.createObjectURL(b) : null;
+  imgCache.set(key, u); return u;
+}
+function dropURL(key) { const u = imgCache.get(key); if (u) URL.revokeObjectURL(u); imgCache.delete(key); }
+const PH = {
+  home: ['Home scene', '16:9 · silent loop 6–10 s · MP4 or GIF'],
+  done: ['Session finished video', '16:9 · MP4 with sound · about 10 s'],
+  ok: ['"Correct" reaction', '16:9 · silent · 2–3 s'],
+  bad: ['"Wrong" reaction', '16:9 · silent · 2–3 s'],
+  reward: ['Reward animation', '1:1 · silent loop'],
+  level: ['Level picture', '1:1'],
+};
+const ph = (kind, extra = '') => `<div class="ph"><b>Here: ${PH[kind][0]}${extra}</b><span>${PH[kind][1]}</span></div>`;
+// user's media if loaded, else a labelled placeholder
+async function mediaOrPh(key, kind = key, { sound = false, extra = '' } = {}) {
+  const b = await blobGet('media:' + key);
+  if (!b) return ph(kind, extra);
+  const u = await imgURL('media:' + key);
+  return `<div class="media" style="width:100%;height:100%">${/^video/.test(b.type) ? `<video src="${u}" ${sound ? 'playsinline preload="auto"' : 'autoplay muted loop playsinline'}></video>` : `<img src="${u}" alt="">`}</div>`;
+}
+
+/* ---------- speech (British English) ---------- */
+const canSpeak = 'speechSynthesis' in window;
+function gbVoices() { return canSpeak ? speechSynthesis.getVoices().filter(v => /^en[-_]GB/i.test(v.lang)) : []; }
+function pickVoice() { const gb = gbVoices(); return gb.find(v => v.voiceURI === S.voiceURI) || gb[0]; }
+function speak(text) {
+  if (!canSpeak || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text), v = pickVoice();
+  if (v) u.voice = v; u.lang = 'en-GB'; u.rate = S.rate || 0.9;
+  speechSynthesis.speak(u);
+}
+if (canSpeak) speechSynthesis.onvoiceschanged = () => { if (tab === 'settings') renderSettings(); };
+
+/* ---------- sounds ---------- */
+let actx;
+function tone(notes, type = 'sine', vol = .22) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
+    const t0 = actx.currentTime;
+    for (const [f, d, len = .26] of notes) {
+      const o = actx.createOscillator(), g = actx.createGain(), t = t0 + d;
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + len + .02);
+    }
+  } catch {}
+}
+const sfx = { key: () => tone([[1100, 0, .05]], 'triangle', .08), good: () => tone([[880, 0], [1320, .09]]), bad: () => tone([[300, 0], [220, .12]], 'triangle', .16), tick: () => tone([[700, 0, .06]], 'square', .05) };
+
+/* ---------- snow: real flakes with depth, sway and gusts of wind ---------- */
+function snow() {
+  const cv = $('#snow'), ctx = cv.getContext('2d');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // one soft flake picture per focus level: far flakes are crisp dots, near ones are soft and out of focus
+  const sprite = soft => { const s = 64, c = document.createElement('canvas'); c.width = c.height = s; const g = c.getContext('2d'), gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(soft ? .25 : .55, `rgba(255,255,255,${soft ? .55 : .9})`); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, s, s); return c; };
+  const SPR = [sprite(false), sprite(true)];
+  let W = 0, H = 0, flakes = [], last = performance.now(), t = 0, raf = 0;
+  const make = (anywhere) => {
+    const z = Math.pow(Math.random(), 1.7);               // 0 = far away, 1 = right in front; most flakes are far
+    const bokeh = z > .93;                                // a few big blurred ones close to the "camera"
+    return { z, x: Math.random() * (W + 80) - 40, y: anywhere ? Math.random() * H : -12 - Math.random() * 40,
+      r: bokeh ? 6 + Math.random() * 5 : .9 + z * 3.2 + Math.random() * .6, vy: 16 + z * 78 + Math.random() * 14,
+      a: bokeh ? .16 + Math.random() * .12 : .35 + z * .5 + Math.random() * .15, soft: bokeh || z > .6 ? 1 : 0,
+      ph: Math.random() * 6.28, sf: .5 + Math.random() * 1.1, sa: 6 + z * 16 + Math.random() * 6, tw: Math.random() * 6.28 };
+  };
+  const resize = () => { const d = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    const n = Math.max(70, Math.min(170, Math.round(W * H / 4200))); flakes = Array.from({ length: n }, () => make(true)); if (still) frame(performance.now(), true); };
+  function frame(now, once) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+    const wind = Math.sin(t * .11) * 16 + Math.sin(t * .37 + 1.3) * 9 + Math.max(0, Math.sin(t * .05 + 4)) * 22;   // slow breeze + an occasional gust
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < flakes.length; i++) {
+      const f = flakes[i];
+      f.y += f.vy * dt; f.x += (wind * (.35 + f.z) + Math.cos(t * f.sf + f.ph) * f.sa * .6) * dt;
+      if (f.y > H + 14) { flakes[i] = make(false); continue; }
+      if (f.x < -50) f.x += W + 90; else if (f.x > W + 50) f.x -= W + 90;
+      const x = f.x + Math.sin(t * f.sf + f.ph) * f.sa * .35, d = f.r * 2.4;
+      ctx.globalAlpha = f.a * (.82 + .18 * Math.sin(t * 2.3 + f.tw));   // faint glint as a flake turns
+      ctx.drawImage(SPR[f.soft], x - d / 2, f.y - d / 2, d, d);
+    }
+    ctx.globalAlpha = 1;
+    if (!once) raf = requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize); resize();
+  if (still) return;
+  document.addEventListener('visibilitychange', () => { cancelAnimationFrame(raf); if (!document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } });
+  raf = requestAnimationFrame(frame);
+}
+
+/* ---------- toast & dialogs ---------- */
+let toastT;
+function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms); }
+let overlayOpen = 0;
+function openScrim(html, center = true) {
+  const sc = document.createElement('div'); sc.className = 'scrim' + (center ? ' center' : ''); sc.innerHTML = html;
+  document.body.appendChild(sc); overlayOpen++;
+  sc.close = () => { if (sc.isConnected) { sc.remove(); overlayOpen--; } };
+  return sc;
+}
+function confirmDlg(title, text, ok = 'OK') {
+  return new Promise(res => {
+    const sc = openScrim(`<div class="dlg"><h2>${esc(title)}</h2><p>${esc(text)}</p><div class="btn-row"><button class="ghost" data-r="0">Cancel</button><button class="primary" style="height:48px" data-r="1">${esc(ok)}</button></div></div>`);
+    sc.addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b || e.target === sc) { sc.close(); res(b?.dataset.r === '1'); } });
+  });
+}
+function confetti(n = 70) {
+  const c = document.createElement('div'); c.className = 'confetti';
+  const cols = ['#ff5d5d', '#ffd166', '#6fe3a5', '#6fb8ff', '#fff', '#e9a85a'];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('i');
+    p.style.left = Math.random() * 100 + 'vw'; p.style.background = cols[i % cols.length];
+    p.style.animationDuration = 2.2 + Math.random() * 2.2 + 's'; p.style.animationDelay = Math.random() * .8 + 's';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c); setTimeout(() => c.remove(), 5500);
+}
+
+/* ---------- avatar: one of Dad's set, or his own photo ---------- */
+async function avatarURL(which = S.avatar) {
+  if (which === 'own') { const u = await imgURL('media:avatar:own'); if (u) return u; }
+  const n = /^a:(.+)$/.exec(which || '')?.[1];
+  if (n && AV.includes(n)) { const u = await imgURL('media:avatar:' + n); if (u) return u; }
+  return which === S.avatar && AV.length ? imgURL('media:avatar:' + AV[0]) : null;       // nothing chosen yet: Dad's first one
+}
+async function avatarHTML() { const u = await avatarURL(); return u ? `<img src="${u}" alt="">` : 'Here:<br>avatar<br>1:1'; }
+async function openAvatarPicker() {
+  const cur = (await avatarURL()) || '', own = await imgURL('media:avatar:own');
+  const tiles = await Promise.all(AV.map(async n => { const u = await imgURL('media:avatar:' + n); return u ? `<button data-av="a:${n}" class="${u === cur ? 'on' : ''}"><img src="${u}" alt=""></button>` : ''; }));
+  if (own) tiles.push(`<button data-av="own" class="${own === cur ? 'on' : ''}"><img src="${own}" alt=""></button>`);
+  const sc = openScrim(`<div class="dlg"><h2>Choose your avatar</h2>
+    ${tiles.join('') ? `<div class="av-grid">${tiles.join('')}</div>` : '<p>No avatars from Dad yet. You can use your own photo.</p>'}
+    <button class="ghost" data-av="pick" style="margin-bottom:10px">📷 Use a photo from my phone</button><button class="primary gold" style="height:48px" data-av="close">Done</button></div>`);
+  sc.addEventListener('click', async e => {
+    const b = e.target.closest('[data-av]'), v = b?.dataset.av;
+    if (e.target === sc || v === 'close') return sc.close();
+    if (!v) return;
+    if (v === 'pick') { const f = $('#f-avatar'); f.value = ''; f.onchange = async () => { if (f.files[0] && await setOwnAvatar(f.files[0])) { sc.close(); renderHome(); } }; return f.click(); }
+    S.avatar = v; await kvSet('settings', S); sc.close(); renderHome();
+  });
+}
+async function setOwnAvatar(file) {                       // centre-crop to a square, shrink to 320 px
+  try {
+    const url = URL.createObjectURL(file), img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const side = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement('canvas'); c.width = c.height = 320;
+    c.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, 320, 320); URL.revokeObjectURL(url);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .88));
+    await tx('blobs', 'readwrite', st => { st.put(blob, 'media:avatar:own'); }); dropURL('media:avatar:own');
+    S.avatar = 'own'; await kvSet('settings', S); return true;
+  } catch { toast('Could not use that picture.'); return false; }
+}
+
+/* =========================================================
+   Views
+   ========================================================= */
+function go(t) {
+  tab = t;
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + t));
+  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  $('#views').scrollTop = 0; render();
+}
+function render() { ({ home: renderHome, words: renderWords, verbs: renderVerbs, rewards: renderRewards, progress: renderProgress, settings: renderSettings })[tab](); }
+const greeting = () => { const h = new Date().getHours(); return h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
+const slotHTML = (d = ymd()) => CFG.slots.map((s, i) => { const st = dayStatus(d)[i]; return `<div class="slot ${st}"><b>${st === 'done' ? '✅' : st === 'missed' ? '❌' : slotIcon(s)}</b>${slotName(s, i)}<small>${s.from}–${s.to}</small></div>`; }).join('');
+async function levelArt(lvl) { const u = await imgURL('media:level:' + lvl); return u ? `<img src="${u}" alt="">` : ph('level', ' ' + lvl); }
+
+async function renderHome() {
+  const L = levelInfo(), st = dayStatus(), doneN = st.filter(s => s === 'done').length, open = st.indexOf('open'), ex = extrasOn(ymd());
+  const stake = CFG.rewards.map(r => ({ r, s: rewardState(r) })).find(x => x.s.status !== 'earned') || null;
+  const vs = verbList(), VL = verbLearned();
+  const label = !wordList().length ? 'No words yet' : open >= 0 ? `Start ${slotName(CFG.slots[open], open).toLowerCase()} session` : 'Extra session (bonus)';
+  $('#v-home').innerHTML = `
+    <div class="h-top"><div class="who"><button class="avatar ${(await avatarURL()) ? '' : 'empty'}" data-action="avatar" aria-label="Change avatar">${await avatarHTML()}</button><div><div class="kicker">${greeting()}</div><h1>${esc(CFG.name)}</h1></div></div><div class="streak">🔥 ${streakDays()} day${streakDays() === 1 ? '' : 's'}</div></div>
+    <div class="lights">${'<i></i>'.repeat(14)}</div>
+    <div class="r169" style="margin-bottom:12px">${await mediaOrPh('home')}</div>
+    <div class="panel"><div class="kicker">Today · ${doneN} of ${st.length} sessions${ex ? ` · +${ex} extra` : ''}</div><div class="slots">${slotHTML()}</div></div>
+    <button class="panel" style="display:block;width:100%;text-align:left" data-go="progress"><div class="row"><div class="lvl-art">${await levelArt(L.lvl)}</div><div class="tx"><div class="kicker">Level ${L.lvl} of ${LEVELS}</div><b>${esc(L.name)}</b>${L.done ? 'Every level done. Suspiciously impressive.' : `${L.inLvl} / ${L.per} learned · ${L.per - L.inLvl} to the next lift`}</div></div><div class="bar"><i style="width:${L.inLvl / L.per * 100}%"></i></div></button>
+    ${stake ? `<button class="panel" style="display:block;width:100%;text-align:left" data-go="rewards"><div class="row"><div class="ico">🎁</div><div class="tx"><b>${esc(stake.r.title)}</b>${esc(stake.s.cur)}</div><span class="pill ${stake.s.status === 'lost' ? 'no' : 'wait'}">${stake.s.status === 'lost' ? 'lost this week' : 'on track'}</span></div></button>` : ''}
+    <button class="primary" data-action="start" ${wordList().length ? '' : 'disabled'}>${label}</button>
+    <div class="hint" style="text-align:center;margin-top:10px">${wordList().length ? `${CFG.minutes} min · counts with ${CFG.minCorrect}+ correct answers` : 'Dad adds the words in Studio. Open the app with internet to load them.'}</div>
+    ${vs.length ? verbButton(vs, VL) : ''}`;
+}
+
+const verbButton = (vs, VL) => `<button class="vbtn" data-action="start" data-mode="verbs"><span class="vb-ico">🔁</span><span class="vb-tx"><b>Irregular verbs</b><small>${CFG.verbMinutes || 5} min practice · its own score</small></span><span class="vb-sc"><b>${VL}</b>/${vs.length}</span><i style="width:${VL / vs.length * 100}%"></i></button>`;
+const verbStats = () => { const vl = LOG.filter(x => x.kind === 'verbs' && !x.quit), wk = weekDays()[0], c = vl.reduce((a, x) => a + x.correct, 0), t = vl.reduce((a, x) => a + x.cards, 0);
+  return { n: vl.length, week: vl.filter(x => x.day >= wk).length, best: vl.reduce((m, x) => Math.max(m, x.correct), 0), pct: t ? Math.round(c / t * 100) : null }; };
+let vSet = -1;
+async function renderVerbs() {
+  const vs = verbList();
+  if (!vs.length) { $('#v-verbs').innerHTML = `<div class="v-head"><div class="kicker">Irregular verbs</div><h1>Verbs</h1></div><div class="panel"><div class="hint" style="text-align:center;padding:14px">Dad has not added the irregular verbs yet.</div></div>`; return; }
+  const sets = []; for (let i = 0; i < vs.length; i += 10) sets.push(vs.slice(i, i + 10));
+  const L = vs.filter(v => v.learned).length, VS = verbStats();
+  if (vSet < 0) { vSet = sets.findIndex(st => st.some(v => !v.learned)); if (vSet < 0) vSet = 0; }
+  const st = sets[vSet] || sets[0];
+  const rows = await Promise.all(st.map(async v => { const u = await imgURL('img:' + v.id);
+    return `<div class="vrow ${v.learned ? 'done' : v.seen ? '' : 'new'}"><div class="vpic">${u ? `<img src="${u}" alt="">` : '<span>?</span>'}</div>
+      <div class="tx"><b>${esc(v.en)} – ${v.seen || v.learned ? esc(v.past.join(' / ')) + ' – ' + esc(v.pp.join(' / ')) : '<span style="color:var(--faint)">? – ?</span>'}</b><span>${esc(v.ru)}</span></div>
+      ${v.learned ? '<span class="pill ok">✓</span>' : `<div class="pips">${Array.from({ length: CFG.target }, (_, i) => `<i class="${i < (v.count || 0) ? 'on' : ''}"></i>`).join('')}</div>`}
+      ${v.seen || v.learned ? `<button class="vsay" data-action="vsay" data-id="${v.id}">🔊</button>` : ''}</div>`; }));
+  $('#v-verbs').innerHTML = `<div class="v-head"><div class="kicker">Irregular verbs · ${L} of ${vs.length} learned</div><h1>Verbs</h1></div>
+    ${verbButton(vs, L)}
+    <div class="stats four vstats"><div class="stat"><b>${L}</b><span>verbs learned</span></div><div class="stat"><b>${vs.filter(v => v.seen && !v.learned).length}</b><span>in progress</span></div>
+      <div class="stat"><b>${VS.best}</b><span>best practice (correct)</span></div><div class="stat"><b>${VS.pct ?? '–'}${VS.pct == null ? '' : '%'}</b><span>correct · ${VS.week} practice${VS.week === 1 ? '' : 's'} this week</span></div></div>
+    <div class="vsets">${sets.map((s2, i) => { const d = s2.filter(v => v.learned).length; return `<button data-action="vset" data-i="${i}" class="${i === vSet ? 'on' : ''} ${d === s2.length ? 'full' : ''}">${i + 1}<small>${d}/${s2.length}</small></button>`; }).join('')}</div>
+    <div class="panel"><div class="kicker" style="margin-bottom:4px">Set ${vSet + 1}</div>${rows.join('')}</div>
+    <div class="hint" style="text-align:center">Verb practice is separate from your word sessions: it has its own score and does not count for the day's sessions. Verbs come in a few at a time, in this order.</div>`;
+}
+function renderWords() {
+  const cnt = { all: words.length, new: 0, progress: 0, learned: 0 };
+  words.filter(w => !isVerb(w)).forEach(w => cnt[w.learned ? 'learned' : w.seen ? 'progress' : 'new']++); cnt.all = words.filter(w => !isVerb(w)).length;
+  const list = words.filter(w => !isVerb(w)).filter(w => wordFilter === 'all' || (wordFilter === 'learned' ? w.learned : wordFilter === 'progress' ? w.seen && !w.learned : !w.seen));
+  $('#v-words').innerHTML = `<div class="v-head"><div class="kicker">${cnt.all} items</div><h1>Words</h1></div>
+    <div class="seg">${[['all', 'All'], ['new', 'New'], ['progress', 'Learning'], ['learned', 'Learned']].map(([k, l]) => `<button data-filter="${k}" class="${wordFilter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>
+    <div class="panel">${list.length ? list.slice(0, 300).map(w => `<div class="wrow"><div class="tx"><b>${esc(w.en)}</b><span>${esc(w.ru)}</span></div>${w.learned ? '<span class="pill ok">learned</span>' : `<div class="pips">${Array.from({ length: CFG.target }, (_, i) => `<i class="${i < (w.count || 0) ? 'on' : ''}"></i>`).join('')}</div>`}</div>`).join('') : '<div class="hint" style="text-align:center;padding:14px">Nothing here yet.</div>'}</div>`;
+}
+
+async function renderRewards() {
+  const days = weekDays(), today = ymd(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  const cls = { done: 'g', missed: 'x', open: 'o', later: '' };
+  const cards = [], hist = [];
+  for (const r of CFG.rewards) {
+    const s = rewardState(r), unpaid = s.earned.filter(e => !paidAt(e.key));
+    const pill = unpaid.length ? `<span class="pill wait">earned · waiting for Dad</span>` : s.status === 'lost' ? '<span class="pill no">lost this week</span>' : s.status === 'manual' ? '<span class="pill dim">special</span>' : `<span class="pill dim">${Math.round(s.pct * 100)}%</span>`;
+    cards.push(`<div class="panel"><div class="rw"><div class="anim r11">${await mediaOrPh('reward:' + r.id, 'reward')}</div><div class="tx"><b>${esc(r.title)}</b>${esc(s.cur)}<br><em>${esc(r.text || '')}</em></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><div class="bar" style="flex:1;margin:0 10px 0 0"><i style="width:${s.pct * 100}%"></i></div>${pill}</div></div>`);
+    s.earned.forEach(e => hist.push({ ...e, title: r.title }));
+  }
+  hist.sort((a, b) => (paidAt(a.key) ? 1 : 0) - (paidAt(b.key) ? 1 : 0));
+  $('#v-rewards').innerHTML = `<div class="v-head"><div class="kicker">Rewards</div><h1>My stakes 🎁</h1></div>
+    <div class="panel"><div class="kicker">This week</div><div class="wk">${days.map((d, i) => `<div class="d ${d === today ? 'today' : ''}">${names[i]}<div class="dots">${dayStatus(d).map(s => `<i class="${cls[s]}"></i>`).join('')}</div>${extrasOn(d) ? `<div style="color:var(--gold2);font-weight:800;margin-top:2px">+${extrasOn(d)}</div>` : ''}</div>`).join('')}</div>
+      <div class="hint" style="margin-top:10px">🟢 done · 🟡 open now · 🔴 missed · +N extra sessions</div></div>
+    ${cards.join('')}
+    <div class="panel"><div class="kicker" style="margin-bottom:4px">Earned</div>${hist.length ? hist.map(h => `<div class="hist"><span><b>${esc(h.title)}</b> · ${esc(h.label)}</span>${paidAt(h.key) ? '<span class="pill ok">paid ✓</span>' : '<span class="pill wait">to pay</span>'}</div>`).join('') : '<div class="hint">Nothing earned yet. The mountain is patient.</div>'}</div>`;
+}
+
+async function renderProgress() {
+  const L = levelInfo(), wk = weekDays(), WL = LOG.filter(x => x.kind !== 'verbs'), inWeek = WL.filter(x => x.day >= wk[0]);
+  const corr = inWeek.reduce((a, x) => a + x.correct, 0), tot = inWeek.reduce((a, x) => a + x.cards, 0);
+  const nodes = [];
+  for (let i = 1; i <= LEVELS; i++) nodes.push(`<div class="node ${i < L.lvl || L.done ? 'done' : i === L.lvl ? 'cur' : 'locked'}"><div class="art">${await levelArt(i)}</div>${i}. ${esc(LV.names[i - 1])}</div>`);
+  $('#v-progress').innerHTML = `<div class="v-head"><div class="kicker">Level ${L.lvl} of ${LEVELS}</div><h1>${esc(L.name)}</h1></div>
+    <div class="stats"><div class="stat"><b>${L.total}</b><span>items learned</span></div><div class="stat"><b>${wordList().filter(w => w.seen && !w.learned).length}</b><span>in progress</span></div>
+      <div class="stat"><b>${tot ? Math.round(corr / tot * 100) + '%' : '–'}</b><span>correct this week</span></div><div class="stat"><b>${WL.filter(x => x.ok).length}</b><span>sessions that counted</span></div></div>
+    <div class="panel"><div class="kicker" style="margin-bottom:12px">The way up</div><div class="road">${nodes.join('')}</div></div>`;
+}
+
+function renderSettings() {
+  const gb = gbVoices();
+  $('#v-settings').innerHTML = `<div class="v-head"><div class="kicker">Settings</div><h1>Settings</h1></div>
+    <div class="panel"><div class="kicker">Pronunciation</div>
+      <div class="set-row"><span>Voice</span><select id="s-voice">${gb.length ? gb.map(v => `<option value="${esc(v.voiceURI)}" ${pickVoice()?.voiceURI === v.voiceURI ? 'selected' : ''}>${esc(v.name)}</option>`).join('') : '<option>British (default)</option>'}</select></div>
+      <div class="set-row"><span>Test the voice</span><button class="pill" style="height:36px;padding:0 16px" data-action="voice-test">Play</button></div></div>
+    <div class="panel"><div class="kicker">Rules</div>
+      <div class="hint" style="margin-top:8px">Session length, times, scoring and rewards are set by Dad. Now: <b>${CFG.slots.length}</b> session${CFG.slots.length === 1 ? '' : 's'} a day · <b>${CFG.minutes} min</b> · <b>${CFG.minCorrect}+</b> correct answers to count · a miss costs <b>${CFG.missPenalty}</b>.</div></div>
+    <div class="panel"><div class="kicker">Link to Dad</div>
+      <div class="hint" style="margin-top:8px">${LINK ? `Linked ✓ · ${SYNC.err ? 'last try failed: ' + esc(SYNC.err) : SYNC.at ? 'last sync ' + new Date(SYNC.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'not synced yet'}${LOG.some(x => !x.synced) ? ` · ${LOG.filter(x => !x.synced).length} session(s) waiting to send` : ''}` : 'Not linked yet. Dad opens the link from his admin page on this phone.'}</div>
+      <button class="ghost" style="margin-top:10px" data-action="update">Check for new words and rules</button></div>
+    <div class="foot">Word Shredder ${APP_VERSION} · ${words.length} items</div>`;
+}
+
+/* =========================================================
+   Import from site (same content format Studio publishes)
+   ========================================================= */
+async function mergePool(data) {
+  const mapId = new Map(words.map(w => [w.id, w]));
+  let order = words.reduce((m, w) => Math.max(m, w.order || 0), 0), added = 0;
+  const wPuts = [], bPuts = [];
+  for (const p of data.words || []) {
+    if (!p.en || !p.ru) continue;
+    let w = mapId.get(p.id);
+    const base = { en: p.en.trim(), ipa: (p.ipa || '').trim(), ru: p.ru.trim(), example: (p.example || '').trim(), updated: p.updated || Date.now(),
+      ...(p.type === 'verb' ? { type: 'verb', past: p.past || [], pp: p.pp || [], seq: p.seq || 0, note: p.note || '' } : { type: '' }) };
+    if (w) Object.assign(w, base);
+    else { w = { id: p.id || uid(), ...base, order: ++order, count: 0, seen: 0, wrong: 0, learned: false, learnedAt: 0, stage: 0, nextReview: 0, lastSeen: 0 }; words.push(w); mapId.set(w.id, w); added++; }
+    wPuts.push(w); if (p.image instanceof Blob) bPuts.push(['img:' + w.id, p.image]);
+  }
+  const m = data.media || {};
+  for (const k of MEDIA_KEYS) if (m[k] instanceof Blob) bPuts.push(['media:' + k, m[k]]);
+  for (const [n, b] of Object.entries(m.levels || {})) if (b instanceof Blob) bPuts.push(['media:level:' + n, b]);
+  for (const [id, b] of Object.entries(m.rewards || {})) if (b instanceof Blob) bPuts.push(['media:reward:' + id, b]);
+  for (const [n, b] of Object.entries(m.avatars || {})) if (b instanceof Blob) bPuts.push(['media:avatar:' + n, b]);
+  await tx(['words', 'blobs'], 'readwrite', ([ws, bs]) => { wPuts.forEach(w => ws.put(w)); bPuts.forEach(([k, b]) => bs.put(b, k)); });
+  bPuts.forEach(([k]) => dropURL(k));
+  if (Array.isArray(m.levelNames) && m.levelNames.length === LEVELS) { LV.names = m.levelNames.map((n, i) => n || DEFAULT_LEVEL_NAMES[i]); await kvSet('levels', LV); }
+  words.sort((a, b) => a.order - b.order);
+  return added;
+}
+let syncing = false;
+const headTag = h => h.headers.get('etag') || h.headers.get('last-modified') || h.headers.get('content-length') || '';
+async function fetchBlob(path) { const r = await fetch(path); if (!r.ok) throw new Error(path + ' ' + r.status); return r.blob(); }
+async function pooled(items, n, fn) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const k = i++; await fn(items[k], k); } })); }
+async function syncFromSite(manual = false) {
+  if (!/^https?:$/.test(location.protocol) || syncing || sess) return;
+  syncing = true;
+  try {
+    const h = await fetch('content/words.json', { method: 'HEAD', cache: 'no-cache' });
+    if (!h.ok) { if (manual) toast('No words published yet.'); return; }
+    const tag = headTag(h);
+    if (tag && tag === await kvGet('siteTag')) { if (manual) toast('Already up to date.'); return; }
+    const man = await (await fetch('content/words.json', { cache: 'no-cache' })).json();
+    if (!man || !Array.isArray(man.words)) return;
+    const src = (await kvGet('siteSrc')) || { words: {}, media: {} }, byIdLocal = new Map(words.map(w => [w.id, w]));
+    const todo = [];
+    for (const p of man.words) {
+      if (!p.en || !p.ru) continue;
+      const w = byIdLocal.get(p.id), imgChanged = !!p.image && (!w || src.words[p.id] !== p.image);
+      if (!w || imgChanged || (w.updated || 0) !== (p.updated || 0)) todo.push({ p, imgChanged });
+    }
+    const m = man.media || {}, mOut = { levels: {}, rewards: {}, avatars: {} }, jobs = [];
+    const want = (key, path, put) => { if (path && src.media[key] !== path) jobs.push([key, path, put]); };
+    for (const k of MEDIA_KEYS) want(k, m[k], b => mOut[k] = b);
+    for (const [n, p] of Object.entries(m.levels || {})) want('level:' + n, p, b => mOut.levels[n] = b);
+    for (const [id, p] of Object.entries(m.rewards || {})) want('reward:' + id, p, b => mOut.rewards[id] = b);
+    for (const [n, p] of Object.entries(m.avatars || {})) want('avatar:' + n, p, b => mOut.avatars[n] = b);
+    const total = todo.filter(t => t.imgChanged).length + jobs.length; let done = 0;
+    const tick = () => total && toast(`Loading… ${done}/${total}`, 60000); tick();
+    await pooled(todo, 6, async t => { if (t.imgChanged) { t.p = { ...t.p, imagePath: t.p.image, image: await fetchBlob(t.p.image) }; done++; tick(); } else t.p = { ...t.p, image: null }; });
+    await pooled(jobs, 3, async ([k, path, put]) => { put(await fetchBlob(path)); done++; tick(); });
+    mOut.levelNames = m.levelNames;
+    const added = await mergePool({ words: todo.map(t => t.p), media: mOut });
+    // Dad's list is the truth: items he deleted in Studio leave this phone too
+    const keep = new Set(man.words.map(p => p.id)), gone = words.filter(w => !keep.has(w.id));
+    if (gone.length) { await tx(['words', 'blobs'], 'readwrite', ([ws, bs]) => gone.forEach(w => { ws.delete(w.id); bs.delete('img:' + w.id); })); words = words.filter(w => keep.has(w.id)); gone.forEach(w => { dropURL('img:' + w.id); delete src.words[w.id]; }); }
+    for (const t of todo) if (t.p.imagePath) src.words[t.p.id] = t.p.imagePath;
+    for (const [k, path] of jobs) src.media[k] = path;
+    AV = Object.keys(m.avatars || {}).sort((a, b) => a - b); await kvSet('avatars', AV);
+    await kvSet('siteSrc', src); await kvSet('siteTag', tag);
+    toast(added ? `${added} new item${added === 1 ? '' : 's'} loaded` : 'Updated', 3000); render();
+  } catch (err) { console.warn('site sync skipped', err); if (manual) toast('Could not reach the site.'); }
+  finally { syncing = false; }
+}
+
+/* =========================================================
+   Session: every card is a test
+   ========================================================= */
+let sess = null, tickT = null;
+const logEvent = (kind, w) => { EV.push({ t: Date.now(), kind, item: w?.en || '', sid: sess?.id || '' }); if (EV.length > 600) EV = EV.slice(-600); kvSet('events', EV); };
+function refillDeck() {                    // word sessions get only words; verb practice gets only verbs
+  const now = Date.now(), vm = sess.mode === 'verbs', pool = words.filter(w => isVerb(w) === vm);
+  const notL = pool.filter(w => !w.learned), cap = vm ? Math.max(2, CFG.verbActive || 6) : ACTIVE_CAP;
+  const ord = vm ? notL.sort((a, b) => a.seq - b.seq) : notL;                              // verbs come in their fixed order
+  const active = [...ord.filter(w => w.seen), ...ord.filter(w => !w.seen)].slice(0, cap);
+  let due = shuffle(pool.filter(w => w.learned && (w.nextReview || 0) <= now)).slice(0, 8);
+  if (vm && !active.length && !due.length) due = shuffle(pool.filter(w => w.learned)).slice(0, 10);   // all 100 learned: keep them fresh
+  sess.deck = shuffle([...active, ...due].map(w => ({ id: w.id })));
+}
+async function startSession(mode = 'words') {
+  const vm = mode === 'verbs';
+  if (!(vm ? verbList() : wordList()).length) return toast(vm ? 'No verbs yet.' : 'No words yet.');
+  const slot = vm ? -1 : openSlot(), ms = (vm ? CFG.verbMinutes || 5 : CFG.minutes) * 60000;
+  sess = { id: uid(), mode, start: Date.now(), slot, total: ms, remaining: ms, last: performance.now(), cards: 0, correct: 0, wrong: 0, timeouts: 0, left: 0, fast: 0, learned: 0, deck: [], prevId: null, cur: null, done: false };
+  refillDeck();
+  $('#session').classList.toggle('verbs', vm); $('#s-mode').textContent = vm ? '🔁 Irregular verbs' : '';
+  $('#session').classList.remove('hidden'); updateHead();
+  clearInterval(tickT); tickT = setInterval(tick, 100);
+  await nextCard();
+}
+function tick() {
+  if (!sess || sess.done) return;
+  const now = performance.now(), dt = Math.min(now - sess.last, 1000); sess.last = now;
+  if (document.hidden || overlayOpen) return;
+  sess.remaining -= dt;
+  const c = sess.cur;
+  if (c && c.phase === 'test') {                         // per-answer countdown
+    c.left -= dt;
+    const f = Math.max(0, c.left / c.limit), bar = $('#abar i');
+    if (bar) { bar.style.transform = `scaleX(${f})`; bar.classList.toggle('low', f < .3); }
+    if (c.left <= 0) return resolve(false, 'timeout');
+  }
+  updateHead();
+  if (sess.remaining <= 0 && !c) finishSession(true);   // a running card is finished first; then "Next" ends the session
+}
+function updateHead() {
+  const s = Math.max(0, Math.ceil(sess.remaining / 1000));
+  $('#s-time').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  $('#s-count').innerHTML = sess.mode === 'verbs' ? `<b>${sess.correct}</b> correct` : `<b>${sess.correct}</b> / ${CFG.minCorrect} correct`;
+}
+// Leaving the app in the middle of a test = miss (he could be looking the word up)
+document.addEventListener('visibilitychange', () => {
+  if (!sess || sess.done) return;
+  sess.last = performance.now();
+  if (document.hidden && sess.cur?.phase === 'test') resolve(false, 'left');
+});
+
+function pickItem() {
+  for (let guard = 0; guard < 3; guard++) {
+    if (!sess.deck.length) refillDeck();
+    while (sess.deck.length) {
+      let it = sess.deck.shift();
+      if (it.id === sess.prevId && sess.deck.length) { sess.deck.splice(1, 0, it); it = sess.deck.shift(); }
+      const w = byId(it.id); if (w) return w;
+    }
+  }
+  return null;
+}
+const typeNorm = s => String(s || '').toLowerCase().replace(/[’`]/g, "'").replace(/[-‐–—]/g, ' ').replace(/[^a-z0-9' ]/g, '').replace(/\s+/g, ' ').trim();
+const tokens = s => typeNorm(s).split(' ').filter(Boolean);
+function distractors(w, n, key) {   // wrong options: same kind first (word with words, sentence with sentences), closest length first
+  const seen = new Set([norm(w[key])]), out = [], kind = kindOf(w), len = w[key].length;
+  const cand = shuffle(words.filter(x => x.id !== w.id)).sort((a, b) => (kindOf(a) === kind ? 0 : 1) - (kindOf(b) === kind ? 0 : 1) || Math.abs(a[key].length - len) - Math.abs(b[key].length - len));
+  const near = cand.slice(0, Math.max(n * 2, 8));          // a little variety, still similar
+  for (const x of [...shuffle(near), ...cand.slice(near.length)]) { const k = norm(x[key]); if (!k || seen.has(k)) continue; seen.add(k); out.push(x); if (out.length === n) break; }
+  return out;
+}
+// Which test for this item now. Early steps may be recognition; later steps and the last one are always typed.
+function pickTest(w) {
+  const kind = kindOf(w), p = w.learned ? CFG.target : (w.count || 0), last = w.learned || p + 1 >= CFG.target;
+  if (kind === 'verb') return p === 0 ? 'vchoose' : 'verb';     // first meeting: pick the right forms; after that: type both
+  const canChoose = words.length >= 6, gap = gapParts(w);
+  if (kind === 'sentence') return last ? 'type' : p < 2 ? 'order' : Math.random() < .5 ? 'order' : 'hear';
+  if (last) return Math.random() < .7 ? 'type' : 'hear';
+  if (p === 0 && canChoose) return 'choose';
+  if (p === 1) return kind === 'phrase' ? 'order' : gap ? 'gap' : canChoose ? 'choose' : 'type';
+  const pool = ['type', 'type', 'hear']; if (gap) pool.push('gap');
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+const vforms = w => `${w.past.join(' / ')} – ${w.pp.join(' / ')}`;
+function verbOptions(w) {                                  // 1 right answer + 5 believable wrong ones
+  const b = w.en, ed = /e$/.test(b) ? b + 'd' : /[^aeiou]y$/.test(b) ? b.slice(0, -1) + 'ied' : b + 'ed', p = w.past[0], q = w.pp[0];
+  const right = vforms(w), cand = [`${ed} – ${ed}`, `${p} – ${p}`, `${q} – ${q}`, `${q} – ${p}`, `${b} – ${q}`, `${p} – ${ed}`, `${ed} – ${q}`];
+  const out = [...new Set(cand)].filter(x => x !== right && x !== `${w.past.join(' / ')} – ${w.pp.join(' / ')}`);
+  for (const o of shuffle(words.filter(x => isVerb(x) && x.id !== w.id))) { if (out.length >= 8) break; out.push(vforms(o)); }
+  const trap = `${ed} – ${ed}`;                          // the classic mistake is always one of the options
+  return shuffle([right, trap, ...shuffle(out.filter(x => x !== trap)).slice(0, 4)]);
+}
+function gapParts(w) {                                    // example sentence with the item blanked out
+  if (!w.example || kindOf(w) === 'sentence' || isVerb(w)) return null;
+  const i = w.example.toLowerCase().indexOf(w.en.toLowerCase());
+  return i < 0 ? null : [w.example.slice(0, i), w.example.slice(i + w.en.length)];
+}
+async function nextCard() {
+  const w = pickItem();
+  if (!w) { toast('No words to study.'); return finishSession(false); }
+  const test = pickTest(w), T = CFG.time, len = typeNorm(w.en).length, wc = tokens(w.en).length;
+  const vlen = isVerb(w) ? typeNorm(w.past[0] + w.pp[0]).length : 0;
+  const limit = 1000 * (test === 'choose' || test === 'vchoose' ? T.choose : test === 'order' ? T.order + T.perWord * wc : test === 'verb' ? T.type + T.perChar * vlen + 4 : T.type + T.perChar * len + (test === 'hear' ? T.hear : 0));
+  const c = sess.cur = { w, test, phase: 'test', limit, left: limit, shown: performance.now(), typed: '', keys: 0, built: [], f: ['', ''], fi: 0 };
+  sess.prevId = w.id;
+  const pic = await imgURL('img:' + w.id), kick = t => `<div class="t-kick">${t}</div>`;
+  let body, bottom = '';
+  if (test === 'vchoose') {
+    c.vopts = verbOptions(w); c.right = vforms(w);
+    body = `${kick('Irregular verb · choose the forms')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q">${esc(w.en)}</div><div class="t-sub">${esc(w.ru)}</div>
+      <div class="opts">${c.vopts.map((o, i) => `<button class="opt" data-action="vopt" data-i="${i}">${esc(o)}</button>`).join('')}</div>`;
+  } else if (test === 'verb') {
+    body = `${kick('Irregular verb · type both forms')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q">${esc(w.en)}</div><div class="t-sub">${esc(w.ru)}</div>
+      <div class="vf"><button class="vf-l" data-action="vfield" data-i="0">Past simple</button><div class="t-in on" id="vf0" data-action="vfield" data-i="0"></div>
+      <button class="vf-l" data-action="vfield" data-i="1">Past participle</button><div class="t-in" id="vf1" data-action="vfield" data-i="1"></div></div>`;
+    bottom = keyboardHTML(false).replace('data-action="check">Check<', 'data-action="check" id="kb-go">Next ›<');
+  } else if (test === 'choose') {
+    c.dir = Math.random() < .5 ? 'en' : 'ru'; const key = c.dir === 'en' ? 'ru' : 'en';
+    c.opts = shuffle([w, ...distractors(w, 5, key)]);
+    body = `${kick(c.dir === 'en' ? 'Choose the translation' : 'Choose the English')}<div class="t-q">${esc(c.dir === 'en' ? w.en : w.ru)}</div>
+      <div class="opts">${c.opts.map((o, i) => `<button class="opt" data-action="opt" data-i="${i}">${esc(o[key])}</button>`).join('')}</div>`;
+  } else if (test === 'order') {
+    c.want = tokens(w.en);
+    const extra = distractors(w, 6, 'en').flatMap(x => tokens(x.en)).filter(t => !c.want.includes(t)).slice(0, 2);
+    c.tiles = shuffle([...c.want, ...extra]).map((t, i) => ({ t, i, used: false }));
+    body = `${kick('Build it in English')}<div class="t-q sm">${esc(w.ru)}</div><div class="built" id="built"></div><div class="tiles" id="tiles"></div>`;
+    bottom = `<button class="primary gold" data-action="check" style="margin-top:8px">Check</button>`;
+  } else {
+    const head = test === 'hear' ? `${kick('Listen and type it')}<button class="t-speak" data-action="say">🔊</button>`
+      : test === 'gap' ? `${kick('Type the missing part')}<div class="t-q sm">${esc(gapParts(w)[0])}<span style="color:var(--gold2)"> ____ </span>${esc(gapParts(w)[1])}</div><div class="t-sub">${esc(w.ru)}</div>`
+      : `${kick('Type it in English')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q ${kindOf(w) === 'word' ? '' : 'sm'}">${esc(w.ru)}</div>`;
+    body = `${head}<div class="t-in" id="t-in"></div>`;
+    bottom = keyboardHTML(/[0-9]/.test(w.en));
+  }
+  $('#stage').innerHTML = `<div class="abar" id="abar"><i></i></div><div class="tcard">${body}</div>${bottom}`;
+  if (test === 'order') drawOrder(); else if (test === 'verb') drawVerb(); else if (test !== 'choose' && test !== 'vchoose') drawTyped();
+  if (test === 'hear') setTimeout(() => speak(w.en), 200);
+}
+const keyboardHTML = digits => `<div class="kb">${digits ? `<div class="kr">${[...'1234567890'].map(k => `<button data-k="${k}">${k}</button>`).join('')}</div>` : ''}${['qwertyuiop', 'asdfghjkl', 'zxcvbnm'].map((r, i) => `<div class="kr">${i === 2 ? `<button class="w" data-k="'">'</button>` : ''}${[...r].map(k => `<button data-k="${k}">${k}</button>`).join('')}${i === 2 ? `<button class="w" data-k="back">⌫</button>` : ''}</div>`).join('')}
+  <div class="kr"><button class="w" data-k="-">-</button><button class="sp" data-k=" ">space</button><button class="go" data-action="check">Check</button></div></div>`;
+function drawTyped() { const c = sess.cur, el = $('#t-in'); if (el) el.innerHTML = (c.typed ? esc(c.typed).replace(/ /g, '&nbsp;') : '<span class="phd">type here</span>') + '<span class="caret"></span>'; }
+function drawVerb() {
+  const c = sess.cur;
+  for (const i of [0, 1]) { const el = $('#vf' + i); if (!el) return; el.classList.toggle('on', c.fi === i);
+    el.innerHTML = (c.f[i] ? esc(c.f[i]).replace(/ /g, '&nbsp;') : '<span class="phd">type here</span>') + (c.fi === i ? '<span class="caret"></span>' : ''); }
+  const go = $('#kb-go'); if (go) go.textContent = c.fi === 0 ? 'Next ›' : 'Check';
+}
+function pressKey(k) {
+  const c = sess?.cur;
+  if (c && c.phase === 'test' && c.test === 'verb') {
+    if (k === 'back') c.f[c.fi] = c.f[c.fi].slice(0, -1); else if (k === '/' ) return; else if (c.f[c.fi].length < 40) { c.f[c.fi] += k; c.keys++; }
+    sfx.key(); return drawVerb();
+  }
+  if (!c || c.phase !== 'test' || !$('#t-in')) return;
+  if (k === 'back') c.typed = c.typed.slice(0, -1); else if (c.typed.length < 160) { c.typed += k; c.keys++; }
+  sfx.key(); drawTyped();
+}
+function drawOrder() {
+  const c = sess.cur;
+  $('#built').innerHTML = c.built.map((ix, n) => `<button class="tile" data-action="untile" data-n="${n}">${esc(c.tiles[ix].t)}</button>`).join('') || '<span class="hint">tap the words in order</span>';
+  $('#tiles').innerHTML = c.tiles.map(t => `<button class="tile ${t.used ? 'used' : ''}" data-action="tile" data-i="${t.i}" ${t.used ? 'disabled' : ''}>${esc(t.t)}</button>`).join('');
+}
+function check() {
+  const c = sess?.cur; if (!c || c.phase !== 'test') return;
+  if (c.test === 'verb') {
+    if (c.fi === 0) { if (!typeNorm(c.f[0])) return; c.fi = 1; return drawVerb(); }
+    if (!typeNorm(c.f[1])) return;
+    const okPast = c.w.past.some(x => typeNorm(x) === typeNorm(c.f[0])), okPp = c.w.pp.some(x => typeNorm(x) === typeNorm(c.f[1]));
+    c.given = `${c.f[0].trim()} – ${c.f[1].trim()}`; c.verbParts = [okPast, okPp];
+    return resolve(okPast && okPp, 'verb');
+  }
+  if (c.test === 'order') { if (!c.built.length) return; c.given = c.built.map(ix => c.tiles[ix].t).join(' '); return resolve(c.given === c.want.join(' '), 'order'); }
+  if (!typeNorm(c.typed)) return;
+  c.given = c.typed.trim();
+  resolve(typeNorm(c.typed) === typeNorm(c.w.en), c.test);
+}
+function chooseVerb(i) {
+  const c = sess?.cur; if (!c || c.phase !== 'test' || c.test !== 'vchoose') return;
+  const right = c.vopts.indexOf(c.right); c.given = c.vopts[i];
+  if (performance.now() - c.shown < 650) { sess.fast++; logEvent('fast', c.w); }
+  document.querySelectorAll('#stage .opt').forEach((b, k) => b.classList.add(k === right ? 'ok' : k === +i ? 'no' : 'dim'));
+  resolve(+i === right, 'choose');
+}
+function chooseOpt(i) {
+  const c = sess?.cur; if (!c || c.phase !== 'test' || c.test !== 'choose') return;
+  const right = c.opts.findIndex(o => o.id === c.w.id), key = c.dir === 'en' ? 'ru' : 'en';
+  c.given = c.opts[i][key];
+  if (performance.now() - c.shown < 650) { sess.fast++; logEvent('fast', c.w); }   // faster than anyone can read 6 options
+  document.querySelectorAll('#stage .opt').forEach((b, k) => b.classList.add(k === right ? 'ok' : k === +i ? 'no' : 'dim'));
+  resolve(+i === right, 'choose');
+}
+// Score the answer, then show the result card
+async function resolve(ok, why) {
+  const c = sess?.cur; if (!c || c.phase !== 'test') return;
+  c.phase = 'result'; c.ok = ok; c.why = why;
+  const w = c.w, was = w.learned ? CFG.target : (w.count || 0);
+  w.seen = (w.seen || 0) + 1; w.lastSeen = Date.now();
+  let chip;
+  if (ok) {
+    sess.correct++;
+    if (w.learned) { w.stage = Math.min((w.stage || 0) + 1, REVIEW_DAYS.length - 1); w.nextReview = Date.now() + REVIEW_DAYS[w.stage] * DAY; chip = '<span class="chip up">Still got it ✓</span>'; }
+    else { w.count = (w.count || 0) + 1; chip = `<span class="chip up">Correct +1</span>`;
+      if (w.count >= CFG.target) { w.learned = true; w.learnedAt = Date.now(); w.stage = 0; w.nextReview = Date.now() + REVIEW_DAYS[0] * DAY; sess.learned++; c.justLearned = true; chip = '<span class="chip win">Learned ★</span>'; } }
+  } else {
+    sess.wrong++; w.wrong = (w.wrong || 0) + 1;
+    if (why === 'timeout') { sess.timeouts++; logEvent('timeout', w); } else if (why === 'left') { sess.left++; logEvent('left', w); }
+    if (w.learned) { w.learned = false; w.count = Math.max(0, CFG.target - CFG.missPenalty); } else w.count = Math.max(0, was - CFG.missPenalty);
+    const lost = was - w.count;
+    chip = `<span class="chip down">${why === 'timeout' ? "Time's up" : why === 'left' ? 'You left the app' : 'Wrong'}${lost > 0 ? ' · −' + lost : ''}</span>`;
+    sess.deck = sess.deck.filter(x => x.id !== w.id); sess.deck.splice(Math.min(sess.deck.length, 2 + Math.floor(Math.random() * 3)), 0, { id: w.id });
+  }
+  sess.cards++; (ok ? sfx.good : sfx.bad)(); await saveWord(w); updateHead();
+  if (why === 'choose') await new Promise(r => setTimeout(r, ok ? 500 : 1100));
+  if (sess?.cur !== c) return;
+  const pic = await imgURL('img:' + w.id);
+  const ex = w.example ? `<div class="r-ex">${esc(w.example)}</div>` : '';
+  const pips = Array.from({ length: CFG.target }, (_, i) => `<i class="${w.learned || i < (w.count || 0) ? 'on' : ''}"></i>`).join('');
+  $('#stage').innerHTML = `<div class="tcard">${chip}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}
+      ${isVerb(w) ? `<div class="r-en">${esc(w.en)} – ${esc(w.past.join(' / '))} – ${esc(w.pp.join(' / '))}</div><div class="r-ru">${esc(w.ru)}</div>${w.note ? `<div class="t-sub">${esc(w.note)}</div>` : ''}`
+        : `<div class="r-en">${esc(w.en)}</div>${w.ipa ? `<div class="t-sub">${esc(w.ipa)}</div>` : ''}<div class="r-ru">${esc(w.ru)}</div>${ex}`}
+      ${!ok && c.given ? `<div class="r-yours">You answered: ${esc(c.given)}</div>` : ''}<div class="pips">${pips}</div></div>
+    <button class="react r-h" data-action="next">${await mediaOrPh(ok ? 'ok' : 'bad')}<span class="lbl">${sess.remaining <= 0 ? 'Finish ›' : 'Next ›'}</span></button>`;
+  speak(isVerb(w) ? `${w.en}, ${w.past.join(' or ')}, ${w.pp.join(' or ')}` : w.en);
+  if (ok && c.justLearned) confetti(40);
+}
+
+async function finishSession(timeUp) {
+  if (!sess || sess.done) return;
+  sess.done = true; clearInterval(tickT); if (canSpeak) speechSynthesis.cancel();
+  if (sess.mode === 'verbs') return finishVerbs(timeUp);
+  const s = sess, valid = timeUp && s.correct >= CFG.minCorrect, day = ymd(new Date(s.start));
+  // which slot gets the credit: the one that was open at the start, if not already done today; otherwise it is an extra
+  const credit = valid && s.slot >= 0 && !sessOn(day).some(x => x.slot === s.slot) ? s.slot : -1;
+  const rec = { id: s.id, day, start: s.start, end: Date.now(), ok: valid, slot: credit, slots: CFG.slots.length, cfgV: CFG.v || 0, minutes: CFG.minutes, need: CFG.minCorrect, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  LOG.push(rec); await kvSet('sessions', LOG);
+  if (learnedCount() > PEAK) { PEAK = learnedCount(); await kvSet('peak', PEAK); }
+  const close = () => { $('#session').classList.add('hidden'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); };   // send the log once the session is closed
+  if (!timeUp) return close();
+  const b = await blobGet('media:done'), url = b ? await imgURL('media:done') : null;
+  const head = valid ? (credit >= 0 ? `${slotName(CFG.slots[credit], credit)} session done ✓` : 'Extra session done ⭐') : 'This one does not count';
+  const sub = valid ? `${s.correct} correct of ${s.cards}${s.learned ? ` · ${s.learned} learned` : ''}` : `You need ${CFG.minCorrect} correct answers. You got ${s.correct}.`;
+  const sc = openScrim(`<div class="dlg" style="max-width:440px"><div class="kicker">Session over</div><h2 style="margin-top:6px">${head}</h2><p>${sub}</p>
+    ${valid ? `<div class="r169" style="margin-bottom:14px;position:relative">${url ? `<div class="media" style="width:100%;height:100%"><video id="fin-v" src="${url}#t=0.1" playsinline preload="auto"></video></div>` : ph('done')}</div>` : ''}
+    <button class="primary ${valid ? '' : 'gold'}" id="fin-ok">${valid && url ? 'Play the video' : 'Done'}</button></div>`);
+  if (valid) confetti(90);
+  const v = $('#fin-v', sc), done = () => { v?.pause(); sc.close(); close(); };
+  $('#fin-ok', sc).onclick = () => { if (v && v.paused && !v.dataset.played) { v.dataset.played = 1; v.muted = false; v.play().catch(() => { v.controls = true; }); $('#fin-ok', sc).textContent = 'Done'; } else done(); };
+}
+
+async function finishVerbs(timeUp) {          // verb practice: logged on its own, never fills a word slot
+  const s = sess, day = ymd(new Date(s.start));
+  const rec = { id: s.id, kind: 'verbs', day, start: s.start, end: Date.now(), ok: timeUp, slot: -1, minutes: CFG.verbMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  const prevBest = verbStats().best;
+  LOG.push(rec); await kvSet('sessions', LOG);
+  if (verbLearned() > VPEAK) { VPEAK = verbLearned(); await kvSet('vpeak', VPEAK); }
+  const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('verbs'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); };
+  if (!timeUp) return close();
+  const vs = verbList(), VL = verbLearned(), best = s.correct > prevBest && prevBest > 0;
+  const sc = openScrim(`<div class="dlg vdone" style="max-width:440px"><div class="kicker">🔁 Irregular verbs</div><h2 style="margin-top:6px">Verb practice done</h2>
+    <div class="vd-score"><b>${s.correct}</b><span>correct of ${s.cards}${best ? ' · new best!' : ''}</span></div>
+    <p>${s.learned ? `${s.learned} verb${s.learned === 1 ? '' : 's'} learned in this one. ` : ''}${VL} of ${vs.length} verbs learned.</p>
+    <div class="bar" style="margin:0 0 16px"><i style="width:${VL / vs.length * 100}%"></i></div>
+    <button class="primary" id="fin-ok">Done</button></div>`);
+  if (s.correct) confetti(best ? 90 : 40);
+  $('#fin-ok', sc).onclick = () => { sc.close(); close(); };
+}
+
+/* =========================================================
+   Online link: pull Dad's signed rules, push the session log
+   ========================================================= */
+const gh = ghClient(() => LINK);
+async function takeLinkFromURL() {                        // #link=<base64 {o: owner, t: token, k: public key}> opened once on this phone
+  const m = /[#&]link=([^&]+)/.exec(location.hash); if (!m) return;
+  try {
+    const j = JSON.parse(b64.text(decodeURIComponent(m[1]).replace(/-/g, '+').replace(/_/g, '/')));
+    if (!j.o || !j.t || !j.k) throw 0;
+    LINK = { owner: j.o, token: j.t, pub: j.k, ...(j.a ? { api: j.a } : {}) }; await kvSet('link', LINK);
+    await kvSet('shas', {}); toast('Linked to Dad ✓', 4000);
+  } catch { toast('That link is not valid.', 4000); }
+  history.replaceState(null, '', location.pathname + location.search);   // the key must not stay in the address bar
+}
+async function pullRules() {
+  const f = await gh.text('rules.json'); if (!f) return;
+  let file; try { file = JSON.parse(f.text); } catch { file = null; }
+  const cfg = file && await verifyRules(file, LINK.pub);
+  if (!cfg) { if (!EV.some(e => e.kind === 'tamper' && Date.now() - e.t < DAY)) logEvent('tamper'); return; }   // not signed by Dad: ignore it
+  if ((cfg.v || 0) < (CFG.v || 0)) { if (!EV.some(e => e.kind === 'rollback' && Date.now() - e.t < DAY)) logEvent('rollback'); return; }   // an older copy put back
+  const changed = cfg.v !== CFG.v;
+  CFG = { ...structuredClone(CFG_DEFAULT), ...cfg }; await kvSet('cfg', CFG);
+  const src = (await kvGet('rewSrc')) || {};
+  for (const r of CFG.rewards) if (r.anim && src[r.id] !== r.anim) {
+    try { const b = await gh.blob(r.anim); await tx('blobs', 'readwrite', st => { st.put(b, 'media:reward:' + r.id); }); dropURL('media:reward:' + r.id); src[r.id] = r.anim; } catch {}
+  }
+  await kvSet('rewSrc', src);
+  if (changed && !sess) render();
+}
+async function pushLog() {
+  const shas = (await kvGet('shas')) || {}, months = [...new Set(LOG.filter(x => !x.synced).map(x => x.day.slice(0, 7)))];
+  for (const m of months) {
+    const path = `log/sessions-${m}.json`, list = LOG.filter(x => x.day.startsWith(m)).map(({ synced, ...x }) => x);
+    shas[path] = await gh.put(path, b64.utf8(JSON.stringify(list, null, 1)), `sessions ${m}`, shas[path] || undefined);
+    LOG.forEach(x => { if (x.day.startsWith(m)) x.synced = true; });
+    await kvSet('sessions', LOG); await kvSet('shas', shas);
+  }
+  const state = { v: 1, updated: Date.now(), tz: new Date().getTimezoneOffset(), app: APP_VERSION, cfgV: CFG.v || 0, learned: learnedCount(), peak: peakLearned(), verbs: verbLearned(), vpeak: peakVerbs(), verbTotal: verbList().length,
+    items: words.map(w => ({ id: w.id, en: w.en, ...(isVerb(w) ? { verb: 1 } : {}), count: w.count || 0, learned: !!w.learned, seen: w.seen || 0, wrong: w.wrong || 0, lastSeen: w.lastSeen || 0 })), events: EV.slice(-300) };
+  const sig = JSON.stringify([state.learned, state.peak, state.verbs, state.vpeak, state.cfgV, state.items.map(i => [i.count, i.learned, i.seen, i.wrong]), EV.length]);
+  if (months.length || sig !== await kvGet('stateSig')) { shas['log/state.json'] = await gh.put('log/state.json', b64.utf8(JSON.stringify(state)), 'state', shas['log/state.json'] || undefined); await kvSet('shas', shas); await kvSet('stateSig', sig); }
+}
+let syncBusy = false;
+async function syncData() {                               // safe to call any time; quietly does nothing offline
+  if (!LINK || syncBusy || sess) return;
+  syncBusy = true;
+  try { await pullRules(); await pushLog(); SYNC = { at: Date.now(), err: '' }; }
+  catch (e) { SYNC = { at: SYNC.at, err: String(e.message || e).slice(0, 60) }; console.warn('sync', e); }
+  finally { syncBusy = false; if (tab === 'settings' && !sess) renderSettings(); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const t = e.target;
+  const tb = t.closest('#tabbar button'); if (tb) return go(tb.dataset.tab);
+  const g = t.closest('[data-go]'); if (g) return go(g.dataset.go);
+  const f = t.closest('[data-filter]'); if (f) { wordFilter = f.dataset.filter; return renderWords(); }
+  const k = t.closest('[data-k]'); if (k) return pressKey(k.dataset.k);
+  const el = t.closest('[data-action]'), a = el?.dataset.action; if (!a) return;
+  const c = sess?.cur;
+  switch (a) {
+    case 'start': return startSession(el.dataset.mode);
+    case 'avatar': return openAvatarPicker();
+    case 'opt': return chooseOpt(el.dataset.i);
+    case 'vopt': return chooseVerb(el.dataset.i);
+    case 'vfield': if (c?.phase === 'test' && c.test === 'verb') { c.fi = +el.dataset.i; drawVerb(); } return;
+    case 'check': return check();
+    case 'say': return speak(c?.w.en);
+    case 'vsay': { const v = byId(el.dataset.id); return v && speak(`${v.en}, ${v.past.join(' or ')}, ${v.pp.join(' or ')}`); }
+    case 'vset': vSet = +el.dataset.i; return renderVerbs();
+    case 'tile': { if (c?.phase !== 'test') return; const tl = c.tiles[el.dataset.i]; if (tl.used) return; tl.used = true; c.built.push(tl.i); sfx.key(); return drawOrder(); }
+    case 'untile': { if (c?.phase !== 'test') return; const ix = c.built.splice(el.dataset.n, 1)[0]; c.tiles[ix].used = false; return drawOrder(); }
+    case 'next': if (c?.phase !== 'result') return; return sess.remaining <= 0 ? finishSession(true) : nextCard();
+    case 'quit': if (await confirmDlg('Quit this session?', 'A session only counts if you finish the timer.', 'Quit')) finishSession(false); return;
+    case 'voice-test': return speak('Fresh powder today. Try not to fall.');
+    case 'update': await syncFromSite(true); await syncData(); return renderSettings();
+  }
+});
+document.addEventListener('change', e => { if (e.target.id === 's-voice') { S.voiceURI = e.target.value; kvSet('settings', S); speak('Hello from the lodge.'); } });
+// physical keyboard (PC testing); paste is ignored because there is no text field at all
+document.addEventListener('keydown', e => {
+  if (!sess || sess.cur?.phase !== 'test' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'Enter') return check();
+  if (e.key === 'Backspace') return pressKey('back');
+  if (/^[a-zA-Z0-9' -]$/.test(e.key)) pressKey(e.key.toLowerCase());
+});
+
+/* ---------- boot ---------- */
+(async function boot() {
+  db = await openDB();
+  words = ((await tx('words', 'readonly', s => s.getAll())) || []).sort((a, b) => a.order - b.order);
+  S = { ...DEFAULTS, ...((await kvGet('settings')) || {}) };
+  CFG = { ...structuredClone(CFG_DEFAULT), ...((await kvGet('cfg')) || {}) };
+  LOG = (await kvGet('sessions')) || []; EV = (await kvGet('events')) || [];
+  LV = { names: DEFAULT_LEVEL_NAMES.slice(), ...((await kvGet('levels')) || {}) };
+  PEAK = (await kvGet('peak')) || 0; VPEAK = (await kvGet('vpeak')) || 0; LINK = (await kvGet('link')) || null; AV = (await kvGet('avatars')) || [];
+  await takeLinkFromURL();
+  render(); snow();
+  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  syncFromSite(); syncData();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { syncFromSite(); syncData(); if (!sess) render(); } });
+  window.addEventListener('online', syncData);
+  setInterval(() => { if (!sess && tab === 'home' && !document.hidden) renderHome(); }, 60000);   // slot status follows the clock
+})();
+
+</script>
+</body>
+</html>
