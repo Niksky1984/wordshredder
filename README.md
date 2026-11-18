@@ -48,6 +48,10 @@ Then **Publish to site** (Studio) or **Save & send to his phone** (admin page).
 
 100 verbs built into Studio, in learning order (10 sets of 10). Verbs have **their own button** (home screen and Verbs tab), their own blue practice window and their own score. Verb practice never fills a word session and does not count for word levels; word sessions contain no verbs. Admin page → Rules: *Verb practice length* (default 5 min) and *Irregular verbs in rotation* (default 6). Rewards can use the rule *Every N irregular verbs learned*. First meeting: pick the right forms out of 6. After that: type **both** the past simple and the past participle; one wrong form = miss. Both learnt/learned, burnt/burned, was/were and got/gotten are accepted. His **Verbs** tab shows the sets and his progress.
 
+## Weather (the snow)
+
+Dad's desk → **Rules** → **Weather**, with a live preview. Presets: Calm, Light snow, Snowfall, Heavy snow, Blizzard, Changing weather, No snow. Or set it yourself: *Fixed* intensity 0–100, or *Changing* between a weakest and strongest level at the speed you choose; plus wind, gusts, flake size, falling speed and white-out haze. **Save & send to his phone** and his app changes the next time it opens.
+
 ## Using Studio and Dad's desk on two devices (PC + phone)
 
 Both pages work on the PC and on your phone. Open them from the site: `…/wordshredder/editor.html` and `…/wordshredder/admin.html`.

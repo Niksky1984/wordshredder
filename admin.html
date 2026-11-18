@@ -28,7 +28,7 @@ h1,h2,h3{margin:0;font-weight:700}
 .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
 
 /* falling snow. App: drawn flake by flake on a canvas (see snow() in app.js). Admin page: simple drifting dots. */
-canvas#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+canvas#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}   /* in front of the cards (taps go through), behind the tab bar and sessions */
 div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
   background-image:radial-gradient(#fff 1.3px,transparent 1.8px),radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#fff 1.8px,transparent 2.4px);
   background-size:64px 78px,96px 110px,170px 190px;animation:snow 16s linear infinite}
@@ -282,6 +282,18 @@ td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 
 .pill.verb{background:rgba(90,184,255,.18);color:#8fd3ff}
 
+/* weather */
+.wx-prev{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;margin:12px 0;background:linear-gradient(180deg,#17344d 0%,#10202f 55%,#0b1722 100%);border:1px solid var(--line)}
+.wx-prev::after{content:'';position:absolute;left:0;right:0;bottom:0;height:22%;background:linear-gradient(180deg,transparent,rgba(235,244,255,.16));pointer-events:none}
+.wx-prev canvas{position:absolute;inset:0;width:100%;height:100%}
+.wx-tag{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.45);padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700}
+.wx-pre{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.seg-s{display:flex;gap:6px;flex-wrap:wrap}
+.wx-sl{display:flex;align-items:center;gap:10px;min-width:50%}.wx-sl input{flex:1;accent-color:var(--gold);height:auto;background:none;border:0;padding:0}.wx-sl b{min-width:58px;text-align:right;font-variant-numeric:tabular-nums}
+.sw{position:relative;display:inline-block;width:50px;height:30px}.sw input{opacity:0;width:0;height:0}.sw i{position:absolute;inset:0;border-radius:99px;background:var(--surface2);border:1px solid var(--line);transition:.2s}
+.sw i::after{content:'';position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#cfd8e3;transition:.2s}.sw input:checked+i{background:var(--gold)}.sw input:checked+i::after{transform:translateX(20px);background:#fff}
+@media (max-width:600px){.wx-row{flex-wrap:wrap}.wx-sl{width:100%}}
+
 </style>
 </head>
 <body>
@@ -325,6 +337,7 @@ const CFG_DEFAULT = {
     { id: 'r-words', title: 'Every 30 words learned', text: 'Reward: set by Dad', rule: { type: 'words', n: 30 } },
   ],
   paid: {},               // rewardKey -> time Dad tapped "Payment done"
+  weather: null,          // snow settings; null = WEATHER_DEFAULT
 };
 const RULE_TYPES = {
   perfect_week: { label: 'Perfect week: every session, all 7 days', n: false },
@@ -451,6 +464,113 @@ function ghClient(get) {                                  // get() -> {owner, to
 }
 
 /* =========================================================
+   Weather: realistic snow from a few slow flakes to a blizzard.
+   Used by his app (full screen, behind everything) and by Dad's desk (live preview).
+   ========================================================= */
+const WEATHER_DEFAULT = {
+  mode: 'cycle',     // 'fixed' = always `level` · 'cycle' = changes by itself between `min` and `max` · 'off'
+  level: 40,         // 0–100: 0 a few lazy flakes … 100 blizzard
+  min: 10, max: 100, // range for 'cycle'
+  period: 8,         // minutes for one full change in 'cycle'
+  wind: 35,          // 0–100: steady wind
+  gusts: 50,         // 0–100: how often and how hard gusts hit
+  size: 100,         // % flake size
+  speed: 100,        // % falling speed
+  haze: true,        // white-out haze in heavy snow
+};
+const WEATHER_PRESETS = [
+  ['calm', 'Calm', { mode: 'fixed', level: 6, wind: 10, gusts: 10 }],
+  ['light', 'Light snow', { mode: 'fixed', level: 25, wind: 25, gusts: 30 }],
+  ['snow', 'Snowfall', { mode: 'fixed', level: 50, wind: 35, gusts: 45 }],
+  ['heavy', 'Heavy snow', { mode: 'fixed', level: 75, wind: 55, gusts: 60 }],
+  ['blizzard', 'Blizzard', { mode: 'fixed', level: 100, wind: 85, gusts: 85 }],
+  ['cycle', 'Changing weather', { mode: 'cycle', min: 5, max: 100, period: 8, wind: 40, gusts: 55 }],
+];
+const weatherOf = w => ({ ...WEATHER_DEFAULT, ...(w || {}) });
+const weatherName = l => l < 12 ? 'Calm' : l < 35 ? 'Light snow' : l < 60 ? 'Snowfall' : l < 85 ? 'Heavy snow' : 'Blizzard';
+// Where 'cycle' is at a moment t (seconds): slow, irregular, with blizzards rarer than light snow
+function weatherCycle(w, t) {
+  const P = Math.max(1, w.period) * 60, k = 2 * Math.PI / P;
+  let s = .5 + .5 * (.55 * Math.sin(k * t) + .3 * Math.sin(k * 2.73 * t + 1.7) + .15 * Math.sin(k * 6.1 * t + 4.2));
+  s = Math.pow(Math.min(1, Math.max(0, s)), 1.35);
+  return w.min + (w.max - w.min) * s;
+}
+
+function makeSnow(cv, getW, opts = {}) {
+  const ctx = cv.getContext('2d'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const timeScale = opts.timeScale || 1, cap = opts.cap || 650;
+  const sprite = soft => { const s = 64, c = document.createElement('canvas'); c.width = c.height = s; const g = c.getContext('2d'), gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(soft ? .25 : .55, `rgba(255,255,255,${soft ? .55 : .9})`); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, s, s); return c; };
+  const SPR = [sprite(false), sprite(true)];
+  let W = 0, H = 0, flakes = [], last = performance.now(), t = Math.random() * 1e4, ct = Date.now() / 1000,   // ct: weather clock, the same on every device
+    raf = 0, I = -1, stopped = false;
+  let gust = 0, gustT = 0, gustLen = 0, gustAmp = 0, dir = 1, nextGust = 2;
+  const make = anywhere => {
+    const z = Math.pow(Math.random(), 1.7), bokeh = z > .93;
+    return { z, x: Math.random() * (W + 160) - 80, y: anywhere ? Math.random() * H : -14 - Math.random() * 60, bokeh,
+      r: bokeh ? 6 + Math.random() * 5 : .9 + z * 3.2 + Math.random() * .6, vy: 16 + z * 78 + Math.random() * 14,
+      a: bokeh ? .16 + Math.random() * .12 : .35 + z * .5 + Math.random() * .15, soft: bokeh || z > .6 ? 1 : 0,
+      ph: Math.random() * 6.28, sf: .5 + Math.random() * 1.1, sa: 6 + z * 16 + Math.random() * 6, tw: Math.random() * 6.28, fi: anywhere ? 1 : 0 };
+  };
+  const want = () => { const area = W * H / 4200 * (opts.density || 1); return Math.min(cap, Math.round(area * (.3 + 6 * Math.pow(Math.max(0, I), 1.35)))); };
+  const resize = () => {
+    const d = Math.min(2, devicePixelRatio || 1), r = cv.getBoundingClientRect();
+    W = opts.fixed ? r.width : innerWidth; H = opts.fixed ? r.height : innerHeight; if (!W || !H) return;
+    cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    if (I < 0) I = level(); flakes = Array.from({ length: want() }, () => make(true)); if (still) frame(performance.now(), true);
+  };
+  const level = () => { const w = weatherOf(getW()); if (w.mode === 'off') return 0; return Math.min(100, Math.max(0, w.mode === 'cycle' ? weatherCycle(w, ct) : w.level)) / 100; };
+  function frame(now, once) {
+    if (stopped) return;
+    const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt; ct += dt * timeScale;
+    const w = weatherOf(getW()), off = w.mode === 'off';
+    const target = level(); I += (target - I) * Math.min(1, dt * (timeScale > 1 ? 2 : .25));   // the sky changes gently, never in a jump
+    if (opts.onLevel) opts.onLevel(I, target);
+    // gusts: random bursts, stronger and more often in heavy snow
+    const G = w.gusts / 100;
+    nextGust -= dt;
+    if (gustT <= 0 && nextGust <= 0 && G > 0) { gustLen = 2 + Math.random() * 4; gustT = gustLen; gustAmp = G * (50 + 380 * I) * (.6 + Math.random() * .7); nextGust = (3 + Math.random() * 14) / (.3 + G + I); if (Math.random() < .12) dir = -dir; }
+    if (gustT > 0) { gustT -= dt; gust = Math.sin(Math.PI * (1 - gustT / gustLen)); } else gust = 0;
+    const steady = (w.wind / 100) * (20 + 260 * Math.pow(I, 1.4));
+    const wind = dir * (steady + gust * gustAmp) + Math.sin(t * .11) * 14 * (1 - I) + Math.sin(t * .37 + 1.3) * 8;
+    const spd = (w.speed / 100) * (.55 + 1.9 * I), sz = (w.size / 100) * (1 + .3 * (1 - I)), sway = 1.35 - I;
+    const n = off ? 0 : want();
+    ctx.clearRect(0, 0, W, H);
+    // add flakes when the snow gets heavier; extra ones simply are not replaced when it calms down
+    for (let k = 0; flakes.length < n && k < 8; k++) { const f = make(true); f.fi = 0; flakes.push(f); }   // fades in where it is: the snow thickens all over, not only from the top
+    const streak = I > .5;
+    for (let i = 0; i < flakes.length; i++) {
+      const f = flakes[i];
+      const vx = wind * (.35 + f.z) + Math.cos(t * f.sf + f.ph) * f.sa * .6 * sway, vy = f.vy * spd * (1 + gust * .25 * I);
+      f.y += vy * dt; f.x += vx * dt;
+      if (f.y > H + 16 || f.x < -120 || f.x > W + 120) {
+        if (flakes.length > n) { flakes.splice(i--, 1); continue; }
+        const nf = make(false);
+        if (f.x < -120 || f.x > W + 120) { nf.y = Math.random() * H; nf.x = vx > 0 ? -60 - Math.random() * 40 : W + 60 + Math.random() * 40; }   // blown in from the side
+        flakes[i] = nf; continue;
+      }
+      const x = f.x + Math.sin(t * f.sf + f.ph) * f.sa * .35 * sway, d = f.r * 2.4 * sz;
+      if (f.fi < 1) f.fi = Math.min(1, f.fi + dt * 1.2);
+      const a = f.a * f.fi * (.82 + .18 * Math.sin(t * 2.3 + f.tw));
+      if (streak && !f.bokeh && f.z > .35) {      // fast snow smears into short streaks along its path
+        const len = Math.min(42, Math.hypot(vx, vy) * .035 * (I - .4) * 2.2);
+        ctx.globalAlpha = a * .85; ctx.strokeStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1, f.r * .9 * sz);
+        const m = Math.hypot(vx, vy) || 1; ctx.beginPath(); ctx.moveTo(x, f.y); ctx.lineTo(x - vx / m * len, f.y - vy / m * len); ctx.stroke();
+      } else { ctx.globalAlpha = a; ctx.drawImage(SPR[f.soft], x - d / 2, f.y - d / 2, d, d); }
+    }
+    ctx.globalAlpha = 1;
+    if (w.haze && I > .55) {                       // white-out: the air itself goes milky in a blizzard, pulsing with the gusts
+      const h = Math.min(1, (I - .55) / .45); ctx.fillStyle = `rgba(214,230,245,${(h * h * .2 + gust * h * .1).toFixed(3)})`; ctx.fillRect(0, 0, W, H);
+    }
+    if (!once) raf = requestAnimationFrame(frame);
+  }
+  const onVis = () => { cancelAnimationFrame(raf); if (!document.hidden && !stopped) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+  addEventListener('resize', resize); resize();
+  if (!still) { document.addEventListener('visibilitychange', onVis); raf = requestAnimationFrame(frame); }
+  return { stop() { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', resize); document.removeEventListener('visibilitychange', onVis); }, level: () => I };
+}
+
+/* =========================================================
    Word Shredder — Dad's desk (admin page)
    Reads his log from the private data repo; writes the signed rules.
    The signing key lives only in this browser (back it up in Setup).
@@ -536,6 +656,7 @@ function render() {
   $('#busy').textContent = busy; $('#busy').classList.toggle('hidden', !busy);
   if (!A && tab !== 'setup') tab = 'setup';
   $('#main').innerHTML = ({ overview: vOverview, sessions: vSessions, words: vWords, rules: vRules, rewards: vRewards, setup: vSetup })[tab]();
+  mountPreview();
 }
 const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
 function toPay() { return CFG.rewards.flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }
@@ -596,8 +717,31 @@ function vRules() {
       ${num('time.perChar', 'Typing: extra per letter', 'A 10-letter word gets base + 10 × this', 0.5, 5, 0.1)}
       ${num('time.order', 'Build the sentence: base time', 'Plus the time per word below', 3, 60)}
       ${num('time.perWord', 'Build the sentence: extra per word', '', 0.5, 10, 0.5)}
-      ${num('time.hear', 'Listen and type: extra time', 'Added to the typing time', 0, 30)}</div>`;
+      ${num('time.hear', 'Listen and type: extra time', 'Added to the typing time', 0, 30)}</div>
+    ${vWeather()}`;
 }
+/* ---------- weather (snow on his screen) ---------- */
+let PREVIEW = null;
+function vWeather() {
+  const w = weatherOf(CFG.weather), cur = WEATHER_PRESETS.find(([, , p]) => Object.entries(p).every(([k, v]) => w[k] === v));
+  const sl = (k, label, hint, min, max, unit = '') => `<div class="set-row wx-row"><span>${label}<div class="hint">${hint}</div></span><span class="wx-sl"><input type="range" data-wx="${k}" min="${min}" max="${max}" value="${w[k]}"><b id="wxv-${k}">${w[k]}${unit}</b></span></div>`;
+  return `<div class="panel" id="wx"><div class="kicker">Weather · the snow on his screen</div>
+    <div class="wx-prev"><canvas id="wx-cv"></canvas><div class="wx-tag" id="wx-tag"></div></div>
+    <div class="wx-pre">${WEATHER_PRESETS.map(([id, name]) => `<button class="btn ${cur && cur[1] === name ? 'gold' : ''}" data-wxp="${id}">${name}</button>`).join('')}<button class="btn ${w.mode === 'off' ? 'gold' : ''}" data-wxp="off">No snow</button></div>
+    <div class="set-row"><span>Mode<div class="hint">Fixed: always the same. Changing: the sky changes by itself, from light snow to blizzard and back.</div></span>
+      <span class="seg-s">${[['fixed', 'Fixed'], ['cycle', 'Changing'], ['off', 'Off']].map(([m, l]) => `<button class="btn ${w.mode === m ? 'gold' : ''}" data-wxm="${m}">${l}</button>`).join('')}</span></div>
+    ${w.mode === 'fixed' ? sl('level', 'Intensity', '0 = a few lazy flakes · 100 = blizzard', 0, 100) : ''}
+    ${w.mode === 'cycle' ? sl('min', 'Weakest', 'The calmest it gets', 0, 100) + sl('max', 'Strongest', '100 = full blizzard now and then', 0, 100) + sl('period', 'Speed of change', 'Minutes for one full change (the preview runs 30× faster)', 1, 30, ' min') : ''}
+    ${w.mode !== 'off' ? sl('wind', 'Wind', 'Steady wind; grows with the intensity', 0, 100) + sl('gusts', 'Gusts', 'Sudden bursts of wind', 0, 100) + sl('size', 'Flake size', '%', 50, 160, '%') + sl('speed', 'Falling speed', '%', 50, 200, '%') +
+      `<div class="set-row"><span>White-out haze<div class="hint">The air turns milky in heavy snow</div></span><label class="sw"><input type="checkbox" data-wxh ${w.haze ? 'checked' : ''}><i></i></label></div>` : ''}</div>`;
+}
+function mountPreview() {
+  if (PREVIEW) { PREVIEW.stop(); PREVIEW = null; }
+  const cv = $('#wx-cv'); if (!cv) return;
+  PREVIEW = makeSnow(cv, () => CFG.weather, { fixed: true, density: 2.2, timeScale: weatherOf(CFG.weather).mode === 'cycle' ? 30 : 1, cap: 400,
+    onLevel: (i, tg) => { const el = $('#wx-tag'); if (el) el.textContent = weatherOf(CFG.weather).mode === 'off' ? 'No snow' : `${weatherName(i * 100)} · ${Math.round(i * 100)}`; } });
+}
+const setWx = patch => { CFG.weather = { ...weatherOf(CFG.weather), ...patch }; dirty = true; $('#savebar').classList.remove('hidden'); };
 function vRewards() {
   const cards = CFG.rewards.map((r, i) => { const s = rewardState(r), rt = RULE_TYPES[r.rule.type] || {};
     return `<div class="panel"><div class="rw"><div class="anim r11">${r.animURL ? (/\.(mp4|webm|mov)$/i.test(r.anim) ? `<div class="media" style="width:100%;height:100%"><video src="${r.animURL}" autoplay muted loop playsinline></video></div>` : `<div class="media" style="width:100%;height:100%"><img src="${r.animURL}"></div>`) : r.anim ? '<div class="ph"><b>animation set ✓</b></div>' : '<div class="ph"><b>no animation</b><span>1:1</span></div>'}</div>
@@ -629,8 +773,17 @@ function vSetup() {
 
 /* ---------- events ---------- */
 const setPath = (path, val) => { const ks = path.split('.'), last = ks.pop(); ks.reduce((o, k) => o[k], CFG)[last] = val; };
+document.addEventListener('input', e => {             // weather sliders: live, without redrawing the page
+  const d = e.target.dataset; if (!d.wx) return;
+  const v = +e.target.value; setWx({ [d.wx]: v });
+  const w = weatherOf(CFG.weather);
+  if (d.wx === 'min' && v > w.max) setWx({ max: v }); if (d.wx === 'max' && v < w.min) setWx({ min: v });
+  ['min', 'max', d.wx].forEach(k => { const b = $('#wxv-' + k), i = $(`[data-wx="${k}"]`); if (b) b.textContent = weatherOf(CFG.weather)[k] + (k === 'period' ? ' min' : k === 'size' || k === 'speed' ? '%' : ''); if (i && k !== d.wx) i.value = weatherOf(CFG.weather)[k]; });
+});
 document.addEventListener('change', e => {
   const t = e.target, d = t.dataset;
+  if (d.wx) return;
+  if ('wxh' in d) { setWx({ haze: t.checked }); return; }
   if (d.num) { const v = parseFloat(t.value); if (isFinite(v)) { setPath(d.num.replace(/^CFG\./, ''), Math.min(+t.max, Math.max(+t.min, v))); touch(); } }
   else if (d.str) { CFG[d.str] = t.value.trim() || CFG[d.str]; touch(); }
   else if (d.slot) { const [i, k] = d.slot.split('.'); if (t.value) { CFG.slots[i][k] = t.value; CFG.slots.sort((a, b) => hm(a.from) - hm(b.from)); touch(); } }
@@ -641,6 +794,8 @@ document.addEventListener('change', e => {
 document.addEventListener('click', async e => {
   const t = e.target.closest('button'); if (!t) return; const d = t.dataset;
   if (t.closest('#tabs')) { tab = d.tab; return render(); }
+  if (d.wxp) { const y = scrollY; setWx(d.wxp === 'off' ? { mode: 'off' } : WEATHER_PRESETS.find(p => p[0] === d.wxp)[2]); render(); scrollTo(0, y); return; }
+  if (d.wxm) { const y = scrollY; setWx({ mode: d.wxm }); render(); scrollTo(0, y); return; }
   if (d.pay) { CFG.paid = { ...CFG.paid, [d.pay]: Date.now() }; return saveRules('payment done'); }
   if (d.unpay) { delete CFG.paid[d.unpay]; return saveRules('payment undone'); }
   if (d.delslot) { CFG.slots.splice(d.delslot, 1); return touch(); }
