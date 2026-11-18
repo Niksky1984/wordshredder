@@ -1,0 +1,29 @@
+{
+ "id": "./editor.html",
+ "name": "Word Shredder Studio",
+ "short_name": "Studio",
+ "description": "Add words, pictures and media",
+ "start_url": "./editor.html",
+ "scope": "./editor.html",
+ "display": "standalone",
+ "background_color": "#0b1722",
+ "theme_color": "#0b1722",
+ "icons": [
+  {
+   "src": "icons/studio-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/studio-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/studio-512-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

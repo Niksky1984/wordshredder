@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b1722">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/admin-192.png">
+<link rel="manifest" href="admin.webmanifest">
+<link rel="apple-touch-icon" href="icons/admin-180.png">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Word Shredder · Dad's desk</title>
 <style>
 :root{
@@ -433,12 +436,13 @@ function ghClient(get) {                                  // get() -> {owner, to
     async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
     async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
     // create or replace; finds the current sha itself and retries once if someone wrote in between
-    async put(p, content64, message, sha) {
+    async put(p, content64, message, sha, strict = false) {   // strict: never overwrite a newer copy from another device
       for (let attempt = 0; attempt < 2; attempt++) {
         if (sha === undefined) sha = (await this.meta(p))?.sha || null;
         const r = await call(p, { method: 'PUT', body: JSON.stringify({ message, content: content64, ...(sha ? { sha } : {}) }) });
         if (r.ok) return (await r.json()).content.sha;
         if (r.status !== 409 && r.status !== 422) throw new Error('GitHub ' + r.status);
+        if (strict) throw new Error('CONFLICT');
         sha = undefined;
       }
       throw new Error('GitHub conflict');
@@ -484,8 +488,9 @@ async function repoExists() {
   if (r.status === 404 || r.status === 403) throw new Error(`Cannot open the private repo "${DATA_REPO}". Create it, and give this token access to it (Contents: Read and write).`);
   if (!r.ok) throw new Error('GitHub ' + r.status);
 }
+let loadedAt = 0;
 async function loadAll() {
-  busy = 'Loading…'; render();
+  busy = 'Loading…'; render(); loadedAt = Date.now();
   try {
     await repoExists();
     const f = await gh.text('rules.json').catch(() => null);
@@ -512,10 +517,14 @@ async function saveRules(msg = 'rules') {
   try {
     CFG.v = Math.max(CFG.v || 0, Date.now());            // always newer than anything he could put back
     const text = JSON.stringify(CFG, (k, x) => k === 'animURL' ? undefined : x), file = { text, sig: await signText(text) };   // animURL is only a local preview
-    rulesSha = await gh.put('rules.json', b64.utf8(JSON.stringify(file)), msg, rulesSha || undefined);
+    rulesSha = await gh.put('rules.json', b64.utf8(JSON.stringify(file)), msg, rulesSha || null, true);   // strict: a change made on the other device is never overwritten
     localStorage.setItem('ws-last', text);
     dirty = false; foreignRules = false; busy = ''; toast('Saved ✓ His phone gets it next time the app opens.');
-  } catch (e) { busy = ''; toast('Could not save: ' + e.message, 6000); }
+  } catch (e) {
+    busy = '';
+    if (e.message === 'CONFLICT') { toast('Your rules were changed on your other device (PC or phone). The latest version is loaded now. Please make your change again.', 9000); return loadAll(); }
+    toast('Could not save: ' + e.message, 6000);
+  }
   render();
 }
 const touch = () => { dirty = true; render(); };
@@ -674,6 +683,9 @@ async function pickAnim(i) {
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 (async function boot() { render(); if (A) await loadAll(); })();
+
+// Coming back to this page (e.g. after using the other device): show the latest, unless there are unsaved changes here
+document.addEventListener('visibilitychange', () => { if (!document.hidden && A.token && !dirty && !busy && Date.now() - loadedAt > 30000) loadAll(); });
 
 </script>
 </body>

@@ -1,5 +1,5 @@
 // Word Shredder service worker: network-first so updates arrive instantly, cache fallback for offline.
-const CACHE = 'wordshredder-v1';
+const CACHE = 'wordshredder-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 
@@ -22,6 +22,6 @@ self.addEventListener('fetch', e => {
       if (res.status === 200) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true })
-      .then(r => r || (req.mode === 'navigate' ? caches.match('./index.html') : Response.error())))
+      .then(r => r || (req.mode === 'navigate' && !/(admin|editor)\.html$/.test(new URL(req.url).pathname) ? caches.match('./index.html') : Response.error())))
   );
 });

@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Word Shredder Studio</title>
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/studio-192.png">
+<link rel="manifest" href="studio.webmanifest">
+<link rel="apple-touch-icon" href="icons/studio-180.png">
+<meta name="theme-color" content="#0b1722">
+<meta name="mobile-web-app-capable" content="yes">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#0b1722;--surface:#14283a;--surface2:#1c3449;--line:rgba(255,255,255,.09);--text:#f5effc;--muted:#a798bf;--faint:#6f6388;--gold:#ecbf7a;--gold2:#f7dcae;--rose:#f2a0ba;--bad:#ff9a9a;--ok:#86e3bd;
@@ -90,6 +94,29 @@ td.num{color:var(--faint);width:44px;font-variant-numeric:tabular-nums}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .empty{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty h3{font-family:var(--serif);font-size:24px;color:var(--text);margin:0 0 8px;font-weight:600}
+/* phone */
+@media (max-width:700px){
+  header{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .brand{flex:1 1 100%;font-size:19px}
+  header .btn{flex:1;justify-content:center}
+  main{padding:12px 12px 60px}
+  .tabs{overflow-x:auto}.tabs button{padding:10px 10px;white-space:nowrap}
+  .toolbar .btn{flex:1 1 auto;justify-content:center}
+  .toolbar input{width:100%}
+  .seg{flex-wrap:wrap}.stats{margin-left:0}
+  .grid2{grid-template-columns:1fr}
+  .m-foot{flex-wrap:wrap}.m-foot .msg{flex:1 1 100%}
+  .scrim{padding:10px}.modal{padding:16px}
+  thead{display:none}
+  table,tbody{display:block}
+  tr{display:grid;grid-template-columns:64px 1fr;column-gap:12px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+  tr:last-child{border-bottom:0}
+  td{display:block;padding:1px 0;border:0}
+  td.num{display:none}
+  tr>td:nth-child(2){grid-row:span 5;align-self:start}
+  td.row-act{text-align:left;margin-top:4px}
+  .ex{max-width:none}
+}
 </style>
 </head>
 <body>
@@ -416,7 +443,11 @@ async function openPool() {
   if (d.format !== 'wordcrown' || !Array.isArray(d.words)) return toast('Not a WordCrown file.');
   await mergeIntoStudio(d);
 }
-async function mergeIntoStudio(d) {
+async function mergeIntoStudio(d, onSite = null) {
+  if (onSite) {                       // deleted on the other device -> delete here, unless it was added or edited here after the last sync
+    const since = Math.max(syncAt, lastExport), gone = words.filter(w => !onSite.has(w.id) && !((w.updated || 0) > since));
+    if (gone.length) { words = words.filter(w => !gone.includes(w)); await tx('words', 'readwrite', st => gone.forEach(w => st.delete(w.id))); }
+  }
   const mapId = new Map(words.map(w => [w.id, w])), mapEn = new Map(words.map(w => [norm(w.en), w]));
   let order = nextOrder() - 1, added = 0, updated = 0; const changed = [];
   for (const p of d.words) {
@@ -424,6 +455,7 @@ async function mergeIntoStudio(d) {
     if (p.type === 'verb') { if (p.image) VIMG[p.en] = p.image; VON = true; continue; }
     const rec = { en: p.en, ipa: p.ipa || '', ru: p.ru || '', example: p.example || '', image: p.image || null, updated: p.updated || Date.now() };
     const w = mapId.get(p.id) || mapEn.get(norm(p.en));
+    if (w && onSite && (w.updated || 0) > Math.max(syncAt, lastExport)) continue;   // edited here and not published yet: keep this version
     if (w) { Object.assign(w, rec); changed.push(w); updated++; }
     else { const nw = { id: p.id || uid(), order: ++order, imageName: '', ...rec }; words.push(nw); changed.push(nw); added++; }
   }
@@ -484,9 +516,18 @@ async function remoteTree() {
   const ref = await gh(repoPath(`/git/ref/heads/${GH.branch}`));
   const commit = await gh(repoPath(`/git/commits/${ref.object.sha}`));
   const tree = await gh(repoPath(`/git/trees/${commit.tree.sha}?recursive=1`));
-  return { head: ref.object.sha, treeSha: commit.tree.sha, paths: new Set(tree.tree.filter(t => t.type === 'blob').map(t => t.path)) };
+  const blobs = tree.tree.filter(t => t.type === 'blob');
+  return { head: ref.object.sha, treeSha: commit.tree.sha, paths: new Set(blobs.map(t => t.path)), shas: new Map(blobs.map(t => [t.path, t.sha])) };
 }
 const LEGACY = p => false;
+// Two Studios (PC + phone): remember when this one last matched the site, so it never publishes over newer work from the other
+let syncAt = 0, syncSha = '';   // syncSha: fingerprint of content/words.json when this Studio last matched the site
+async function wordsChangedAt() {        // when content/words.json was last published, from any device
+  const c = await gh(repoPath(`/commits?path=content/words.json&per_page=1&sha=${GH.branch}`));
+  return c[0] ? Date.parse(c[0].commit.committer.date) : 0;
+}
+const MIME = Object.fromEntries(Object.entries(EXT).map(([m, e]) => [e, m]));
+const b64ToUtf8 = t => new TextDecoder().decode(Uint8Array.from(atob(t.replace(/\s/g, '')), c => c.charCodeAt(0)));
 
 function settingsDialog(after) {
   const sc = document.createElement('div'); sc.className = 'scrim';
@@ -507,7 +548,18 @@ function settingsDialog(after) {
   };
 }
 
-async function publishDialog() {
+function staleDialog(at) {
+  const sc = document.createElement('div'); sc.className = 'scrim';
+  sc.innerHTML = `<div class="modal" style="max-width:520px"><h2>Changed on your other device</h2>
+    <p class="note">The site was published from another device (PC or phone)${at ? ` on <b>${new Date(at).toLocaleString()}</b>` : ''}, after this Studio last matched it.</p>
+    <p class="note">Press <b>Load from site</b> first, so you don't undo those changes. Words you added here and have not published yet are kept. Then publish again.</p>
+    <div class="m-foot"><button class="btn" id="s-cancel">Cancel</button><button class="btn" id="s-force">Publish anyway</button><button class="btn gold" id="s-load">Load from site</button></div></div>`;
+  document.body.appendChild(sc);
+  $('#s-cancel', sc).onclick = () => sc.remove();
+  $('#s-force', sc).onclick = () => { if (confirm('Publish anyway? Changes made on the other device that are not in this Studio will be undone on the site and on his phone.')) { sc.remove(); publishDialog(true); } };
+  $('#s-load', sc).onclick = () => { sc.remove(); loadFromSite(true); };
+}
+async function publishDialog(force = false) {
   if (!GH.token) return settingsDialog(publishDialog);
   toast('Checking the site…', 60000);
   let site, remote;
@@ -515,6 +567,13 @@ async function publishDialog() {
   catch (e) { $('#toast').classList.remove('on'); return /401|403|404/.test(e.message) ? settingsDialog(publishDialog) : toast('Could not reach GitHub: ' + e.message, 6000); }
   $('#toast').classList.remove('on');
   if (!site.manifest.words.length) return toast('No words with pictures to publish.');
+  if (!force) {
+    const cur = remote.shas.get('content/words.json') || '';
+    if (syncSha ? cur && cur !== syncSha : lastExport && cur) {           // older Studio without a fingerprint: fall back to the time
+      const at = await wordsChangedAt().catch(() => 0);
+      if (syncSha || at > lastExport + 60000) return staleDialog(at);
+    }
+  }
   const upload = [...site.files.keys()].filter(p => !remote.paths.has(p));
   const remove = [...remote.paths].filter(p => (p.startsWith('content/') && !site.files.has(p) && p !== 'content/words.json') || LEGACY(p));
   const upMB = upload.reduce((a, p) => a + site.files.get(p).length * .75, 0) / 1048576;
@@ -543,21 +602,30 @@ async function publishDialog() {
       const t = await gh(repoPath('/git/trees'), { method: 'POST', body: JSON.stringify({ base_tree: remote.treeSha, tree }) });
       const c = await gh(repoPath('/git/commits'), { method: 'POST', body: JSON.stringify({ message: `Word Shredder: ${site.manifest.words.length} items (Studio)`, tree: t.sha, parents: [remote.head] }) });
       await gh(repoPath(`/git/refs/heads/${GH.branch}`), { method: 'PATCH', body: JSON.stringify({ sha: c.sha }) });
-      lastExport = Date.now(); await kvSet('lastExport', lastExport);
+      lastExport = Date.now(); await kvSet('lastExport', lastExport); syncAt = lastExport; syncSha = man.sha; await kvSet('syncAt', syncAt); await kvSet('syncSha', syncSha);
       sc.remove(); renderWords(); toast('Published ✓ The site updates in about a minute.', 6000);
     } catch (e) { btn.disabled = false; msg.innerHTML = `<span class="bad">${esc(/409|422/.test(e.message) ? 'The site changed meanwhile. Close and publish again.' : e.message)}</span>`; }
   };
 }
 
 // Pull what is on the website into Studio (first time on a new PC, or to start from the live version)
-async function loadFromSite() {
+async function loadFromSite(asked = false) {
   const base = siteBase();
-  if (words.length && !confirm(`Load the words and media from ${base}?\nWords with the same English word are updated; your other words stay.`)) return;
+  if (words.length && !asked && !confirm(`Bring this Studio up to date with the site?\nWords changed or deleted on your other device are updated here too. Words you added here and have not published yet are kept.`)) return;
   toast('Loading from the site…', 120000);
   try {
-    let r = await fetch(base + 'content/words.json', { cache: 'no-cache' }), data;
+    let remote = null, r, data, man, get;
+    if (GH.token) remote = await remoteTree().catch(() => null);
+    if (remote?.shas.has('content/words.json')) {          // straight from GitHub: always the newest version
+      const blob = async p => (await gh(repoPath('/git/blobs/' + remote.shas.get(p)))).content.replace(/\s/g, '');
+      man = JSON.parse(b64ToUtf8(await blob('content/words.json')));
+      get = async p => `data:${MIME[p.split('.').pop().toLowerCase()] || 'application/octet-stream'};base64,${await blob(p)}`;
+      r = { ok: true };
+    } else {
+      r = await fetch(base + 'content/words.json', { cache: 'no-cache' });
+      if (r.ok) { man = await r.json(); get = async p => blobToDataURL(await (await fetch(base + p)).blob()); }
+    }
     if (r.ok) {
-      const man = await r.json(), get = async p => blobToDataURL(await (await fetch(base + p)).blob());
       let n = 0; const all = man.words.length;
       data = { format: 'wordcrown', words: [], media: { levels: {} } };
       for (const p of man.words) { data.words.push({ ...p, image: p.image ? await get(p.image) : null }); toast(`Loading from the site… ${++n}/${all}`, 120000); }
@@ -571,7 +639,9 @@ async function loadFromSite() {
       if (!r.ok) return toast('Nothing found on the site yet.');
       data = await r.json();
     }
-    await mergeIntoStudio(data);
+    const startedAt = Date.now();
+    await mergeIntoStudio(data, man ? new Set(man.words.map(p => p.id)) : null);
+    if (man) { syncAt = startedAt; await kvSet('syncAt', syncAt); if (remote) { syncSha = remote.shas.get('content/words.json'); await kvSet('syncSha', syncSha); } }
   } catch (e) { toast('Could not load from the site: ' + e.message, 6000); }
 }
 
@@ -629,7 +699,7 @@ document.addEventListener('drop', e => { if ($('.scrim')) return; e.preventDefau
   words = ((await tx('words', 'readonly', s => s.getAll())) || []).sort((a, b) => a.order - b.order);
   media = { ...media, ...((await kvGet('media')) || {}) };
   if (!Array.isArray(media.levelNames) || media.levelNames.length !== LEVELS) media.levelNames = DEFAULT_LEVEL_NAMES.slice();
-  lastExport = (await kvGet('lastExport')) || 0;
+  lastExport = (await kvGet('lastExport')) || 0; syncAt = (await kvGet('syncAt')) || 0; syncSha = (await kvGet('syncSha')) || '';
   GH = { ...GH_DEFAULT, ...((await kvGet('gh')) || {}) };
   VIMG = (await kvGet('verbImgs')) || {}; VON = (await kvGet('verbsOn')) ?? true;
   renderWords();

@@ -416,12 +416,13 @@ function ghClient(get) {                                  // get() -> {owner, to
     async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
     async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
     // create or replace; finds the current sha itself and retries once if someone wrote in between
-    async put(p, content64, message, sha) {
+    async put(p, content64, message, sha, strict = false) {   // strict: never overwrite a newer copy from another device
       for (let attempt = 0; attempt < 2; attempt++) {
         if (sha === undefined) sha = (await this.meta(p))?.sha || null;
         const r = await call(p, { method: 'PUT', body: JSON.stringify({ message, content: content64, ...(sha ? { sha } : {}) }) });
         if (r.ok) return (await r.json()).content.sha;
         if (r.status !== 409 && r.status !== 422) throw new Error('GitHub ' + r.status);
+        if (strict) throw new Error('CONFLICT');
         sha = undefined;
       }
       throw new Error('GitHub conflict');

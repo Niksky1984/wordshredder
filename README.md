@@ -48,6 +48,14 @@ Then **Publish to site** (Studio) or **Save & send to his phone** (admin page).
 
 100 verbs built into Studio, in learning order (10 sets of 10). Verbs have **their own button** (home screen and Verbs tab), their own blue practice window and their own score. Verb practice never fills a word session and does not count for word levels; word sessions contain no verbs. Admin page → Rules: *Verb practice length* (default 5 min) and *Irregular verbs in rotation* (default 6). Rewards can use the rule *Every N irregular verbs learned*. First meeting: pick the right forms out of 6. After that: type **both** the past simple and the past participle; one wrong form = miss. Both learnt/learned, burnt/burned, was/were and got/gotten are accepted. His **Verbs** tab shows the sets and his progress.
 
+## Using Studio and Dad's desk on two devices (PC + phone)
+
+Both pages work on the PC and on your phone. Open them from the site: `…/wordshredder/editor.html` and `…/wordshredder/admin.html`.
+
+- **Studio on a new device:** Website settings → your token → **Load from site**. It pulls everything straight from GitHub.
+- **Neither device can undo the other's work.** If you publish from the phone, Studio on the PC stops with *"Changed on your other device"* when you try to publish. Press **Load from site** (your own unpublished words stay), then publish.
+- **Dad's desk on a new device:** Setup → your token → **Restore from backup** (the key file). If you saved rules on one device, the other one warns, loads the latest, and you make your change again. It also refreshes by itself when you come back to the page.
+
 ## Dad's desk (admin page): `admin.html`
 
 Manage everything from anywhere: schedule, scoring, time limits, rewards with their animations, **Payment done**, his sessions and the honesty report.
