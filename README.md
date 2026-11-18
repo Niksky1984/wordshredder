@@ -48,6 +48,15 @@ Then **Publish to site** (Studio) or **Save & send to his phone** (admin page).
 
 100 verbs built into Studio, in learning order (10 sets of 10). Verbs have **their own button** (home screen and Verbs tab), their own blue practice window and their own score. Verb practice never fills a word session and does not count for word levels; word sessions contain no verbs. Admin page → Rules: *Verb practice length* (default 5 min) and *Irregular verbs in rotation* (default 6). Rewards can use the rule *Every N irregular verbs learned*. First meeting: pick the right forms out of 6. After that: type **both** the past simple and the past participle; one wrong form = miss. Both learnt/learned, burnt/burned, was/were and got/gotten are accepted. His **Verbs** tab shows the sets and his progress.
 
+## Treasury (game coins)
+
+The gold bag next to his streak shows his coins (12.5K, 1.2M). Tap it to open the treasury (9:16), with his balance, a **Withdraw** button (he asks Dad for an amount) and a **History** list.
+
+- **Coins in:** every reward can pay coins (Dad's desk → Rewards → *coins each time*). Rule types include *Perfect day*, *Every session that counts*, *Every finished verb practice*, *Perfect week*, *Every N items / verbs learned*, *Extra sessions*, *Perfect days in a row* and *Special*. Tick **needs my approval** to approve each payout yourself; otherwise it is credited automatically. You can also add or take coins by hand with a note.
+- **Coins out:** his request pops up in Dad's desk. **Approve** deducts it, **Decline** leaves his balance as it is. While it waits, that amount is held so he can't ask twice.
+- A reward with a text (e.g. "Cinema") is a real-life reward: it shows under *Earned* with **Payment done**. A reward with coins only goes straight to the treasury.
+- Everything you decide is signed with your key, so his phone can't fake coins or approvals.
+
 ## Weather (the snow)
 
 Dad's desk → **Rules** → **Weather**, with a live preview. Presets: Calm, Light snow, Snowfall, Heavy snow, Blizzard, Changing weather, No snow. Or set it yourself: *Fixed* intensity 0–100, or *Changing* between a weakest and strongest level at the speed you choose; plus wind, gusts, flake size, falling speed and white-out haze. **Save & send to his phone** and his app changes the next time it opens.

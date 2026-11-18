@@ -247,6 +247,38 @@ div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
 .vdone .vd-score{justify-content:center}.vdone .bar i,#v-verbs .bar i{background:linear-gradient(90deg,#5ab8ff,#9fe6ff)}
 #session.verbs .primary{background:linear-gradient(135deg,#2f8fd8,#1d6aa8)}
 
+/* ---------- treasury ---------- */
+.gold-num{background:linear-gradient(180deg,#fff7cf 0%,#ffd84d 38%,#e0a21a 62%,#9c6a0c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;filter:drop-shadow(0 1px 0 rgba(60,30,0,.9)) drop-shadow(0 2px 6px rgba(0,0,0,.55));font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.h-right{display:flex;align-items:center;gap:8px;flex:none}
+.bag{position:relative;width:60px;height:56px;display:block}
+.bag img{position:absolute;left:4px;top:-4px;width:52px;height:47px;object-fit:contain;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));transition:transform .15s}
+.bag:active img{transform:scale(.92)}
+.bag b{position:absolute;left:-6px;right:-6px;bottom:-2px;text-align:center;font-size:17px;line-height:1}
+.coin-tag{display:flex;align-items:center;gap:6px;margin-top:6px}.coin-tag img{width:24px;height:22px;object-fit:contain}.coin-tag b{font-size:16px}.coin-tag small{color:var(--muted)}
+.vault{position:relative;width:min(92vw,calc(92vh * 9 / 16));aspect-ratio:9/16;border-radius:24px;overflow:hidden;background:#1a1006 url(img/treasury_room.jpg) center/cover no-repeat;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;color:#fff}
+.vault::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 32%,rgba(0,0,0,0) 50%,rgba(0,0,0,.72) 78%,rgba(0,0,0,.85) 100%);pointer-events:none}
+.vault>*{position:relative}
+.v-x{position:absolute;right:12px;top:12px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:16px}
+.v-top{text-align:center;padding:26px 16px 0}.v-top .kicker{color:#ffe7a6}
+.v-sum{font-size:clamp(40px,13vw,64px);line-height:1.05;margin-top:6px}
+.v-unit{color:#ffe7a6;font-weight:700;font-size:13px;text-shadow:0 1px 3px #000}
+.v-note{display:inline-block;margin-top:8px;background:rgba(0,0,0,.5);border-radius:99px;padding:4px 12px;font-size:12.5px;font-weight:700}
+.v-body{margin-top:auto;padding:14px}
+.v-panel{background:rgba(12,8,2,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,215,120,.25);border-radius:18px;padding:12px}
+.v-panel .kicker{color:#ffe7a6}
+.v-amt{font-size:38px;text-align:center;margin:4px 0 8px}
+.v-btn{height:46px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-weight:800;font-size:15px}
+.v-btn.gold{background:linear-gradient(180deg,#ffe28a,#e3a51c);color:#3a2300;border:0;box-shadow:0 4px 14px rgba(227,165,28,.4)}
+.v-btn.ghost{height:34px;padding:0 12px;font-size:13px}
+.v-btn[disabled]{opacity:.45}
+.v-acts{display:flex;gap:10px;margin-top:10px}.v-acts .v-btn{flex:1}
+.v-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}.v-chips .v-btn{height:36px;font-size:13px}
+.v-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.v-pad .v-btn{height:42px;font-size:18px}
+.v-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border-radius:12px;background:rgba(12,8,2,.65);margin-bottom:6px;font-weight:700}
+.v-row small{display:block;font-weight:500;color:#e8d9b5;font-size:12px}
+.v-list{max-height:46vh;overflow:auto;margin:6px 0 0}.v-list .v-row{background:rgba(255,255,255,.06)}
+.v-row b.pos{color:#ffd84d}.v-row b.neg{color:#ff9a8a}
+
 /* admin page additions (on top of app.css) */
 body{user-select:text;-webkit-user-select:text}
 #wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:18px 16px 110px}
@@ -294,6 +326,14 @@ td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 .sw i::after{content:'';position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#cfd8e3;transition:.2s}.sw input:checked+i{background:var(--gold)}.sw input:checked+i::after{transform:translateX(20px);background:#fff}
 @media (max-width:600px){.wx-row{flex-wrap:wrap}.wx-sl{width:100%}}
 
+/* treasury */
+.gold-num{background:linear-gradient(180deg,#fff7cf 0%,#ffd84d 38%,#e0a21a 62%,#9c6a0c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;filter:drop-shadow(0 1px 0 rgba(60,30,0,.9));font-variant-numeric:tabular-nums}
+.tre-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}.tre-head img{width:64px;height:58px;object-fit:contain}.tre-head b{font-size:30px}
+.hist.req{background:rgba(233,168,90,.08);border-radius:12px;padding:10px}
+.coins-row img{width:30px;height:27px;object-fit:contain}.coins-row input[type=number]{width:110px}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);margin-left:auto}.chk input{width:18px;height:18px;accent-color:var(--gold)}
+.req-pop{max-width:420px;text-align:center}.req-pop img{width:110px;height:100px;object-fit:contain}.req-pop h2 .gold-num{font-size:1.15em}.pp-foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
 </style>
 </head>
 <body>
@@ -337,9 +377,16 @@ const CFG_DEFAULT = {
     { id: 'r-words', title: 'Every 30 words learned', text: 'Reward: set by Dad', rule: { type: 'words', n: 30 } },
   ],
   paid: {},               // rewardKey -> time Dad tapped "Payment done"
+  coinOk: {},             // rewardKey -> coins Dad approved (rewards set to "needs my approval")
+  coinNo: {},             // rewardKey -> time Dad declined the coins
+  bank: [],               // coins Dad added (+) or took (−) by hand: {id, at, amount, note}
+  wd: {},                 // withdrawal requests Dad decided: id -> {ok, at, amount}
   weather: null,          // snow settings; null = WEATHER_DEFAULT
 };
 const RULE_TYPES = {
+  daily: { label: 'Perfect day: every session of the day', n: false },
+  session: { label: 'Every session that counts', n: false },
+  vsession: { label: 'Every finished verb practice', n: false },
   perfect_week: { label: 'Perfect week: every session, all 7 days', n: false },
   extra: { label: 'Extra sessions in one week', n: 'How many extra sessions' },
   words: { label: 'Every N items learned', n: 'N items' },
@@ -408,6 +455,15 @@ function rewardState(r) {
         if (isCur) { out.cur = `${Math.min(ex, n)} of ${n} extra sessions this week`; out.pct = Math.min(1, ex / n); out.status = ex >= n ? 'earned' : 'progress'; }
       }
     }
+  } else if (t === 'daily') {
+    const today = ymd();
+    for (let d = firstDay(); d <= today; d = addDays(d, 1)) if (perfectDay(d)) out.earned.push({ key: `${r.id}@${d}`, label: `perfect day ${d.slice(8)}.${d.slice(5, 7)}`, at: new Date(d + 'T23:00').getTime() });
+    const st = dayStatus(today), done = st.filter(x => x === 'done').length;
+    out.cur = `${done} of ${st.length} sessions today`; out.pct = st.length ? done / st.length : 0; out.status = st.includes('missed') ? 'lost' : done === st.length ? 'earned' : 'progress';
+  } else if (t === 'session' || t === 'vsession') {
+    const vb = t === 'vsession', list = LOG.filter(x => x.ok && (x.kind === 'verbs') === vb);
+    for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
+    const today = list.filter(x => x.day === ymd()).length; out.cur = `${today} today`; out.pct = 0;
   } else if (t === 'words') {
     const L = peakLearned(), got = Math.floor(L / n);
     for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} learned` });
@@ -426,6 +482,40 @@ function rewardState(r) {
   return out;
 }
 const paidAt = key => CFG.paid?.[key] || 0;
+
+/* ---------- treasury: game coins ----------
+   In:  rewards that pay coins (automatically, or after Dad approves) + coins Dad adds by hand.
+   Out: withdrawals Dad approved. Everything Dad decides lives in his signed rules, so the phone cannot fake it. */
+function fmtCoins(n) {
+  const a = Math.abs(Math.round(n)), sg = n < 0 ? '−' : '', cut = (v, d) => String(+v.toFixed(d));
+  if (a >= 1e6) return sg + cut(a / 1e6, a < 1e7 ? 2 : 1) + 'M';
+  if (a >= 1e3) return sg + cut(a / 1e3, a < 1e4 ? 2 : a < 1e5 ? 1 : 0) + 'K';
+  return sg + a;
+}
+const fullCoins = n => Math.round(n).toLocaleString('en-US');
+function treasury(requests = []) {
+  const hist = [], awaiting = [];
+  for (const r of CFG.rewards || []) {
+    const c = Math.max(0, Math.round(r.coins || 0)); if (!c) continue;
+    for (const e of rewardState(r).earned) {
+      if (CFG.coinNo?.[e.key]) continue;
+      if (r.approve && !CFG.coinOk?.[e.key]) { awaiting.push({ key: e.key, title: r.title, label: e.label, amount: c, at: e.at || 0 }); continue; }
+      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label, at: e.at || 0 });
+    }
+  }
+  for (const b of CFG.bank || []) hist.push({ kind: 'bank', amount: b.amount, title: b.amount >= 0 ? 'From Dad' : 'Taken by Dad', label: b.note || '', at: b.at });
+  const pending = [];
+  for (const q of requests) {
+    const d = CFG.wd?.[q.id];
+    if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id: q.id }); }
+    else if (!q.cancelled) pending.push(q);
+  }
+  // approvals whose request the phone no longer lists still count
+  for (const [id, d] of Object.entries(CFG.wd || {})) if (d.ok && !requests.some(q => q.id === id)) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id });
+  hist.sort((a, b) => b.at - a.at);
+  const balance = hist.reduce((a, h) => a + h.amount, 0), held = pending.reduce((a, q) => a + q.amount, 0);
+  return { balance, available: balance - held, pending, awaiting, hist };
+}
 
 /* ---------- signed rules: only Dad's key can change them ---------- */
 const b64 = { enc: buf => btoa(String.fromCharCode(...new Uint8Array(buf))), dec: s => Uint8Array.from(atob(s), c => c.charCodeAt(0)),
@@ -626,7 +716,7 @@ async function loadAll() {
     for (const e of Array.isArray(dir) ? dir : []) if (/^sessions-\d{4}-\d{2}\.json$/.test(e.name)) { const t = await gh.text('log/' + e.name); try { LOG.push(...JSON.parse(t.text)); } catch {} }
     LOG.sort((a, b) => a.start - b.start);
     const st = await gh.text('log/state.json').catch(() => null); STATE = null; if (st) try { STATE = JSON.parse(st.text); } catch {}
-    busy = ''; dirty = false;
+    busy = ''; dirty = false; setTimeout(popRequests, 300);
   } catch (e) { busy = ''; toast(e.message, 7000); if (/Token|repo/.test(e.message)) tab = 'setup'; }
   render();
 }
@@ -659,7 +749,8 @@ function render() {
   mountPreview();
 }
 const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
-function toPay() { return CFG.rewards.flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }
+function toPay() { return CFG.rewards.filter(r => (r.text || '').trim()).flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }   // real-life rewards; coins-only ones go to the treasury
+const REQS = () => STATE?.requests || [];
 const flags = x => [x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : ''].filter(Boolean).join(' · ');
 
 function vOverview() {
@@ -678,6 +769,7 @@ function vOverview() {
     <div class="panel"><div class="kicker">🔁 Irregular verbs · separate practice, own score</div>
       <div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${STATE?.verbs ?? '–'}${STATE?.verbTotal ? ' / ' + STATE.verbTotal : ''}</b><span>verbs learned</span></div><div class="stat"><b>${STATE ? STATE.items.filter(i => i.verb && i.seen && !i.learned).length : '–'}</b><span>verbs in progress</span></div>
         <div class="stat"><b>${v7.filter(x => !x.quit).length}${v7.filter(x => x.quit).length ? ` <small class="hint">(+${v7.filter(x => x.quit).length} quit)</small>` : ''}</b><span>verb practices · last 7 days</span></div><div class="stat"><b>${v7.reduce((a, x) => a + x.cards, 0) ? Math.round(v7.reduce((a, x) => a + x.correct, 0) / v7.reduce((a, x) => a + x.cards, 0) * 100) + '%' : '–'}</b><span>verb answers correct</span></div></div></div>
+    ${vTreasury(false)}
     ${bad.length ? `<div class="panel alert"><b>⚠ The rules file on GitHub was changed by someone other than you</b><div class="hint">His app refused it ${bad.length} time(s) this week (${[...new Set(bad.map(e => e.kind === 'tamper' ? 'wrong signature' : 'older copy put back'))].join(', ')}). Your rules were not affected. Check the repo history on GitHub.</div></div>` : ''}
     <div class="panel"><div class="kicker">To pay</div>${due.length ? due.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}<br><span class="hint">${esc(e.r.text || '')}</span></span><button class="btn gold" data-pay="${esc(e.key)}">Payment done</button></div>`).join('') : '<div class="hint">Nothing waiting.</div>'}</div>
     <div class="panel"><div class="kicker">Honesty · word sessions · last 7 days</div>
@@ -747,11 +839,40 @@ function vRewards() {
     return `<div class="panel"><div class="rw"><div class="anim r11">${r.animURL ? (/\.(mp4|webm|mov)$/i.test(r.anim) ? `<div class="media" style="width:100%;height:100%"><video src="${r.animURL}" autoplay muted loop playsinline></video></div>` : `<div class="media" style="width:100%;height:100%"><img src="${r.animURL}"></div>`) : r.anim ? '<div class="ph"><b>animation set ✓</b></div>' : '<div class="ph"><b>no animation</b><span>1:1</span></div>'}</div>
       <div class="tx" style="flex:1"><input type="text" class="wide" data-rw="${i}.title" value="${esc(r.title)}" placeholder="Title, e.g. Perfect week">
         <input type="text" class="wide" data-rw="${i}.text" value="${esc(r.text || '')}" placeholder="What he gets, e.g. Fishing trip with Dad" style="margin-top:6px">
-        <div class="times" style="margin-top:6px"><select data-rw="${i}.type">${Object.entries(RULE_TYPES).map(([k, v]) => `<option value="${k}" ${r.rule.type === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select>${rt.n ? `<input type="number" min="1" max="999" data-rw="${i}.n" value="${r.rule.n || 1}" title="${rt.n}">` : ''}</div></div></div>
+        <div class="times" style="margin-top:6px"><select data-rw="${i}.type">${Object.entries(RULE_TYPES).map(([k, v]) => `<option value="${k}" ${r.rule.type === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select>${rt.n ? `<input type="number" min="1" max="999" data-rw="${i}.n" value="${r.rule.n || 1}" title="${rt.n}">` : ''}</div>
+        <div class="times coins-row" style="margin-top:6px"><img src="img/bag_gold.png" alt=""><input type="number" min="0" max="10000000" step="1" data-rw="${i}.coins" value="${r.coins || 0}" title="Coins into his treasury each time"><span class="hint">coins each time</span>
+          <label class="chk"><input type="checkbox" data-rw="${i}.approve" ${r.approve ? 'checked' : ''}> needs my approval</label></div></div></div>
       <div class="times" style="margin-top:10px;justify-content:space-between"><span class="hint">Now: ${esc(s.cur)} · earned ${s.earned.length}×</span><span><button class="btn" data-anim="${i}">${r.anim ? 'Change animation' : 'Add animation (1:1)'}</button>${r.rule.type === 'manual' ? ` <button class="btn gold" data-grant="${i}">Give it now</button>` : ''} <button class="btn x" data-delrw="${i}">Delete</button></span></div></div>`; }).join('');
   const all = toPay().sort((a, b) => (paidAt(a.key) ? 1 : 0) - (paidAt(b.key) ? 1 : 0));
-  return `${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
-    <div class="panel"><div class="kicker">Earned</div>${all.length ? all.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}${paidAt(e.key) ? `<br><span class="hint">paid ${new Date(paidAt(e.key)).toLocaleDateString()}</span>` : ''}</span>${paidAt(e.key) ? `<span><span class="pill ok">paid ✓</span> <button class="btn x" data-unpay="${esc(e.key)}">undo</button></span>` : `<button class="btn gold" data-pay="${esc(e.key)}">Payment done</button>`}</div>`).join('') : '<div class="hint">Nothing earned yet.</div>'}</div>`;
+  return `${vTreasury(true)}${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
+    <div class="panel"><div class="kicker">Earned · real-life rewards (with a text)</div>${all.length ? all.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}${paidAt(e.key) ? `<br><span class="hint">paid ${new Date(paidAt(e.key)).toLocaleDateString()}</span>` : ''}</span>${paidAt(e.key) ? `<span><span class="pill ok">paid ✓</span> <button class="btn x" data-unpay="${esc(e.key)}">undo</button></span>` : `<button class="btn gold" data-pay="${esc(e.key)}">Payment done</button>`}</div>`).join('') : '<div class="hint">Nothing earned yet.</div>'}</div>`;
+}
+/* ---------- treasury ---------- */
+function vTreasury(full) {
+  const T = treasury(REQS()), d8 = t => t ? new Date(t).toLocaleDateString([], { day: 'numeric', month: 'short' }) : '';
+  return `<div class="panel tre"><div class="tre-head"><img src="img/bag_gold.png" alt=""><div><div class="kicker">His treasury · game coins</div><b class="gold-num">${fullCoins(T.balance)}</b> <span class="hint">${fmtCoins(T.balance)}${T.pending.length ? ` · ${fullCoins(T.balance - T.available)} asked for` : ''}</span></div></div>
+    ${T.pending.map(q => `<div class="hist req"><span>💸 <b>Withdraw ${fullCoins(q.amount)}</b><br><span class="hint">asked ${d8(q.at)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</span></span><span><button class="btn x" data-wdno="${q.id}">Decline</button> <button class="btn gold" data-wdok="${q.id}">Approve</button></span></div>`).join('')}
+    ${T.awaiting.map(a => `<div class="hist"><span>🎁 <b>${esc(a.title)}</b> · ${esc(a.label)}<br><span class="hint">+${fullCoins(a.amount)} coins, waiting for your OK</span></span><span><button class="btn x" data-cno="${esc(a.key)}">Decline</button> <button class="btn gold" data-cok="${esc(a.key)}">Approve</button></span></div>`).join('')}
+    ${full ? `<div class="times" style="margin-top:10px;flex-wrap:wrap"><input type="number" id="bank-amt" placeholder="Coins: 500 or -200" style="width:190px"><input type="text" id="bank-note" class="wide" placeholder="Note he sees, e.g. good school marks" style="flex:1;min-width:160px"><button class="btn gold" data-act="bankadd">Add / take</button></div>
+      <details style="margin-top:10px"><summary class="hint">History (${T.hist.length})</summary>${T.hist.slice(0, 200).map(h => `<div class="hist"><span>${esc(h.title)}<br><span class="hint">${esc(h.label)} ${d8(h.at)}</span></span><b style="color:${h.amount < 0 ? 'var(--bad)' : 'var(--gold2)'}">${h.amount < 0 ? '−' : '+'}${fullCoins(Math.abs(h.amount))}</b></div>`).join('')}</details>` : ''}</div>`;
+}
+// his withdrawal requests pop up as soon as the page has the latest data
+let askedAbout = new Set();
+function popRequests() {
+  const T = treasury(REQS()), q = T.pending.find(x => !askedAbout.has(x.id)); if (!q || !KEY) return;
+  askedAbout.add(q.id);
+  const sc = document.createElement('div'); sc.className = 'scrim center';
+  sc.innerHTML = `<div class="dlg req-pop"><img src="img/bag_gold.png" alt=""><div class="kicker">Withdrawal request</div><h2>${esc(CFG.name)} wants <span class="gold-num">${fullCoins(q.amount)}</span> coins</h2>
+    <p class="hint">Asked ${new Date(q.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · his balance ${fullCoins(T.balance)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</p>
+    <div class="pp-foot"><button class="btn" data-pp="later">Later</button><button class="btn x" data-pp="no">Decline</button><button class="btn gold" data-pp="ok">Approve</button></div></div>`;
+  document.body.appendChild(sc);
+  sc.onclick = async e => { const b = e.target.closest('[data-pp]'); if (!b) return; sc.remove();
+    if (b.dataset.pp !== 'later') await decideWd(q.id, b.dataset.pp === 'ok'); popRequests(); };
+}
+async function decideWd(id, ok) {
+  const q = REQS().find(x => x.id === id); if (!q) return;
+  CFG.wd = { ...(CFG.wd || {}), [id]: { ok, at: Date.now(), amount: q.amount } };
+  await saveRules(ok ? 'withdrawal approved' : 'withdrawal declined');
 }
 function vSetup() {
   const site = /\.github\.io$/.test(location.hostname) ? new URL('./', location.href).href : `https://${(A?.owner || 'YOUR-NAME').toLowerCase()}.github.io/wordshredder/`;
@@ -788,7 +909,7 @@ document.addEventListener('change', e => {
   else if (d.str) { CFG[d.str] = t.value.trim() || CFG[d.str]; touch(); }
   else if (d.slot) { const [i, k] = d.slot.split('.'); if (t.value) { CFG.slots[i][k] = t.value; CFG.slots.sort((a, b) => hm(a.from) - hm(b.from)); touch(); } }
   else if (d.rw) { const [i, k] = d.rw.split('.'), r = CFG.rewards[i];
-    if (k === 'type') { r.rule = { type: t.value, ...(RULE_TYPES[t.value].n ? { n: r.rule.n || 3 } : {}) }; } else if (k === 'n') r.rule.n = Math.max(1, parseInt(t.value) || 1); else r[k] = t.value.trim();
+    if (k === 'type') { r.rule = { type: t.value, ...(RULE_TYPES[t.value].n ? { n: r.rule.n || 3 } : {}) }; } else if (k === 'n') r.rule.n = Math.max(1, parseInt(t.value) || 1); else if (k === 'coins') r.coins = Math.max(0, Math.round(+t.value) || 0); else if (k === 'approve') r.approve = t.checked; else r[k] = t.value.trim();
     touch(); }
 });
 document.addEventListener('click', async e => {
@@ -796,6 +917,9 @@ document.addEventListener('click', async e => {
   if (t.closest('#tabs')) { tab = d.tab; return render(); }
   if (d.wxp) { const y = scrollY; setWx(d.wxp === 'off' ? { mode: 'off' } : WEATHER_PRESETS.find(p => p[0] === d.wxp)[2]); render(); scrollTo(0, y); return; }
   if (d.wxm) { const y = scrollY; setWx({ mode: d.wxm }); render(); scrollTo(0, y); return; }
+  if (d.wdok || d.wdno) return decideWd(d.wdok || d.wdno, !!d.wdok);
+  if (d.cok) { const a = treasury(REQS()).awaiting.find(x => x.key === d.cok); if (a) { CFG.coinOk = { ...(CFG.coinOk || {}), [a.key]: a.amount }; return saveRules('coins approved'); } return; }
+  if (d.cno) { CFG.coinNo = { ...(CFG.coinNo || {}), [d.cno]: Date.now() }; return saveRules('coins declined'); }
   if (d.pay) { CFG.paid = { ...CFG.paid, [d.pay]: Date.now() }; return saveRules('payment done'); }
   if (d.unpay) { delete CFG.paid[d.unpay]; return saveRules('payment undone'); }
   if (d.delslot) { CFG.slots.splice(d.delslot, 1); return touch(); }
@@ -806,6 +930,8 @@ document.addEventListener('click', async e => {
     case 'save': return saveRules();
     case 'reload': return loadAll();
     case 'addslot': { const last = CFG.slots.at(-1); CFG.slots.push({ from: last ? last.to : '08:00', to: '22:00' }); return touch(); }
+    case 'bankadd': { const amt = Math.round(+$('#bank-amt').value); if (!amt) return toast('Type an amount, e.g. 500 or -200');
+      CFG.bank = [...(CFG.bank || []), { id: uid().slice(0, 8), at: Date.now(), amount: amt, note: $('#bank-note').value.trim() }]; return saveRules(amt > 0 ? 'coins added' : 'coins taken'); }
     case 'addrw': CFG.rewards.push({ id: 'r-' + uid().slice(0, 8), title: 'New reward', text: '', rule: { type: 'perfect_week' } }); return touch();
     case 'connect': { A = { ...(A || {}), owner: $('#a-owner').value.trim(), token: $('#a-token').value.trim() }; localStorage.setItem('ws-admin', JSON.stringify(A)); await loadAll(); if (A && !busy && tab === 'setup') toast('Connected ✓'); return; }
     case 'keynew': await newKey(); toast('Key created. Back it up now.'); return render();
