@@ -281,6 +281,38 @@ div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
 .v-list{max-height:46vh;overflow:auto;margin:6px 0 0}.v-list .v-row{background:rgba(255,255,255,.06)}
 .v-row b.pos{color:#ffd84d}.v-row b.neg{color:#ff9a8a}
 
+.fixbtn{border-color:rgba(255,140,120,.45);background:linear-gradient(135deg,#4a1f24,#2a1418)}
+#v-words .seg{flex-wrap:wrap}
+
+.exambtn{border-color:rgba(255,255,255,.35);background:linear-gradient(135deg,#1b1b1f,#3a3d44)}.exambtn .vb-tx b{letter-spacing:.02em}
+.exambtn.off{opacity:.7}
+#session.exam{background:linear-gradient(180deg,#2b2f36 0%,#16181d 55%,#0b0c0f 100%)}
+#session.exam .s-mode{color:#fff}
+.exam-done .vd-score b{color:#fff}
+
+.v-goal{margin:10px auto 0;max-width:86%;background:rgba(0,0,0,.5);border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700}.v-goal .bar{margin:6px 0 0;height:8px}
+.v-goal .bar i{background:linear-gradient(90deg,#e3a51c,#ffe28a)}
+.shop-it .s-ic{font-size:22px;margin-right:8px;vertical-align:middle}.shop-it small.gold-num{font-size:15px;margin-top:2px}
+.shop-it .s-b{display:flex;gap:6px;flex:none}.shop-it .v-btn.ghost{padding:0 10px;white-space:nowrap}.v-btn.ghost.gold{background:linear-gradient(180deg,#ffe28a,#e3a51c);color:#3a2300;border:0}.v-btn.ghost.on{border-color:#ffd84d;color:#ffd84d}
+
+.vs-q .gapw{color:var(--gold2);letter-spacing:.05em}.t-pic.sm{max-height:130px;width:auto}
+
+.say-box{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
+.say-btn{width:96px;height:96px;border-radius:50%;font-size:40px;background:radial-gradient(circle at 40% 35%,#ff7a6e,#c8372f);box-shadow:0 8px 24px rgba(216,71,63,.45);border:0}
+.say-btn.on{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,122,110,.6)}50%{box-shadow:0 0 0 18px rgba(255,122,110,0)}}
+.say-st{color:var(--muted);font-weight:700;min-height:20px;text-align:center}
+.say-type{width:auto;height:38px;padding:0 14px;font-size:13px}
+
+.ev-banner{display:flex;align-items:center;gap:12px;margin:-2px 0 12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#7a1e1e,#b5442c 60%,#e9a85a);box-shadow:0 6px 18px rgba(181,68,44,.35)}
+.ev-banner span{font-size:28px}.ev-banner b{display:block;font-size:16px}.ev-banner small{opacity:.9;font-weight:700}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:10px 6px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);filter:grayscale(1);opacity:.45}
+.badge.on{filter:none;opacity:1;background:linear-gradient(180deg,rgba(233,168,90,.18),rgba(233,168,90,.04));border-color:rgba(233,168,90,.45)}
+.badge span{font-size:28px}.badge b{font-size:12px;line-height:1.15}.badge small{font-size:10.5px;color:var(--muted);line-height:1.2}
+.badge-pop{text-align:center}.bp-icon{font-size:72px;line-height:1;margin-bottom:8px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:none}}
+
 </style>
 </head>
 <body>
@@ -329,6 +361,8 @@ const CFG_DEFAULT = {
   missPenalty: 3,         // points lost on a miss
   perLevel: 30,           // learned items per level
   verbMinutes: 5,         // length of an irregular-verb practice (its own button, its own score)
+  exam: { on: true, questions: 20, minutes: 8, pass: 80, minLearned: 10 },   // weekly "Black Run"
+  fixMinutes: 5,          // "Fix my mistakes" practice length
   verbActive: 6,          // verbs in rotation at a time in verb practice, in order
   time: { choose: 9, type: 10, perChar: 1.6, order: 8, perWord: 2.5, hear: 6 },   // seconds
   rewards: [
@@ -341,7 +375,12 @@ const CFG_DEFAULT = {
   coinNo: {},             // rewardKey -> time Dad declined the coins
   bank: [],               // coins Dad added (+) or took (−) by hand: {id, at, amount, note}
   wd: {},                 // withdrawal requests Dad decided: id -> {ok, at, amount}
+  shop: [],               // what coins can buy: {id, name, price, icon}
+  events: [],             // seasonal events: {id, name, icon, from, to (YYYY-MM-DD), mult, weather}
+  rates: [],              // weekly interest history: {from, pct} (0 = off)
   weather: null,          // snow settings; null = WEATHER_DEFAULT
+  speak: true,            // speaking test (Chrome speech recognition)
+  needNet: true,          // sessions start only online, after checking the phone's clock against the internet
 };
 const RULE_TYPES = {
   daily: { label: 'Perfect day: every session of the day', n: false },
@@ -352,6 +391,9 @@ const RULE_TYPES = {
   words: { label: 'Every N items learned', n: 'N items' },
   verbs: { label: 'Every N irregular verbs learned', n: 'N verbs' },
   streak: { label: 'Perfect days in a row', n: 'How many days' },
+  exam: { label: 'Weekly Black Run exam passed', n: false },
+  exam_top: { label: 'Black Run with 95% or more', n: false },
+  badge: { label: 'Every new badge', n: false },
   manual: { label: 'Special: I give it by hand', n: false },
 };
 
@@ -367,9 +409,9 @@ const addDays = (d, n) => { const x = new Date(d + 'T12:00'); x.setDate(x.getDat
 /* ---------- schedule ---------- */
 const slotName = s => { const m = hm(s.from); return m < 12 * 60 ? 'Morning' : m < 17 * 60 ? 'Day' : 'Evening'; };
 const slotIcon = s => { const m = hm(s.from); return m < 12 * 60 ? '☀️' : m < 17 * 60 ? '🏂' : '🌙'; };
-const sessOn = d => LOG.filter(x => x.day === d && x.ok && x.kind !== 'verbs');   // verb practice never fills a word slot
+const sessOn = d => LOG.filter(x => x.day === d && x.ok && !x.kind);   // verb practice and 'fix my mistakes' never fill a word slot
 // How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
-const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && x.kind !== 'verbs'); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
+const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && !x.kind); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
 // status of every slot on a given day: done / open (now) / later / missed
 function dayStatus(d = ymd(), now = clock()) {
   const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
@@ -421,9 +463,17 @@ function rewardState(r) {
     const st = dayStatus(today), done = st.filter(x => x === 'done').length;
     out.cur = `${done} of ${st.length} sessions today`; out.pct = st.length ? done / st.length : 0; out.status = st.includes('missed') ? 'lost' : done === st.length ? 'earned' : 'progress';
   } else if (t === 'session' || t === 'vsession') {
-    const vb = t === 'vsession', list = LOG.filter(x => x.ok && (x.kind === 'verbs') === vb);
+    const vb = t === 'vsession', list = LOG.filter(x => x.ok && (vb ? x.kind === 'verbs' : !x.kind));
     for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
     const today = list.filter(x => x.day === ymd()).length; out.cur = `${today} today`; out.pct = 0;
+  } else if (t === 'exam' || t === 'exam_top') {
+    const list = LOG.filter(x => x.kind === 'exam' && x.passed && (t === 'exam' || x.score >= 95));
+    for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `Black Run ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
+    const wk = LOG.find(x => x.kind === 'exam' && x.day >= weekDays()[0]);
+    out.cur = wk ? `this week: ${wk.score}%${wk.passed ? ' ✓' : ''}` : 'not run this week'; out.pct = wk ? Math.min(1, wk.score / 100) : 0; out.status = wk && !wk.passed ? 'lost' : 'progress';
+  } else if (t === 'badge') {
+    for (const bd of earnedBadges()) out.earned.push({ key: `${r.id}@${bd.id}`, label: `${bd.icon} ${bd.name}`, at: 0 });
+    out.cur = `${out.earned.length} of ${BADGES.length} badges`; out.pct = out.earned.length / BADGES.length;
   } else if (t === 'words') {
     const L = peakLearned(), got = Math.floor(L / n);
     for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} learned` });
@@ -453,25 +503,38 @@ function fmtCoins(n) {
   return sg + a;
 }
 const fullCoins = n => Math.round(n).toLocaleString('en-US');
-function treasury(requests = []) {
+function treasury(requests = [], opt = {}) {
   const hist = [], awaiting = [];
   for (const r of CFG.rewards || []) {
-    const c = Math.max(0, Math.round(r.coins || 0)); if (!c) continue;
+    const c0 = Math.max(0, Math.round(r.coins || 0)); if (!c0 || (opt.noBadge && r.rule?.type === 'badge')) continue;
     for (const e of rewardState(r).earned) {
+      const c = Math.round(c0 * multAt(e.at));
       if (CFG.coinNo?.[e.key]) continue;
       if (r.approve && !CFG.coinOk?.[e.key]) { awaiting.push({ key: e.key, title: r.title, label: e.label, amount: c, at: e.at || 0 }); continue; }
-      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label, at: e.at || 0 });
+      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : ''), at: e.at || 0 });
     }
   }
   for (const b of CFG.bank || []) hist.push({ kind: 'bank', amount: b.amount, title: b.amount >= 0 ? 'From Dad' : 'Taken by Dad', label: b.note || '', at: b.at });
   const pending = [];
   for (const q of requests) {
     const d = CFG.wd?.[q.id];
-    if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id: q.id }); }
+    if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: q.item ? `Bought: ${q.item}` : 'Withdrawn', label: '', at: d.at, id: q.id }); }
     else if (!q.cancelled) pending.push(q);
   }
   // approvals whose request the phone no longer lists still count
   for (const [id, d] of Object.entries(CFG.wd || {})) if (d.ok && !requests.some(q => q.id === id)) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id });
+  // weekly interest: every Monday, on what he kept over the week (the rate that was set at that moment)
+  const rates = (CFG.rates || []).slice().sort((a, b) => a.from - b.from);
+  if (rates.some(r => r.pct > 0) && hist.length) {
+    hist.sort((a, b) => a.at - b.at);
+    const first = Math.max(rates.find(r => r.pct > 0).from, hist[0].at), end = mondayOf().getTime();
+    const B = mondayOf(new Date(first)); B.setDate(B.getDate() + 7);
+    for (; B.getTime() <= end; B.setDate(B.getDate() + 7)) {
+      const t = B.getTime(), rate = [...rates].reverse().find(r => r.from <= t)?.pct || 0; if (!rate) continue;
+      const bal = hist.reduce((a, h) => a + (h.at < t ? h.amount : 0), 0), amt = Math.floor(bal * rate / 100);
+      if (amt > 0) { const k = hist.findIndex(h => h.at >= t); hist.splice(k < 0 ? hist.length : k, 0, { kind: 'interest', amount: amt, title: 'Interest', label: `${rate}% on ${fullCoins(bal)}`, at: t }); }
+    }
+  }
   hist.sort((a, b) => b.at - a.at);
   const balance = hist.reduce((a, h) => a + h.amount, 0), held = pending.reduce((a, q) => a + q.amount, 0);
   return { balance, available: balance - held, pending, awaiting, hist };
@@ -620,12 +683,165 @@ function makeSnow(cv, getW, opts = {}) {
   return { stop() { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', resize); document.removeEventListener('visibilitychange', onVis); }, level: () => I };
 }
 
+/* ---------- seasonal events: coins × N and their own weather for a few days ---------- */
+const EVENT_PRESETS = [
+  ['xmas', '🎄', 'Christmas week', '12-24', '12-31', 2, 'snow'],
+  ['ny', '🎆', 'New Year blizzard', '12-31', '01-02', 3, 'blizzard'],
+  ['birthday', '🎂', 'Birthday week', '10-11', '10-17', 2, 'light'],
+];
+const activeEvents = (d = ymd()) => (CFG.events || []).filter(e => e.from <= d && d <= e.to);
+const multAt = at => { if (!at) return 1; const d = ymd(new Date(at)); return activeEvents(d).reduce((m, e) => Math.max(m, e.mult || 1), 1); };
+const eventWeather = () => { const e = activeEvents().find(x => x.weather); const p = e && WEATHER_PRESETS.find(x => x[0] === e.weather); return p ? { ...weatherOf(CFG.weather), ...p[2] } : null; };
+
+/* ---------- badges: worked out from his real history, so they can't be faked ---------- */
+const BADGES = [
+  ['first', '🎿', 'First Tracks', 'First session that counts', c => c.sess >= 1],
+  ['s25', '🚡', 'Lift Regular', '25 sessions that count', c => c.sess >= 25],
+  ['s100', '🏔️', 'Mountain Local', '100 sessions that count', c => c.sess >= 100],
+  ['w50', '📘', 'Word Collector', '50 words learned', c => c.words >= 50],
+  ['w100', '📗', 'Word Hoarder', '100 words learned', c => c.words >= 100],
+  ['w250', '📙', 'Walking Dictionary', '250 words learned', c => c.words >= 250],
+  ['w500', '📕', 'Lexicon Legend', '500 words learned', c => c.words >= 500],
+  ['v25', '🔁', 'Verb Rookie', '25 irregular verbs learned', c => c.verbs >= 25],
+  ['v50', '🔂', 'Verb Bender', '50 irregular verbs learned', c => c.verbs >= 50],
+  ['v100', '👑', 'Verb Master', 'All 100 irregular verbs learned', c => c.verbs >= 100],
+  ['r7', '🔥', 'Hot Streak', '7 perfect days in a row', c => c.run >= 7],
+  ['r30', '☄️', 'Unstoppable', '30 perfect days in a row', c => c.run >= 30],
+  ['r100', '🌋', 'Volcano', '100 perfect days in a row', c => c.run >= 100],
+  ['ex1', '⛷️', 'Black Run Survivor', 'Pass a Black Run', c => c.exams >= 1],
+  ['ex5', '🏂', 'Black Run Regular', 'Pass 5 Black Runs', c => c.exams >= 5],
+  ['flaw', '💎', 'Flawless', 'A Black Run with 95% or more', c => c.flaw >= 1],
+  ['fix10', '🎯', 'Mistake Hunter', '10 "Fix my mistakes" practices', c => c.fix >= 10],
+  ['c10k', '💰', 'Gold Digger', 'Earn 10,000 coins in total', c => c.earned >= 1e4],
+  ['c100k', '🏦', 'Tycoon', 'Earn 100,000 coins in total', c => c.earned >= 1e5],
+  ['save', '🐷', 'Iron Piggy', 'Have 10,000 coins in the treasury', c => c.bal >= 1e4],
+].map(([id, icon, name, desc, test]) => ({ id, icon, name, desc, test }));
+const allReqs = () => typeof REQ !== 'undefined' ? REQ : (typeof STATE !== 'undefined' && STATE ? STATE.requests || [] : []);
+function badgeCtx() {
+  const T = treasury(allReqs(), { noBadge: true });
+  return { sess: LOG.filter(x => x.ok && !x.kind).length, words: peakLearned(), verbs: peakVerbs(), run: perfectRuns().reduce((m, r) => Math.max(m, r.len), 0),
+    exams: LOG.filter(x => x.kind === 'exam' && x.passed).length, flaw: LOG.filter(x => x.kind === 'exam' && x.score >= 95).length, fix: LOG.filter(x => x.kind === 'fix' && x.ok).length,
+    earned: T.hist.filter(h => h.amount > 0).reduce((a, h) => a + h.amount, 0), bal: T.balance };
+}
+const earnedBadges = () => { const c = badgeCtx(); return BADGES.filter(b => b.test(c)); };
+
+/* Irregular verbs in real sentences: [past simple sentence, past participle sentence].
+   ___ is the gap; the answer is the verb's past or past participle form. A third item narrows the accepted past simple. */
+const VERB_SENT = {
+  cut: ['Mum ___ the Christmas cake into ten pieces.', 'Have you ever ___ your finger on a ski edge?'],
+  put: ['I ___ my gloves on the radiator to dry.', 'Who has ___ snow in my boots?!'],
+  let: ['Dad ___ me drive the snowmobile for five minutes.', 'They have never ___ us stay up after midnight.'],
+  hit: ['A snowball ___ me right in the face.', 'The storm has ___ the north of the country.'],
+  set: ['We ___ the table for twelve people.', 'Have you ___ an alarm for the first lift?'],
+  shut: ['She ___ the window because of the wind.', 'The ski lift has ___ because of the storm.'],
+  cost: ['My new helmet ___ a lot of money.', 'This mistake has ___ me three points.'],
+  hurt: ['I fell and ___ my knee yesterday.', 'Has anyone ___ themselves on the black run?'],
+  read: ['Last night I ___ two chapters of my book.', 'Have you ___ the rules of the game?'],
+  quit: ['He ___ the team after one season.', 'I have ___ eating sweets before bed.'],
+  spread: ['She ___ butter on the hot toast.', 'The news has ___ around the whole school.'],
+  bet: ['I ___ my brother that I could ski faster.', 'Have you ever ___ on a football match?'],
+  burst: ['The balloon ___ with a loud bang.', 'The pipe has ___ because of the frost.'],
+  split: ['We ___ the pizza into eight slices.', 'The class has ___ into two teams.'],
+  have: ['We ___ hot chocolate after skiing.', 'I have ___ three lessons this week.'],
+  make: ['Grandma ___ pancakes for breakfast.', 'Have you ___ your bed today?'],
+  say: ['The instructor ___ that the snow was perfect.', 'You have ___ that three times already!'],
+  get: ['I ___ a new snowboard for Christmas.', 'It has ___ dark very early.'],
+  find: ['I ___ my lost glove under the bench.', 'Have you ___ your phone yet?'],
+  tell: ['He ___ us a funny story at dinner.', 'I have ___ you a hundred times!'],
+  think: ['I ___ the test would be harder.', 'Have you ___ about my question?'],
+  buy: ['Dad ___ new ski passes for everyone.', 'We have ___ all the presents already.'],
+  bring: ['She ___ cookies to the party.', 'Who has ___ the sledge inside?'],
+  teach: ['My uncle ___ me how to snowboard.', 'Mr Brown has ___ English here for ten years.'],
+  catch: ['The dog ___ the snowball in its mouth.', 'Have you ever ___ a fish in winter?'],
+  fight: ['The two cats ___ in the garden.', 'They have ___ about the remote control again.'],
+  sell: ['The shop ___ all its sledges in one day.', 'We have ___ our old car.'],
+  pay: ['I ___ for the tickets with my own money.', 'Have you ___ for the lift pass?'],
+  lay: ['She ___ the map on the table.', 'The hen has ___ three eggs today.'],
+  hold: ['He ___ the rope tightly.', 'They have ___ the race here since 1990.'],
+  stand: ['We ___ in the queue for an hour.', 'The old hotel has ___ here for a century.'],
+  understand: ['Nobody ___ the instructor\'s joke.', 'Have you ___ the new rule?'],
+  sit: ['We ___ by the fire and talked.', 'I have ___ here for twenty minutes!'],
+  win: ['Our team ___ the snowball fight.', 'She has ___ three medals this season.'],
+  lose: ['I ___ my hat on the chairlift.', 'Have you ___ your key again?'],
+  send: ['Grandpa ___ us a card from Siberia.', 'I have ___ you a message.'],
+  spend: ['We ___ the whole day on the slopes.', 'He has ___ all his pocket money.'],
+  build: ['We ___ a huge snowman in the yard.', 'They have ___ a new ski lift.'],
+  lend: ['My friend ___ me his goggles.', 'I have ___ my book to Emily.'],
+  leave: ['The bus ___ at seven o\'clock.', 'Oh no, I have ___ my skis at the hotel!'],
+  feel: ['I ___ tired after the long run.', 'I have never ___ so cold in my life.'],
+  keep: ['She ___ the secret for a week.', 'Have you ___ the receipt?'],
+  sleep: ['I ___ for ten hours after skiing.', 'Have you ___ well?'],
+  meet: ['We ___ a famous snowboarder at the café.', 'Have you ___ my cousin?'],
+  lead: ['The guide ___ us through the forest.', 'She has ___ the team for two years.'],
+  feed: ['I ___ the birds in the snow.', 'Have you ___ the cat?'],
+  hear: ['We ___ a strange noise at night.', 'Have you ___ the news?'],
+  mean: ['Sorry, I ___ to call you yesterday.', 'What have you ___ by that?'],
+  light: ['Dad ___ the candles on the cake.', 'Has anyone ___ the fire?'],
+  shoot: ['He ___ the puck into the goal.', 'They have ___ a film in our town.'],
+  dig: ['The kids ___ a tunnel in the snow.', 'The dog has ___ a hole in the garden.'],
+  hang: ['We ___ the stockings by the chimney.', 'Have you ___ your coat up?'],
+  stick: ['My tongue ___ to the frozen pole!', 'The door has ___ again because of the ice.'],
+  learn: ['I ___ ten new words yesterday.', 'Have you ___ the irregular verbs?'],
+  burn: ['I ___ my tongue on the hot tea.', 'Who has ___ the toast?'],
+  shine: ['The sun ___ all day on the mountain.', 'The stars have ___ brightly all night.'],
+  slide: ['I ___ down the hill on my back.', 'The car has ___ off the icy road.'],
+  come: ['Grandma ___ to visit us at Christmas.', 'Winter has ___ early this year.'],
+  become: ['He ___ a ski instructor at twenty.', 'It has ___ very cold outside.'],
+  run: ['I ___ to the bus stop.', 'Have you ever ___ a marathon?'],
+  be: ['Yesterday it ___ very cold.', 'Have you ever ___ to Sochi?', ['was']],
+  go: ['We ___ skiing last weekend.', 'Dad has ___ to the shop for bread.'],
+  do: ['I ___ my homework before dinner.', 'Have you ___ your session today?'],
+  see: ['We ___ a fox near the ski lift.', 'Have you ever ___ the northern lights?'],
+  eat: ['I ___ three pancakes for breakfast.', 'Have you ___ anything today?'],
+  give: ['Mum ___ me a warm scarf.', 'Has Dad ___ you your coins yet?'],
+  take: ['We ___ the cable car to the top.', 'Who has ___ my phone charger?'],
+  write: ['I ___ a letter to Father Frost.', 'Have you ___ your name on the card?'],
+  speak: ['The coach ___ to us before the race.', 'Have you ever ___ English on the phone?'],
+  break: ['He ___ his ski pole on a rock.', 'Who has ___ the window?'],
+  choose: ['I ___ the blue snowboard.', 'Have you ___ a present for Mum?'],
+  drive: ['Dad ___ us to the mountains.', 'Have you ever ___ a snowmobile?'],
+  ride: ['We ___ the chairlift to the top.', 'Have you ever ___ a horse?'],
+  rise: ['The sun ___ at eight o\'clock.', 'Prices have ___ again.'],
+  fall: ['I ___ three times on the first day.', 'A lot of snow has ___ overnight.'],
+  forget: ['I ___ my gloves at home.', 'Have you ___ my birthday again?'],
+  know: ['I ___ the answer but I was too slow.', 'I have ___ him since kindergarten.'],
+  grow: ['The snowdrift ___ taller every hour.', 'Wow, you have ___ so much!'],
+  throw: ['He ___ a snowball at the window.', 'Who has ___ my hat in the snow?'],
+  blow: ['The wind ___ my hat off.', 'The storm has ___ the fence down.'],
+  fly: ['We ___ to the mountains last winter.', 'Have you ever ___ in a helicopter?'],
+  draw: ['She ___ a picture of our dog.', 'Have you ___ a map of the slopes?'],
+  show: ['He ___ me a new trick on the board.', 'Have you ___ Dad your marks?'],
+  wear: ['I ___ two pairs of socks on the slopes.', 'Have you ever ___ a costume?'],
+  tear: ['I ___ my jacket on a branch.', 'The wind has ___ the flag.'],
+  steal: ['Someone ___ my sandwich from my bag!', 'A bird has ___ the cookie!'],
+  freeze: ['The lake ___ in December.', 'My fingers have ___!'],
+  wake: ['I ___ up at six to catch the first lift.', 'Have you ___ your brother?'],
+  hide: ['I ___ the presents under the bed.', 'Where have you ___ the chocolate?'],
+  bite: ['The dog ___ my glove.', 'Have you ever been ___ by a snake?'],
+  begin: ['It ___ to snow at midnight.', 'The race has already ___!'],
+  drink: ['We ___ hot tea at the top of the mountain.', 'Have you ___ your milk?'],
+  swim: ['We ___ in the hotel pool after skiing.', 'Have you ever ___ in the sea in winter?'],
+  sing: ['We ___ songs around the Christmas tree.', 'Have you ever ___ on a stage?'],
+  ring: ['The phone ___ in the middle of the night.', 'Has the bell ___ yet?'],
+  sink: ['The heavy box ___ in the deep snow.', 'The boat has ___!'],
+  shake: ['I ___ the snow off my coat.', 'Have you ___ the bottle?'],
+  forgive: ['She ___ her brother for the joke.', 'Have you ___ me yet?'],
+  beat: ['Our team ___ the champions!', 'Nobody has ___ his record.'],
+  lie: ['I ___ in the snow and looked at the sky.', 'The old sledge has ___ in the garage for years.'],
+};
+// a sentence with a gap, and the forms accepted in it (the third item, if any, narrows the past simple: "it ___ cold" → was)
+function verbSentence(w) {
+  const s = VERB_SENT[w.en]; if (!s) return null;
+  const pp = Math.random() < .5;
+  return { text: pp ? s[1] : s[0], form: pp ? 'pp' : 'past', ans: pp ? w.pp : (s[2] || w.past) };
+}
+
 /* =========================================================
    Word Shredder — strict word trainer (PWA)
    Words/media: content/words.json (published from Studio)
    Storage: IndexedDB · Rules (schedule, rewards): CFG
    ========================================================= */
-const APP_VERSION = '0.6';   // 0.1 app + Studio · 0.2 online link, signed rules, admin page · 0.3 avatar, real snow · 0.4 irregular verbs
+const APP_VERSION = '0.7';   // 0.1 app + Studio · 0.2 online link, signed rules, admin page · 0.3 avatar, real snow · 0.4 irregular verbs
 const DAY = 86400000;
 const REVIEW_DAYS = [2, 5, 12, 30, 60, 120];
 const ACTIVE_CAP = 12;                                   // items in rotation at a time
@@ -666,7 +882,8 @@ let VPEAK = 0;                        // same for irregular verbs (their own sco
 let LINK = null;                      // {owner, token, pub}: link to Dad's private data repo
 let SYNC = { at: 0, err: '' };
 let AV = [];                          // numbers of the avatars Dad published in Studio
-let REQ = [];                         // his withdrawal requests: {id, at, amount, cancelled?}
+let REQ = [];                         // his withdrawal requests: {id, at, amount, item?, cancelled?}
+let GOAL = '';                        // shop item he is saving for
 const peakLearned = () => Math.max(PEAK, learnedCount());
 const peakVerbs = () => Math.max(VPEAK, verbLearned());
 const imgCache = new Map();
@@ -677,6 +894,10 @@ const learnedCount = () => words.reduce((n, w) => n + (w.learned && !isVerb(w) ?
 const verbLearned = () => words.reduce((n, w) => n + (w.learned && isVerb(w) ? 1 : 0), 0);
 const verbList = () => words.filter(isVerb).sort((a, b) => a.seq - b.seq);
 const wordList = () => words.filter(w => !isVerb(w));
+const dueNow = () => words.filter(w => w.learned && (w.nextReview || 0) <= Date.now());
+// "Trouble words": missed often, recently, or forgotten after being learned
+const troubleScore = w => (w.wrong || 0) + 3 * (w.lapses || 0) + (w.lastWrong && Date.now() - w.lastWrong < 14 * DAY ? 3 : 0) - (w.fixedAt && Date.now() - w.fixedAt < 3 * DAY ? 4 : 0);
+const troubleList = (n = 12) => words.filter(w => (w.wrong || 0) > 0 && troubleScore(w) > 0).sort((a, b) => troubleScore(b) - troubleScore(a)).slice(0, n);
 const isVerb = w => w.type === 'verb';
 const kindOf = w => { if (isVerb(w)) return 'verb'; const n = norm(w.en).split(' ').length; return n >= 4 ? 'sentence' : n >= 2 ? 'phrase' : 'word'; };
 function levelInfo(n = learnedCount()) {
@@ -739,7 +960,7 @@ const sfx = { key: () => tone([[1100, 0, .05]], 'triangle', .08), good: () => to
 
 /* ---------- snow: real flakes with depth, sway and gusts of wind ---------- */
 let SNOW = null;
-function snow() { SNOW = makeSnow($('#snow'), () => CFG.weather); }   // Dad sets the weather in Dad's desk → Rules
+function snow() { SNOW = makeSnow($('#snow'), () => eventWeather() || CFG.weather); }   // an event can bring its own weather   // Dad sets the weather in Dad's desk → Rules
 
 /* ---------- toast & dialogs ---------- */
 let toastT;
@@ -825,13 +1046,16 @@ async function renderHome() {
   $('#v-home').innerHTML = `
     <div class="h-top"><div class="who"><button class="avatar ${(await avatarURL()) ? '' : 'empty'}" data-action="avatar" aria-label="Change avatar">${await avatarHTML()}</button><div><div class="kicker">${greeting()}</div><h1>${esc(CFG.name)}</h1></div></div><div class="h-right"><button class="bag" data-action="bank" aria-label="My treasury"><img src="img/bag_gold.png" alt=""><b class="gold-num">${fmtCoins(treasury(REQ).balance)}</b></button><div class="streak">🔥 ${streakDays()} day${streakDays() === 1 ? '' : 's'}</div></div></div>
     <div class="lights">${'<i></i>'.repeat(14)}</div>
+    ${activeEvents().map(e => `<div class="ev-banner"><span>${esc(e.icon || '🎉')}</span><div><b>${esc(e.name)}</b><small>${e.mult > 1 ? `coins ×${e.mult} · ` : ''}until ${new Date(e.to + 'T12:00').toLocaleDateString([], { day: 'numeric', month: 'short' })}</small></div></div>`).join('')}
     <div class="r169" style="margin-bottom:12px">${await mediaOrPh('home')}</div>
     <div class="panel"><div class="kicker">Today · ${doneN} of ${st.length} sessions${ex ? ` · +${ex} extra` : ''}</div><div class="slots">${slotHTML()}</div></div>
     <button class="panel" style="display:block;width:100%;text-align:left" data-go="progress"><div class="row"><div class="lvl-art">${await levelArt(L.lvl)}</div><div class="tx"><div class="kicker">Level ${L.lvl} of ${LEVELS}</div><b>${esc(L.name)}</b>${L.done ? 'Every level done. Suspiciously impressive.' : `${L.inLvl} / ${L.per} learned · ${L.per - L.inLvl} to the next lift`}</div></div><div class="bar"><i style="width:${L.inLvl / L.per * 100}%"></i></div></button>
     ${stake ? `<button class="panel" style="display:block;width:100%;text-align:left" data-go="rewards"><div class="row"><div class="ico">🎁</div><div class="tx"><b>${esc(stake.r.title)}</b>${esc(stake.s.cur)}</div><span class="pill ${stake.s.status === 'lost' ? 'no' : 'wait'}">${stake.s.status === 'lost' ? 'lost this week' : 'on track'}</span></div></button>` : ''}
     <button class="primary" data-action="start" ${wordList().length ? '' : 'disabled'}>${label}</button>
     <div class="hint" style="text-align:center;margin-top:10px">${wordList().length ? `${CFG.minutes} min · counts with ${CFG.minCorrect}+ correct answers` : 'Dad adds the words in Studio. Open the app with internet to load them.'}</div>
-    ${vs.length ? verbButton(vs, VL) : ''}`;
+    ${vs.length ? verbButton(vs, VL) : ''}
+    ${examButton()}
+    ${fixButton()}`;
 }
 
 const verbButton = (vs, VL) => `<button class="vbtn" data-action="start" data-mode="verbs"><span class="vb-ico">🔁</span><span class="vb-tx"><b>Irregular verbs</b><small>${CFG.verbMinutes || 5} min practice · its own score</small></span><span class="vb-sc"><b>${VL}</b>/${vs.length}</span><i style="width:${VL / vs.length * 100}%"></i></button>`;
@@ -844,12 +1068,15 @@ function openBank(view = 'main') {
     <div class="v-top"><div class="kicker">My treasury</div>
       <div class="v-sum gold-num">${fullCoins(T.balance)}</div><div class="v-unit">coins · ${fmtCoins(T.balance)}</div>
       ${T.pending.length ? `<div class="v-note">⏳ ${fullCoins(T.pending.reduce((a, q) => a + q.amount, 0))} waiting for Dad</div>` : ''}
-      ${T.awaiting.length ? `<div class="v-note">🎁 ${fullCoins(T.awaiting.reduce((a, q) => a + q.amount, 0))} earned, waiting for Dad's OK</div>` : ''}</div>
+      ${T.awaiting.length ? `<div class="v-note">🎁 ${fullCoins(T.awaiting.reduce((a, q) => a + q.amount, 0))} earned, waiting for Dad's OK</div>` : ''}
+      ${goalHTML(T)}</div>
     <div class="v-body" id="v-body"></div></div>`);
   const body = $('#v-body', sc);
   const main = () => { body.innerHTML = `
       ${T.pending.map(q => `<div class="v-row"><span>⏳ Withdraw <b>${fullCoins(q.amount)}</b><small>asked ${new Date(q.at).toLocaleDateString([], { day: 'numeric', month: 'short' })} · Dad decides</small></span><button class="v-btn ghost" data-r="cancel" data-id="${q.id}">Cancel</button></div>`).join('')}
-      <div class="v-acts"><button class="v-btn gold" data-r="wd" ${T.available > 0 ? '' : 'disabled'}>Withdraw</button><button class="v-btn" data-r="hist">History</button></div>`; };
+      <div class="v-acts">${(CFG.shop || []).length ? '<button class="v-btn gold" data-r="shop">🛒 Shop</button>' : ''}<button class="v-btn ${(CFG.shop || []).length ? '' : 'gold'}" data-r="wd" ${T.available > 0 ? '' : 'disabled'}>Withdraw</button><button class="v-btn" data-r="hist">History</button></div>`; };
+  const shop = () => { body.onclick = null; body.innerHTML = `<div class="v-panel"><div class="kicker">Shop · you have ${fullCoins(T.available)}</div><div class="v-list">${(CFG.shop || []).map(it => `<div class="v-row shop-it"><span><span class="s-ic">${esc(it.icon || '🎁')}</span>${esc(it.name)}<small class="gold-num">${fullCoins(it.price)}</small></span><span class="s-b"><button class="v-btn ghost ${GOAL === it.id ? 'on' : ''}" data-r="goal" data-id="${it.id}">${GOAL === it.id ? '★ Goal' : '☆ Goal'}</button><button class="v-btn ghost gold" data-r="buy" data-id="${it.id}" ${it.price <= T.available ? '' : 'disabled'}>Ask Dad</button></span></div>`).join('')}</div>
+      <div class="v-acts"><button class="v-btn" data-r="main">Back</button></div></div>`; };
   const wd = () => { let amt = 0; const max = T.available;
     const draw = () => { $('#v-amt', sc).textContent = fullCoins(amt); $('#v-send', sc).disabled = !(amt > 0 && amt <= max); };
     body.innerHTML = `<div class="v-panel"><div class="kicker">How much? · up to ${fullCoins(max)}</div><div class="v-amt gold-num" id="v-amt">0</div>
@@ -870,19 +1097,56 @@ function openBank(view = 'main') {
     if (r === 'main') { body.onclick = null; return main(); }
     if (r === 'wd') return wd();
     if (r === 'hist') return hist();
+    if (r === 'shop') return shop();
+    if (r === 'goal') { GOAL = GOAL === b.dataset.id ? '' : b.dataset.id; await kvSet('goal', GOAL); sc.close(); openBank(); syncData(); return; }
+    if (r === 'buy') { const it = (CFG.shop || []).find(x => x.id === b.dataset.id); if (!it || it.price > T.available) return;
+      if (!(await confirmDlg(`Buy ${it.name}?`, `${fullCoins(it.price)} coins. Dad gets your request and decides.`, 'Ask Dad'))) return;
+      REQ.push({ id: uid(), at: Date.now(), amount: it.price, item: it.name }); await kvSet('requests', REQ); sc.close(); render(); toast('Sent to Dad ✓', 3000); syncData(); return; }
     if (r === 'send') { const amt = +$('#v-amt', sc).textContent.replace(/\D/g, ''); if (!(amt > 0 && amt <= T.available)) return;
       REQ.push({ id: uid(), at: Date.now(), amount: amt }); await kvSet('requests', REQ); sc.close(); render(); toast(LINK ? 'Sent to Dad ✓ He decides.' : 'Saved. It goes to Dad when the app is linked and online.', 4000); syncData(); return; }
     if (r === 'cancel') { const q = REQ.find(x => x.id === b.dataset.id); if (q && !CFG.wd?.[q.id]) { q.cancelled = Date.now(); await kvSet('requests', REQ); } sc.close(); render(); openBank(); syncData(); }
   });
   main();
 }
+function goalHTML(T) {
+  const g = (CFG.shop || []).find(x => x.id === GOAL); if (!g) return '';
+  const p = Math.max(0, Math.min(1, T.available / g.price));
+  return `<div class="v-goal"><div>🎯 Saving for <b>${esc(g.name)}</b> · ${p >= 1 ? 'you can ask for it!' : `${fullCoins(g.price - T.available)} to go`}</div><div class="bar"><i style="width:${p * 100}%"></i></div></div>`;
+}
 // tell him once when Dad decides on a request
 async function noticeDecisions() {
   const seen = (await kvGet('wdSeen')) || {}; let msg = '';
-  for (const q of REQ) { const d = CFG.wd?.[q.id]; if (d && !seen[q.id]) { seen[q.id] = 1; msg = d.ok ? `💰 Dad approved: ${fullCoins(d.amount)} coins withdrawn` : `Dad declined the withdrawal of ${fullCoins(q.amount)}`; } }
+  for (const q of REQ) { const d = CFG.wd?.[q.id]; if (d && !seen[q.id]) { seen[q.id] = 1; msg = d.ok ? (q.item ? `🎉 Dad approved: ${q.item}!` : `💰 Dad approved: ${fullCoins(d.amount)} coins withdrawn`) : (q.item ? `Dad declined: ${q.item}` : `Dad declined the withdrawal of ${fullCoins(q.amount)}`); } }
   if (msg) { await kvSet('wdSeen', seen); toast(msg, 5000); }
 }
 
+const fixButton = () => { const t = troubleList(), d = dueNow().length;
+  return `${t.length ? `<button class="vbtn fixbtn" data-action="start" data-mode="fix"><span class="vb-ico">🎯</span><span class="vb-tx"><b>Fix my mistakes</b><small>${CFG.fixMinutes || 5} min · your ${t.length} trouble word${t.length === 1 ? '' : 's'}</small></span></button>` : ''}
+    ${d ? `<div class="hint" style="text-align:center;margin-top:10px">🔁 ${d} learned word${d === 1 ? '' : 's'} to review: they come first in your next session</div>` : ''}`; };
+/* ---------- Black Run: the weekly exam on what he has already learned ---------- */
+const examCfg = () => ({ on: true, questions: 20, minutes: 8, pass: 80, minLearned: 10, ...(CFG.exam || {}) });
+const examThisWeek = () => LOG.find(x => x.kind === 'exam' && x.day >= weekDays()[0]);
+const examPool = () => words.filter(w => w.learned || (w.learnedAt && w.lapses));   // learned now, or learned once and slipped
+function examButton() {
+  const E = examCfg(); if (!E.on) return '';
+  const done = examThisWeek(), n = examPool().length;
+  const sub = done ? `This week: <b>${done.score}%</b> ${done.passed ? '· passed ✓' : '· not passed'} · next run on Monday` : n < E.minLearned ? `Opens when you have ${E.minLearned} learned (now ${n})` : `${Math.min(E.questions, n)} questions · ${E.minutes} min · all typed · pass ${E.pass}%`;
+  return `<button class="vbtn exambtn ${done || n < E.minLearned ? 'off' : ''}" data-action="start" data-mode="exam" ${done || n < E.minLearned ? 'disabled' : ''}><span class="vb-ico">⛷️</span><span class="vb-tx"><b>Black Run · weekly exam</b><small>${sub}</small></span></button>`;
+}
+/* ---------- badges ---------- */
+function badgesHTML() {
+  const have = new Set(earnedBadges().map(b => b.id));
+  return `<div class="panel"><div class="kicker" style="margin-bottom:10px">Badges · ${have.size} of ${BADGES.length}</div><div class="badges">${BADGES.map(b => `<div class="badge ${have.has(b.id) ? 'on' : ''}" title="${esc(b.desc)}"><span>${b.icon}</span><b>${esc(b.name)}</b><small>${esc(b.desc)}</small></div>`).join('')}</div></div>`;
+}
+async function checkBadges() {                 // a moment for every new badge
+  const seen = (await kvGet('badgesSeen')) || null, now = earnedBadges().map(b => b.id);
+  if (!seen) return kvSet('badgesSeen', now);   // first run: no fireworks for old history
+  const fresh = BADGES.filter(b => now.includes(b.id) && !seen.includes(b.id)); if (!fresh.length) return;
+  await kvSet('badgesSeen', now);
+  const b = fresh[0], coins = CFG.rewards.filter(r => r.rule?.type === 'badge').reduce((a, r) => a + (r.coins || 0), 0);
+  const sc = openScrim(`<div class="dlg badge-pop"><div class="bp-icon">${b.icon}</div><div class="kicker">New badge${fresh.length > 1 ? ` · +${fresh.length - 1} more` : ''}</div><h2>${esc(b.name)}</h2><p>${esc(b.desc)}${coins ? ` · +${fullCoins(coins)} coins` : ''}</p><button class="primary" data-r="1">Nice</button></div>`);
+  confetti(100); sc.addEventListener('click', e => { if (e.target.closest('[data-r]') || e.target === sc) sc.close(); });
+}
 let vSet = -1;
 async function renderVerbs() {
   const vs = verbList();
@@ -907,9 +1171,12 @@ async function renderVerbs() {
 function renderWords() {
   const cnt = { all: words.length, new: 0, progress: 0, learned: 0 };
   words.filter(w => !isVerb(w)).forEach(w => cnt[w.learned ? 'learned' : w.seen ? 'progress' : 'new']++); cnt.all = words.filter(w => !isVerb(w)).length;
-  const list = words.filter(w => !isVerb(w)).filter(w => wordFilter === 'all' || (wordFilter === 'learned' ? w.learned : wordFilter === 'progress' ? w.seen && !w.learned : !w.seen));
+  const tset = new Set(troubleList(50).map(w => w.id)), now = Date.now();
+  cnt.review = wordList().filter(w => w.learned && (w.nextReview || 0) <= now).length; cnt.trouble = wordList().filter(w => tset.has(w.id)).length;
+  const list = words.filter(w => !isVerb(w)).filter(w => wordFilter === 'all' || (wordFilter === 'learned' ? w.learned : wordFilter === 'progress' ? w.seen && !w.learned : wordFilter === 'review' ? w.learned && (w.nextReview || 0) <= now : wordFilter === 'trouble' ? tset.has(w.id) : !w.seen));
   $('#v-words').innerHTML = `<div class="v-head"><div class="kicker">${cnt.all} items</div><h1>Words</h1></div>
-    <div class="seg">${[['all', 'All'], ['new', 'New'], ['progress', 'Learning'], ['learned', 'Learned']].map(([k, l]) => `<button data-filter="${k}" class="${wordFilter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>
+    <div class="seg">${[['all', 'All'], ['new', 'New'], ['progress', 'Learning'], ['learned', 'Learned'], ['review', 'Review'], ['trouble', 'Trouble']].map(([k, l]) => `<button data-filter="${k}" class="${wordFilter === k ? 'on' : ''}">${l} ${cnt[k]}</button>`).join('')}</div>
+    <div style="margin:-4px 0 12px">${fixButton()}</div>
     <div class="panel">${list.length ? list.slice(0, 300).map(w => `<div class="wrow"><div class="tx"><b>${esc(w.en)}</b><span>${esc(w.ru)}</span></div>${w.learned ? '<span class="pill ok">learned</span>' : `<div class="pips">${Array.from({ length: CFG.target }, (_, i) => `<i class="${i < (w.count || 0) ? 'on' : ''}"></i>`).join('')}</div>`}</div>`).join('') : '<div class="hint" style="text-align:center;padding:14px">Nothing here yet.</div>'}</div>`;
 }
 
@@ -932,13 +1199,14 @@ async function renderRewards() {
 }
 
 async function renderProgress() {
-  const L = levelInfo(), wk = weekDays(), WL = LOG.filter(x => x.kind !== 'verbs'), inWeek = WL.filter(x => x.day >= wk[0]);
+  const L = levelInfo(), wk = weekDays(), WL = LOG.filter(x => !x.kind), inWeek = WL.filter(x => x.day >= wk[0]);
   const corr = inWeek.reduce((a, x) => a + x.correct, 0), tot = inWeek.reduce((a, x) => a + x.cards, 0);
   const nodes = [];
   for (let i = 1; i <= LEVELS; i++) nodes.push(`<div class="node ${i < L.lvl || L.done ? 'done' : i === L.lvl ? 'cur' : 'locked'}"><div class="art">${await levelArt(i)}</div>${i}. ${esc(LV.names[i - 1])}</div>`);
   $('#v-progress').innerHTML = `<div class="v-head"><div class="kicker">Level ${L.lvl} of ${LEVELS}</div><h1>${esc(L.name)}</h1></div>
     <div class="stats"><div class="stat"><b>${L.total}</b><span>items learned</span></div><div class="stat"><b>${wordList().filter(w => w.seen && !w.learned).length}</b><span>in progress</span></div>
       <div class="stat"><b>${tot ? Math.round(corr / tot * 100) + '%' : '–'}</b><span>correct this week</span></div><div class="stat"><b>${WL.filter(x => x.ok).length}</b><span>sessions that counted</span></div></div>
+    ${badgesHTML()}
     <div class="panel"><div class="kicker" style="margin-bottom:12px">The way up</div><div class="road">${nodes.join('')}</div></div>`;
 }
 
@@ -1024,6 +1292,7 @@ async function syncFromSite(manual = false) {
     AV = Object.keys(m.avatars || {}).sort((a, b) => a - b); await kvSet('avatars', AV);
     await kvSet('siteSrc', src); await kvSet('siteTag', tag);
     toast(added ? `${added} new item${added === 1 ? '' : 's'} loaded` : 'Updated', 3000); render();
+    if (LINK && !(await kvGet('restoreChecked'))) setTimeout(syncData, 50);   // words just arrived on a new phone: get his progress back
   } catch (err) { console.warn('site sync skipped', err); if (manual) toast('Could not reach the site.'); }
   finally { syncing = false; }
 }
@@ -1034,21 +1303,47 @@ async function syncFromSite(manual = false) {
 let sess = null, tickT = null;
 const logEvent = (kind, w) => { EV.push({ t: Date.now(), kind, item: w?.en || '', sid: sess?.id || '' }); if (EV.length > 600) EV = EV.slice(-600); kvSet('events', EV); };
 function refillDeck() {                    // word sessions get only words; verb practice gets only verbs
+  if (sess.mode === 'exam') { if (!sess.examIds) { sess.examIds = shuffle(examPool()).slice(0, examCfg().questions).map(w => w.id); sess.deck = sess.examIds.map(id => ({ id })); } else sess.deck = []; return; }
+  if (sess.mode === 'fix') { sess.deck = shuffle(troubleList(12).map(w => ({ id: w.id }))); if (!sess.deck.length) sess.deck = shuffle(words.filter(w => w.seen)).slice(0, 8).map(w => ({ id: w.id })); return; }
   const now = Date.now(), vm = sess.mode === 'verbs', pool = words.filter(w => isVerb(w) === vm);
   const notL = pool.filter(w => !w.learned), cap = vm ? Math.max(2, CFG.verbActive || 6) : ACTIVE_CAP;
   const ord = vm ? notL.sort((a, b) => a.seq - b.seq) : notL;                              // verbs come in their fixed order
   const active = [...ord.filter(w => w.seen), ...ord.filter(w => !w.seen)].slice(0, cap);
-  let due = shuffle(pool.filter(w => w.learned && (w.nextReview || 0) <= now)).slice(0, 8);
+  let due = pool.filter(w => w.learned && (w.nextReview || 0) <= now).sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0)).slice(0, 10);   // most overdue first: memory fades
   if (vm && !active.length && !due.length) due = shuffle(pool.filter(w => w.learned)).slice(0, 10);   // all 100 learned: keep them fresh
   sess.deck = shuffle([...active, ...due].map(w => ({ id: w.id })));
 }
+/* ---------- real time from the internet: the phone's clock can be changed, the website's cannot ---------- */
+const CLOCK_SLACK = 3 * 60000;
+async function serverSkew() {                               // ms the phone is off from real time; null = offline
+  try {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 5000), t0 = Date.now();
+    const r = await fetch(`content/words.json?clock=${t0}`, { method: 'HEAD', cache: 'no-store', signal: ctl.signal }); clearTimeout(to);
+    const d = Date.parse(r.headers.get('Date') || ''); if (!r.ok || !d) return null;
+    return d - (t0 + Date.now()) / 2;                       // Date has 1 s precision; this is plenty for minutes
+  } catch { return null; }
+}
+let starting = false;
 async function startSession(mode = 'words') {
-  const vm = mode === 'verbs';
-  if (!(vm ? verbList() : wordList()).length) return toast(vm ? 'No verbs yet.' : 'No words yet.');
-  const slot = vm ? -1 : openSlot(), ms = (vm ? CFG.verbMinutes || 5 : CFG.minutes) * 60000;
-  sess = { id: uid(), mode, start: Date.now(), slot, total: ms, remaining: ms, last: performance.now(), cards: 0, correct: 0, wrong: 0, timeouts: 0, left: 0, fast: 0, learned: 0, deck: [], prevId: null, cur: null, done: false };
+  const vm = mode === 'verbs', fx = mode === 'fix', ex = mode === 'exam', E = examCfg();
+  if (fx && !troubleList().length) return toast('No mistakes to fix. Nice.');
+  if (ex && (!E.on || examThisWeek() || examPool().length < E.minLearned)) return toast('The Black Run is not open right now.');
+  if (ex && !(await confirmDlg('⛷️ Black Run', `${Math.min(E.questions, examPool().length)} questions on words you already learned. All typed, one try each, ${E.minutes} minutes. You need ${E.pass}%. Only one run a week. Ready?`, 'Drop in'))) return;
+  if (!fx && !ex && !(vm ? verbList() : wordList()).length) return toast(vm ? 'No verbs yet.' : 'No words yet.');
+  if (starting) return;
+  let skew = null;
+  if (CFG.needNet !== false) {
+    starting = true; toast('Checking the time…', 6000); skew = await serverSkew(); starting = false; clearTimeout(toastT); $('#toast').classList.remove('on');
+    if (skew === null) return confirmDlg('No internet', 'Sessions start only with internet, so the time can be checked. Connect and try again.', 'OK');
+    if (Math.abs(skew) > CLOCK_SLACK) {
+      if (!EV.some(e => e.kind === 'clock' && Date.now() - e.t < 3600000)) { EV.push({ t: Date.now(), kind: 'clock', item: `${Math.round(skew / 60000)} min`, sid: '' }); kvSet('events', EV); syncData(); }
+      return confirmDlg('Your clock is wrong', `Your phone's clock is ${Math.round(Math.abs(skew) / 60000)} min ${skew > 0 ? 'behind' : 'ahead'}. Turn on automatic date & time in the phone settings, then start again. (Dad sees this.)`, 'OK');
+    }
+  }
+  const slot = vm || fx || ex ? -1 : openSlot(), ms = (vm ? CFG.verbMinutes || 5 : fx ? CFG.fixMinutes || 5 : ex ? E.minutes : CFG.minutes) * 60000;
+  sess = { id: uid(), mode, start: Date.now(), skew: skew === null ? null : Math.round(skew / 1000), slot, total: ms, remaining: ms, last: performance.now(), cards: 0, correct: 0, wrong: 0, timeouts: 0, left: 0, fast: 0, learned: 0, deck: [], prevId: null, cur: null, done: false };
   refillDeck();
-  $('#session').classList.toggle('verbs', vm); $('#s-mode').textContent = vm ? '🔁 Irregular verbs' : '';
+  $('#session').classList.toggle('verbs', vm || fx); $('#session').classList.toggle('exam', ex); $('#s-mode').textContent = vm ? '🔁 Irregular verbs' : fx ? '🎯 Fix my mistakes' : ex ? '⛷️ Black Run' : '';
   $('#session').classList.remove('hidden'); updateHead();
   clearInterval(tickT); tickT = setInterval(tick, 100);
   await nextCard();
@@ -1071,7 +1366,7 @@ function tick() {
 function updateHead() {
   const s = Math.max(0, Math.ceil(sess.remaining / 1000));
   $('#s-time').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-  $('#s-count').innerHTML = sess.mode === 'verbs' ? `<b>${sess.correct}</b> correct` : `<b>${sess.correct}</b> / ${CFG.minCorrect} correct`;
+  $('#s-count').innerHTML = sess.mode === 'exam' ? `Q <b>${Math.min(sess.cards + 1, sess.examIds?.length || 0)}</b> / ${sess.examIds?.length || 0}` : sess.mode !== 'words' ? `<b>${sess.correct}</b> correct` : `<b>${sess.correct}</b> / ${CFG.minCorrect} correct`;
 }
 // Leaving the app in the middle of a test = miss (he could be looking the word up)
 document.addEventListener('visibilitychange', () => {
@@ -1101,15 +1396,40 @@ function distractors(w, n, key) {   // wrong options: same kind first (word with
   return out;
 }
 // Which test for this item now. Early steps may be recognition; later steps and the last one are always typed.
+/* ---------- speaking: he says the English word, the phone checks it (Chrome speech recognition, needs internet) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const canListen = () => !!SR && CFG.speak !== false && navigator.onLine && sess?.mode !== 'exam';
+const sayNorm = t => String(t || '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const saidRight = (alts, en) => { const want = sayNorm(en).replace(/^(to|a|an|the) /, ''); return alts.some(a => { const g = sayNorm(a); return g === want || g.replace(/^(to|a|an|the) /, '') === want || (` ${g} `).includes(` ${want} `) && g.split(' ').length <= want.split(' ').length + 2; }); };
+let rec = null;
+function listen() {
+  const c = sess?.cur; if (!c || c.phase !== 'test' || c.test !== 'say' || rec) return;
+  const st = $('#say-st'), btn = $('#say-btn');
+  try { rec = new SR(); } catch { rec = null; return toType(); }
+  rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 5;
+  let got = false;
+  rec.onresult = e => { got = true; const alts = [...e.results[0]].map(a => a.transcript); c.given = alts[0]; if (sess?.cur === c && c.phase === 'test') resolve(saidRight(alts, c.w.en), 'say'); };
+  rec.onerror = e => { if (st) st.textContent = e.error === 'not-allowed' ? 'Microphone blocked: allow it for this app, or type instead.' : e.error === 'network' ? 'Needs internet. Type instead.' : "Didn't catch that. Tap and say it again."; };
+  rec.onend = () => { rec = null; if (btn) btn.classList.remove('on'); if (!got && st && st.textContent === 'Listening…') st.textContent = "Didn't catch that. Tap and say it again."; };
+  btn?.classList.add('on'); if (st) st.textContent = 'Listening…';
+  rec.start();
+}
+function toType() { const c = sess?.cur; if (!c || c.phase !== 'test' || c.test !== 'say') return; try { rec?.abort(); } catch {} rec = null;   // switch to typing: same card, same clock, no free pass
+  c.test = 'type'; c.typed = '';
+  $('#stage').querySelector('.say-box')?.replaceWith(Object.assign(document.createElement('div'), { className: 't-in', id: 't-in' }));
+  $('#stage').querySelector('.t-kick').textContent = 'Type it in English';
+  $('#stage').insertAdjacentHTML('beforeend', keyboardHTML(/[0-9]/.test(c.w.en))); drawTyped(); }
+
 function pickTest(w) {
+  if (sess?.mode === 'exam') return isVerb(w) ? (VERB_SENT[w.en] && Math.random() < .5 ? 'vsent' : 'verb') : kindOf(w) === 'sentence' ? 'type' : Math.random() < .75 ? 'type' : 'hear';   // exam: always typed
   const kind = kindOf(w), p = w.learned ? CFG.target : (w.count || 0), last = w.learned || p + 1 >= CFG.target;
-  if (kind === 'verb') return p === 0 ? 'vchoose' : 'verb';     // first meeting: pick the right forms; after that: type both
+  if (kind === 'verb') return p === 0 ? 'vchoose' : last || !VERB_SENT[w.en] ? 'verb' : Math.random() < .5 ? 'vsent' : 'verb';   // first: pick the forms; then both forms or one in a sentence; to learn it: both forms
   const canChoose = words.length >= 6, gap = gapParts(w);
   if (kind === 'sentence') return last ? 'type' : p < 2 ? 'order' : Math.random() < .5 ? 'order' : 'hear';
   if (last) return Math.random() < .7 ? 'type' : 'hear';
   if (p === 0 && canChoose) return 'choose';
   if (p === 1) return kind === 'phrase' ? 'order' : gap ? 'gap' : canChoose ? 'choose' : 'type';
-  const pool = ['type', 'type', 'hear']; if (gap) pool.push('gap');
+  const pool = ['type', 'type', 'hear']; if (gap) pool.push('gap'); if (canListen() && kind !== 'sentence') pool.push('say');
   return pool[Math.floor(Math.random() * pool.length)];
 }
 const vforms = w => `${w.past.join(' / ')} – ${w.pp.join(' / ')}`;
@@ -1128,11 +1448,12 @@ function gapParts(w) {                                    // example sentence wi
 }
 async function nextCard() {
   const w = pickItem();
-  if (!w) { toast('No words to study.'); return finishSession(false); }
+  if (!w) { if (sess.mode === 'exam') return finishSession(true); toast('No words to study.'); return finishSession(false); }
   const test = pickTest(w), T = CFG.time, len = typeNorm(w.en).length, wc = tokens(w.en).length;
   const vlen = isVerb(w) ? typeNorm(w.past[0] + w.pp[0]).length : 0;
-  const limit = 1000 * (test === 'choose' || test === 'vchoose' ? T.choose : test === 'order' ? T.order + T.perWord * wc : test === 'verb' ? T.type + T.perChar * vlen + 4 : T.type + T.perChar * len + (test === 'hear' ? T.hear : 0));
-  const c = sess.cur = { w, test, phase: 'test', limit, left: limit, shown: performance.now(), typed: '', keys: 0, built: [], f: ['', ''], fi: 0 };
+  const vs = test === 'vsent' ? verbSentence(w) : null;
+  const limit = 1000 * (test === 'vsent' ? T.type + T.perChar * typeNorm(vs.ans[0]).length + 5 : test === 'choose' || test === 'vchoose' ? T.choose : test === 'order' ? T.order + T.perWord * wc : test === 'verb' ? T.type + T.perChar * vlen + 4 : T.type + T.perChar * len + (test === 'hear' ? T.hear : 0));
+  const c = sess.cur = { w, test, vs, phase: 'test', limit, left: limit, shown: performance.now(), typed: '', keys: 0, built: [], f: ['', ''], fi: 0 };
   sess.prevId = w.id;
   const pic = await imgURL('img:' + w.id), kick = t => `<div class="t-kick">${t}</div>`;
   let body, bottom = '';
@@ -1157,14 +1478,19 @@ async function nextCard() {
     body = `${kick('Build it in English')}<div class="t-q sm">${esc(w.ru)}</div><div class="built" id="built"></div><div class="tiles" id="tiles"></div>`;
     bottom = `<button class="primary gold" data-action="check" style="margin-top:8px">Check</button>`;
   } else {
-    const head = test === 'hear' ? `${kick('Listen and type it')}<button class="t-speak" data-action="say">🔊</button>`
+    if (test === 'say') { body = `${kick('Say it in English')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q ${kindOf(w) === 'word' ? '' : 'sm'}">${esc(w.ru)}</div>
+      <div class="say-box"><button class="say-btn" id="say-btn" data-action="listen">🎤</button><div class="say-st" id="say-st">Tap the mic and say it</div><button class="ghost say-type" data-action="totype">⌨ Type instead</button></div>`; }
+    else {
+    const head = test === 'vsent' ? `${kick(`Irregular verb · ${vs.form === 'pp' ? 'past participle' : 'past simple'}`)}${pic ? `<img class="t-pic sm" src="${pic}" alt="">` : ''}<div class="t-q sm vs-q">${esc(vs.text).replace('___', `<span class="gapw">____</span>`)}</div><div class="t-sub">(${esc(w.en)}) · ${esc(w.ru)}</div>`
+      : test === 'hear' ? `${kick('Listen and type it')}<button class="t-speak" data-action="say">🔊</button>`
       : test === 'gap' ? `${kick('Type the missing part')}<div class="t-q sm">${esc(gapParts(w)[0])}<span style="color:var(--gold2)"> ____ </span>${esc(gapParts(w)[1])}</div><div class="t-sub">${esc(w.ru)}</div>`
       : `${kick('Type it in English')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q ${kindOf(w) === 'word' ? '' : 'sm'}">${esc(w.ru)}</div>`;
     body = `${head}<div class="t-in" id="t-in"></div>`;
     bottom = keyboardHTML(/[0-9]/.test(w.en));
+    }
   }
   $('#stage').innerHTML = `<div class="abar" id="abar"><i></i></div><div class="tcard">${body}</div>${bottom}`;
-  if (test === 'order') drawOrder(); else if (test === 'verb') drawVerb(); else if (test !== 'choose' && test !== 'vchoose') drawTyped();
+  if (test === 'order') drawOrder(); else if (test === 'verb') drawVerb(); else if (test !== 'choose' && test !== 'vchoose' && test !== 'say') drawTyped();
   if (test === 'hear') setTimeout(() => speak(w.en), 200);
 }
 const keyboardHTML = digits => `<div class="kb">${digits ? `<div class="kr">${[...'1234567890'].map(k => `<button data-k="${k}">${k}</button>`).join('')}</div>` : ''}${['qwertyuiop', 'asdfghjkl', 'zxcvbnm'].map((r, i) => `<div class="kr">${i === 2 ? `<button class="w" data-k="'">'</button>` : ''}${[...r].map(k => `<button data-k="${k}">${k}</button>`).join('')}${i === 2 ? `<button class="w" data-k="back">⌫</button>` : ''}</div>`).join('')}
@@ -1203,6 +1529,7 @@ function check() {
   if (c.test === 'order') { if (!c.built.length) return; c.given = c.built.map(ix => c.tiles[ix].t).join(' '); return resolve(c.given === c.want.join(' '), 'order'); }
   if (!typeNorm(c.typed)) return;
   c.given = c.typed.trim();
+  if (c.test === 'vsent') return resolve(c.vs.ans.some(a => typeNorm(a) === typeNorm(c.typed)), 'vsent');
   resolve(typeNorm(c.typed) === typeNorm(c.w.en), c.test);
 }
 function chooseVerb(i) {
@@ -1223,22 +1550,24 @@ function chooseOpt(i) {
 // Score the answer, then show the result card
 async function resolve(ok, why) {
   const c = sess?.cur; if (!c || c.phase !== 'test') return;
+  if (rec) { try { rec.abort(); } catch {} rec = null; }
   c.phase = 'result'; c.ok = ok; c.why = why;
   const w = c.w, was = w.learned ? CFG.target : (w.count || 0);
   w.seen = (w.seen || 0) + 1; w.lastSeen = Date.now();
   let chip;
   if (ok) {
-    sess.correct++;
+    sess.correct++; if (sess.mode === 'fix') w.fixedAt = Date.now();
     if (w.learned) { w.stage = Math.min((w.stage || 0) + 1, REVIEW_DAYS.length - 1); w.nextReview = Date.now() + REVIEW_DAYS[w.stage] * DAY; chip = '<span class="chip up">Still got it ✓</span>'; }
     else { w.count = (w.count || 0) + 1; chip = `<span class="chip up">Correct +1</span>`;
       if (w.count >= CFG.target) { w.learned = true; w.learnedAt = Date.now(); w.stage = 0; w.nextReview = Date.now() + REVIEW_DAYS[0] * DAY; sess.learned++; c.justLearned = true; chip = '<span class="chip win">Learned ★</span>'; } }
   } else {
-    sess.wrong++; w.wrong = (w.wrong || 0) + 1;
+    sess.wrong++; w.wrong = (w.wrong || 0) + 1; w.lastWrong = Date.now(); w.wt = { ...(w.wt || {}), [c.test]: ((w.wt || {})[c.test] || 0) + 1 };
+    if (w.learned) w.lapses = (w.lapses || 0) + 1;   // forgotten after it was learned
     if (why === 'timeout') { sess.timeouts++; logEvent('timeout', w); } else if (why === 'left') { sess.left++; logEvent('left', w); }
     if (w.learned) { w.learned = false; w.count = Math.max(0, CFG.target - CFG.missPenalty); } else w.count = Math.max(0, was - CFG.missPenalty);
     const lost = was - w.count;
     chip = `<span class="chip down">${why === 'timeout' ? "Time's up" : why === 'left' ? 'You left the app' : 'Wrong'}${lost > 0 ? ' · −' + lost : ''}</span>`;
-    sess.deck = sess.deck.filter(x => x.id !== w.id); sess.deck.splice(Math.min(sess.deck.length, 2 + Math.floor(Math.random() * 3)), 0, { id: w.id });
+    if (sess.mode !== 'exam') sess.deck = sess.deck.filter(x => x.id !== w.id), sess.deck.splice(Math.min(sess.deck.length, 2 + Math.floor(Math.random() * 3)), 0, { id: w.id });
   }
   sess.cards++; (ok ? sfx.good : sfx.bad)(); await saveWord(w); updateHead();
   if (why === 'choose') await new Promise(r => setTimeout(r, ok ? 500 : 1100));
@@ -1247,7 +1576,7 @@ async function resolve(ok, why) {
   const ex = w.example ? `<div class="r-ex">${esc(w.example)}</div>` : '';
   const pips = Array.from({ length: CFG.target }, (_, i) => `<i class="${w.learned || i < (w.count || 0) ? 'on' : ''}"></i>`).join('');
   $('#stage').innerHTML = `<div class="tcard">${chip}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}
-      ${isVerb(w) ? `<div class="r-en">${esc(w.en)} – ${esc(w.past.join(' / '))} – ${esc(w.pp.join(' / '))}</div><div class="r-ru">${esc(w.ru)}</div>${w.note ? `<div class="t-sub">${esc(w.note)}</div>` : ''}`
+      ${isVerb(w) ? `<div class="r-en">${esc(w.en)} – ${esc(w.past.join(' / '))} – ${esc(w.pp.join(' / '))}</div><div class="r-ru">${esc(w.ru)}</div>${c.vs ? `<div class="r-ex">${esc(c.vs.text).replace('___', `<b>${esc(c.vs.ans.join(' / '))}</b>`)}</div>` : ''}${w.note ? `<div class="t-sub">${esc(w.note)}</div>` : ''}`
         : `<div class="r-en">${esc(w.en)}</div>${w.ipa ? `<div class="t-sub">${esc(w.ipa)}</div>` : ''}<div class="r-ru">${esc(w.ru)}</div>${ex}`}
       ${!ok && c.given ? `<div class="r-yours">You answered: ${esc(c.given)}</div>` : ''}<div class="pips">${pips}</div></div>
     <button class="react r-h" data-action="next">${await mediaOrPh(ok ? 'ok' : 'bad')}<span class="lbl">${sess.remaining <= 0 ? 'Finish ›' : 'Next ›'}</span></button>`;
@@ -1259,13 +1588,15 @@ async function finishSession(timeUp) {
   if (!sess || sess.done) return;
   sess.done = true; clearInterval(tickT); if (canSpeak) speechSynthesis.cancel();
   if (sess.mode === 'verbs') return finishVerbs(timeUp);
+  if (sess.mode === 'fix') return finishFix(timeUp);
+  if (sess.mode === 'exam') return finishExam(timeUp);
   const s = sess, valid = timeUp && s.correct >= CFG.minCorrect, day = ymd(new Date(s.start));
   // which slot gets the credit: the one that was open at the start, if not already done today; otherwise it is an extra
   const credit = valid && s.slot >= 0 && !sessOn(day).some(x => x.slot === s.slot) ? s.slot : -1;
-  const rec = { id: s.id, day, start: s.start, end: Date.now(), ok: valid, slot: credit, slots: CFG.slots.length, cfgV: CFG.v || 0, minutes: CFG.minutes, need: CFG.minCorrect, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  const rec = { id: s.id, day, start: s.start, end: Date.now(), skew: s.skew, ok: valid, slot: credit, slots: CFG.slots.length, cfgV: CFG.v || 0, minutes: CFG.minutes, need: CFG.minCorrect, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
   LOG.push(rec); await kvSet('sessions', LOG);
   if (learnedCount() > PEAK) { PEAK = learnedCount(); await kvSet('peak', PEAK); }
-  const close = () => { $('#session').classList.add('hidden'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); };   // send the log once the session is closed
+  const close = () => { $('#session').classList.add('hidden'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };   // send the log once the session is closed
   if (!timeUp) return close();
   const b = await blobGet('media:done'), url = b ? await imgURL('media:done') : null;
   const head = valid ? (credit >= 0 ? `${slotName(CFG.slots[credit], credit)} session done ✓` : 'Extra session done ⭐') : 'This one does not count';
@@ -1280,11 +1611,11 @@ async function finishSession(timeUp) {
 
 async function finishVerbs(timeUp) {          // verb practice: logged on its own, never fills a word slot
   const s = sess, day = ymd(new Date(s.start));
-  const rec = { id: s.id, kind: 'verbs', day, start: s.start, end: Date.now(), ok: timeUp, slot: -1, minutes: CFG.verbMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  const rec = { id: s.id, kind: 'verbs', day, start: s.start, end: Date.now(), skew: s.skew, ok: timeUp, slot: -1, minutes: CFG.verbMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
   const prevBest = verbStats().best;
   LOG.push(rec); await kvSet('sessions', LOG);
   if (verbLearned() > VPEAK) { VPEAK = verbLearned(); await kvSet('vpeak', VPEAK); }
-  const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('verbs'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); };
+  const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('verbs'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };
   if (!timeUp) return close();
   const vs = verbList(), VL = verbLearned(), best = s.correct > prevBest && prevBest > 0;
   const sc = openScrim(`<div class="dlg vdone" style="max-width:440px"><div class="kicker">🔁 Irregular verbs</div><h2 style="margin-top:6px">Verb practice done</h2>
@@ -1293,6 +1624,35 @@ async function finishVerbs(timeUp) {          // verb practice: logged on its ow
     <div class="bar" style="margin:0 0 16px"><i style="width:${VL / vs.length * 100}%"></i></div>
     <button class="primary" id="fin-ok">Done</button></div>`);
   if (s.correct) confetti(best ? 90 : 40);
+  $('#fin-ok', sc).onclick = () => { sc.close(); close(); };
+}
+
+async function finishExam(done) {             // done = all questions answered or time up; quitting = 0%
+  const s = sess, E = examCfg(), day = ymd(new Date(s.start)), total = s.examIds.length;
+  const score = done ? Math.round(s.correct / total * 100) : 0, passed = score >= E.pass;
+  LOG.push({ id: s.id, kind: 'exam', day, start: s.start, end: Date.now(), skew: s.skew, ok: true, passed, score, total, need: E.pass, slot: -1, minutes: E.minutes, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: 0, quit: !done });
+  await kvSet('sessions', LOG);
+  const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('exam'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };
+  const coins = CFG.rewards.filter(r => (r.rule?.type === 'exam' && passed) || (r.rule?.type === 'exam_top' && score >= 95)).reduce((a, r) => a + (r.coins || 0), 0);
+  const sc = openScrim(`<div class="dlg vdone exam-done" style="max-width:440px"><div class="kicker">⛷️ Black Run</div><h2 style="margin-top:6px">${!done ? 'Bailed out' : passed ? (score >= 95 ? 'Flawless run!' : 'You made it down!') : 'Wiped out'}</h2>
+    <div class="vd-score"><b>${score}%</b><span>${s.correct} of ${total} · you needed ${E.pass}%</span></div>
+    <p>${passed ? (coins ? `+${fullCoins(coins)} coins${CFG.rewards.some(r => r.approve && r.coins && r.rule?.type?.startsWith('exam')) ? ' (after Dad\'s OK)' : ''}. ` : '') + 'See you on the next run on Monday.' : 'No coins this week. The words you missed are back in practice. Next run on Monday.'}</p>
+    <button class="primary" id="fin-ok">Done</button></div>`);
+  if (passed) confetti(score >= 95 ? 140 : 90);
+  $('#fin-ok', sc).onclick = () => { sc.close(); close(); };
+}
+async function finishFix(timeUp) {            // extra practice on his trouble words: never fills a slot
+  const s = sess, day = ymd(new Date(s.start));
+  LOG.push({ id: s.id, kind: 'fix', day, start: s.start, end: Date.now(), skew: s.skew, ok: timeUp, slot: -1, minutes: CFG.fixMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp });
+  await kvSet('sessions', LOG);
+  if (learnedCount() > PEAK) { PEAK = learnedCount(); await kvSet('peak', PEAK); }
+  const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('verbs'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); };
+  if (!timeUp) return close();
+  const left = troubleList().length;
+  const sc = openScrim(`<div class="dlg vdone" style="max-width:440px"><div class="kicker">🎯 Fix my mistakes</div><h2 style="margin-top:6px">${s.correct >= s.cards * .8 ? 'Fixed!' : 'Better'}</h2>
+    <div class="vd-score"><b>${s.correct}</b><span>correct of ${s.cards}</span></div><p>${left ? `${left} trouble word${left === 1 ? '' : 's'} left.` : 'No trouble words left.'}</p>
+    <button class="primary" id="fin-ok">Done</button></div>`);
+  if (s.correct) confetti(40);
   $('#fin-ok', sc).onclick = () => { sc.close(); close(); };
 }
 
@@ -1306,7 +1666,7 @@ async function takeLinkFromURL() {                        // #link=<base64 {o: o
     const j = JSON.parse(b64.text(decodeURIComponent(m[1]).replace(/-/g, '+').replace(/_/g, '/')));
     if (!j.o || !j.t || !j.k) throw 0;
     LINK = { owner: j.o, token: j.t, pub: j.k, ...(j.a ? { api: j.a } : {}) }; await kvSet('link', LINK);
-    await kvSet('shas', {}); toast('Linked to Dad ✓', 4000);
+    await kvSet('shas', {}); await kvSet('restoreChecked', 0); toast('Linked to Dad ✓', 4000);
   } catch { toast('That link is not valid.', 4000); }
   history.replaceState(null, '', location.pathname + location.search);   // the key must not stay in the address bar
 }
@@ -1323,9 +1683,10 @@ async function pullRules() {
     try { const b = await gh.blob(r.anim); await tx('blobs', 'readwrite', st => { st.put(b, 'media:reward:' + r.id); }); dropURL('media:reward:' + r.id); src[r.id] = r.anim; } catch {}
   }
   await kvSet('rewSrc', src);
-  if (changed && !sess) { render(); noticeDecisions(); }
+  if (changed && !sess) { render(); noticeDecisions(); checkBadges(); }
 }
 async function pushLog() {
+  if (!words.length || !(await kvGet('restoreChecked'))) return;   // never overwrite the backup before this phone has checked it
   const shas = (await kvGet('shas')) || {}, months = [...new Set(LOG.filter(x => !x.synced).map(x => x.day.slice(0, 7)))];
   for (const m of months) {
     const path = `log/sessions-${m}.json`, list = LOG.filter(x => x.day.startsWith(m)).map(({ synced, ...x }) => x);
@@ -1334,15 +1695,50 @@ async function pushLog() {
     await kvSet('sessions', LOG); await kvSet('shas', shas);
   }
   const state = { v: 1, updated: Date.now(), tz: new Date().getTimezoneOffset(), app: APP_VERSION, cfgV: CFG.v || 0, learned: learnedCount(), peak: peakLearned(), verbs: verbLearned(), vpeak: peakVerbs(), verbTotal: verbList().length,
-    items: words.map(w => ({ id: w.id, en: w.en, ...(isVerb(w) ? { verb: 1 } : {}), count: w.count || 0, learned: !!w.learned, seen: w.seen || 0, wrong: w.wrong || 0, lastSeen: w.lastSeen || 0 })), events: EV.slice(-300), requests: REQ.slice(-200), coins: treasury(REQ).balance };
-  const sig = JSON.stringify([JSON.stringify(state.requests), state.learned, state.peak, state.verbs, state.vpeak, state.cfgV, state.items.map(i => [i.count, i.learned, i.seen, i.wrong]), EV.length]);
+    items: words.map(w => ({ id: w.id, en: w.en, ...(isVerb(w) ? { verb: 1 } : {}), count: w.count || 0, learned: !!w.learned, seen: w.seen || 0, wrong: w.wrong || 0, lastSeen: w.lastSeen || 0, stage: w.stage || 0, nextReview: w.nextReview || 0, learnedAt: w.learnedAt || 0, lapses: w.lapses || 0, lastWrong: w.lastWrong || 0, wt: w.wt || {} })), events: EV.slice(-300), requests: REQ.slice(-200), coins: treasury(REQ).balance, goal: GOAL };
+  const sig = JSON.stringify([JSON.stringify(state.requests), state.goal, state.learned, state.peak, state.verbs, state.vpeak, state.cfgV, state.items.map(i => [i.count, i.learned, i.seen, i.wrong, i.nextReview, i.lapses]), EV.length]);
   if (months.length || sig !== await kvGet('stateSig')) { shas['log/state.json'] = await gh.put('log/state.json', b64.utf8(JSON.stringify(state)), 'state', shas['log/state.json'] || undefined); await kvSet('shas', shas); await kvSet('stateSig', sig); }
 }
+/* ---------- backup: a new or wiped phone gets his progress back from Dad's private repo ---------- */
+const hasProgress = () => LOG.length > 0 || words.some(w => w.seen);
+async function restoreFromBackup(force = false) {
+  if (!words.length) return;                                // the word list must be loaded first
+  if (!force && await kvGet('restoreChecked')) return;
+  if (hasProgress() && !force) { await kvSet('restoreChecked', 1); return; }   // this phone already has its own progress
+  const st = await gh.text('log/state.json'); let state = null; try { state = st && JSON.parse(st.text); } catch {}
+  const dir = await gh.meta('log').catch(() => null), logs = [];
+  for (const e of Array.isArray(dir) ? dir : []) if (/^sessions-\d{4}-\d{2}\.json$/.test(e.name)) { const t = await gh.text('log/' + e.name); try { logs.push(...JSON.parse(t.text)); } catch {} }
+  let n = 0;
+  if (state?.items) {
+    const byIdItem = new Map(state.items.map(i => [i.id, i])), changed = [];
+    for (const w of words) { const i = byIdItem.get(w.id); if (!i || !(i.seen || i.learned)) continue;
+      Object.assign(w, { count: i.count || 0, learned: !!i.learned, seen: i.seen || 0, wrong: i.wrong || 0, lastSeen: i.lastSeen || 0, stage: i.stage || 0,
+        nextReview: i.nextReview || (i.learned ? Date.now() : 0), learnedAt: i.learnedAt || (i.learned ? i.lastSeen || Date.now() : 0), lapses: i.lapses || 0, lastWrong: i.lastWrong || 0, wt: i.wt || {} });
+      changed.push(w); n++; }
+    if (changed.length) await tx('words', 'readwrite', s2 => changed.forEach(w => s2.put(w)));
+    PEAK = Math.max(PEAK, state.peak || 0); VPEAK = Math.max(VPEAK, state.vpeak || 0); await kvSet('peak', PEAK); await kvSet('vpeak', VPEAK);
+    for (const q of state.requests || []) if (!REQ.some(x => x.id === q.id)) REQ.push(q);
+    await kvSet('requests', REQ);
+    const evs = (state.events || []).filter(e => !EV.some(x => x.t === e.t && x.kind === e.kind)); EV = [...evs, ...EV].sort((a, b) => a.t - b.t).slice(-600); await kvSet('events', EV);
+  }
+  const have = new Set(LOG.map(x => x.id)); let s3 = 0;
+  for (const x of logs) if (!have.has(x.id)) { LOG.push({ ...x, synced: true }); s3++; }
+  LOG.sort((a, b) => a.start - b.start); await kvSet('sessions', LOG);
+  await kvSet('restoreChecked', 1);
+  if (n || s3) { toast(`Progress restored ✓ ${n} words · ${s3} sessions`, 5000); if (!sess) render(); }
+}
+
 let syncBusy = false;
 async function syncData() {                               // safe to call any time; quietly does nothing offline
   if (!LINK || syncBusy || sess) return;
   syncBusy = true;
-  try { await pullRules(); await pushLog(); SYNC = { at: Date.now(), err: '' }; }
+  try {
+    const sk = await serverSkew();
+    if (sk !== null && Math.abs(sk) > CLOCK_SLACK) {
+      let hit = 0; LOG.forEach(x => { if (!x.synced && x.skew == null) { x.ok = false; x.clock = Math.round(sk / 60000); hit++; } });
+      if (hit) { await kvSet('sessions', LOG); EV.push({ t: Date.now(), kind: 'clock', item: `${Math.round(sk / 60000)} min · ${hit} session(s) not counted`, sid: '' }); await kvSet('events', EV); }
+    }
+    await pullRules(); await restoreFromBackup(); await pushLog(); SYNC = { at: Date.now(), err: '' }; }
   catch (e) { SYNC = { at: SYNC.at, err: String(e.message || e).slice(0, 60) }; console.warn('sync', e); }
   finally { syncBusy = false; if (tab === 'settings' && !sess) renderSettings(); }
 }
@@ -1365,11 +1761,13 @@ document.addEventListener('click', async e => {
     case 'vfield': if (c?.phase === 'test' && c.test === 'verb') { c.fi = +el.dataset.i; drawVerb(); } return;
     case 'check': return check();
     case 'say': return speak(c?.w.en);
+    case 'listen': return listen();
+    case 'totype': return toType();
     case 'vsay': { const v = byId(el.dataset.id); return v && speak(`${v.en}, ${v.past.join(' or ')}, ${v.pp.join(' or ')}`); }
     case 'vset': vSet = +el.dataset.i; return renderVerbs();
     case 'tile': { if (c?.phase !== 'test') return; const tl = c.tiles[el.dataset.i]; if (tl.used) return; tl.used = true; c.built.push(tl.i); sfx.key(); return drawOrder(); }
     case 'untile': { if (c?.phase !== 'test') return; const ix = c.built.splice(el.dataset.n, 1)[0]; c.tiles[ix].used = false; return drawOrder(); }
-    case 'next': if (c?.phase !== 'result') return; return sess.remaining <= 0 ? finishSession(true) : nextCard();
+    case 'next': if (c?.phase !== 'result') return; return sess.remaining <= 0 || (sess.mode === 'exam' && !sess.deck.length) ? finishSession(true) : nextCard();
     case 'quit': if (await confirmDlg('Quit this session?', 'A session only counts if you finish the timer.', 'Quit')) finishSession(false); return;
     case 'voice-test': return speak('Fresh powder today. Try not to fall.');
     case 'update': await syncFromSite(true); await syncData(); return renderSettings();
@@ -1392,7 +1790,7 @@ document.addEventListener('keydown', e => {
   CFG = { ...structuredClone(CFG_DEFAULT), ...((await kvGet('cfg')) || {}) };
   LOG = (await kvGet('sessions')) || []; EV = (await kvGet('events')) || [];
   LV = { names: DEFAULT_LEVEL_NAMES.slice(), ...((await kvGet('levels')) || {}) };
-  PEAK = (await kvGet('peak')) || 0; VPEAK = (await kvGet('vpeak')) || 0; LINK = (await kvGet('link')) || null; AV = (await kvGet('avatars')) || []; REQ = (await kvGet('requests')) || [];
+  PEAK = (await kvGet('peak')) || 0; VPEAK = (await kvGet('vpeak')) || 0; LINK = (await kvGet('link')) || null; AV = (await kvGet('avatars')) || []; REQ = (await kvGet('requests')) || []; GOAL = (await kvGet('goal')) || '';
   await takeLinkFromURL();
   render(); snow();
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});

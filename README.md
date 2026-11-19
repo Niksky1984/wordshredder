@@ -48,6 +48,19 @@ Then **Publish to site** (Studio) or **Save & send to his phone** (admin page).
 
 100 verbs built into Studio, in learning order (10 sets of 10). Verbs have **their own button** (home screen and Verbs tab), their own blue practice window and their own score. Verb practice never fills a word session and does not count for word levels; word sessions contain no verbs. Admin page → Rules: *Verb practice length* (default 5 min) and *Irregular verbs in rotation* (default 6). Rewards can use the rule *Every N irregular verbs learned*. First meeting: pick the right forms out of 6. After that: type **both** the past simple and the past participle; one wrong form = miss. Both learnt/learned, burnt/burned, was/were and got/gotten are accepted. His **Verbs** tab shows the sets and his progress.
 
+## New in 0.7
+
+- **Progress backup:** his progress is copied to your private repo after every sync. A new or wiped phone gets everything back (learned words, review dates, sessions, coins, requests) the moment you open the link on it.
+- **Clock check:** before each session the app compares the phone's clock with the internet. A changed clock means no session, and Dad's desk shows "His phone's clock was changed". (Rules → *Sessions need internet*. If you switch it off, a wrong clock is caught at the next sync and those sessions don't count.)
+- **Memory:** learned words come back for review after 2, 5, 12, 30, 60 and 120 days, most overdue first. A miss on a learned word sends it back to practice ("forgotten"). Rewards stay safe: they use his best count.
+- **Trouble words:** *Fix my mistakes* (home and Words tab) drills the words he misses most. It never counts as a session. Dad's desk → Words shows memory stats, the top-20 trouble words and which test type trips him up.
+- **Black Run:** a weekly exam (Mon–Sun, one run) on words he has already learned. All typed, one try each, with a pass mark you set. Pay coins for it with the rewards *Weekly Black Run exam passed* and *Black Run with 95% or more*.
+- **Shop, goal, interest:** Rewards → Treasury: shop items with prices, a weekly interest rate, and the goal he is saving for. He buys from the list in his treasury; you approve each purchase.
+- **Verbs in sentences:** 200 sentences (past simple and past participle for all 100 verbs), e.g. "We ___ skiing last weekend (go)".
+- **Speaking:** sometimes he must say the word; the phone checks it (needs internet and the mic). He can switch to typing on the same card. Rules → *Speaking test*.
+- **Badges:** 20 badges from his real history (sessions, words, verbs, streaks, Black Runs, coins). Pay coins with the reward *Every new badge*.
+- **Seasonal events:** Rewards → Seasonal events: coins × N and its own weather for a few days (presets: Christmas week, New Year blizzard, Birthday week). He sees a banner.
+
 ## Treasury (game coins)
 
 The gold bag next to his streak shows his coins (12.5K, 1.2M). Tap it to open the treasury (9:16), with his balance, a **Withdraw** button (he asks Dad for an amount) and a **History** list.

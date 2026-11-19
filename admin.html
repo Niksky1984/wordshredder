@@ -279,6 +279,38 @@ div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
 .v-list{max-height:46vh;overflow:auto;margin:6px 0 0}.v-list .v-row{background:rgba(255,255,255,.06)}
 .v-row b.pos{color:#ffd84d}.v-row b.neg{color:#ff9a8a}
 
+.fixbtn{border-color:rgba(255,140,120,.45);background:linear-gradient(135deg,#4a1f24,#2a1418)}
+#v-words .seg{flex-wrap:wrap}
+
+.exambtn{border-color:rgba(255,255,255,.35);background:linear-gradient(135deg,#1b1b1f,#3a3d44)}.exambtn .vb-tx b{letter-spacing:.02em}
+.exambtn.off{opacity:.7}
+#session.exam{background:linear-gradient(180deg,#2b2f36 0%,#16181d 55%,#0b0c0f 100%)}
+#session.exam .s-mode{color:#fff}
+.exam-done .vd-score b{color:#fff}
+
+.v-goal{margin:10px auto 0;max-width:86%;background:rgba(0,0,0,.5);border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700}.v-goal .bar{margin:6px 0 0;height:8px}
+.v-goal .bar i{background:linear-gradient(90deg,#e3a51c,#ffe28a)}
+.shop-it .s-ic{font-size:22px;margin-right:8px;vertical-align:middle}.shop-it small.gold-num{font-size:15px;margin-top:2px}
+.shop-it .s-b{display:flex;gap:6px;flex:none}.shop-it .v-btn.ghost{padding:0 10px;white-space:nowrap}.v-btn.ghost.gold{background:linear-gradient(180deg,#ffe28a,#e3a51c);color:#3a2300;border:0}.v-btn.ghost.on{border-color:#ffd84d;color:#ffd84d}
+
+.vs-q .gapw{color:var(--gold2);letter-spacing:.05em}.t-pic.sm{max-height:130px;width:auto}
+
+.say-box{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
+.say-btn{width:96px;height:96px;border-radius:50%;font-size:40px;background:radial-gradient(circle at 40% 35%,#ff7a6e,#c8372f);box-shadow:0 8px 24px rgba(216,71,63,.45);border:0}
+.say-btn.on{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,122,110,.6)}50%{box-shadow:0 0 0 18px rgba(255,122,110,0)}}
+.say-st{color:var(--muted);font-weight:700;min-height:20px;text-align:center}
+.say-type{width:auto;height:38px;padding:0 14px;font-size:13px}
+
+.ev-banner{display:flex;align-items:center;gap:12px;margin:-2px 0 12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#7a1e1e,#b5442c 60%,#e9a85a);box-shadow:0 6px 18px rgba(181,68,44,.35)}
+.ev-banner span{font-size:28px}.ev-banner b{display:block;font-size:16px}.ev-banner small{opacity:.9;font-weight:700}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:10px 6px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);filter:grayscale(1);opacity:.45}
+.badge.on{filter:none;opacity:1;background:linear-gradient(180deg,rgba(233,168,90,.18),rgba(233,168,90,.04));border-color:rgba(233,168,90,.45)}
+.badge span{font-size:28px}.badge b{font-size:12px;line-height:1.15}.badge small{font-size:10.5px;color:var(--muted);line-height:1.2}
+.badge-pop{text-align:center}.bp-icon{font-size:72px;line-height:1;margin-bottom:8px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:none}}
+
 /* admin page additions (on top of app.css) */
 body{user-select:text;-webkit-user-select:text}
 #wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:18px 16px 110px}
@@ -334,6 +366,12 @@ td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 .chk{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);margin-left:auto}.chk input{width:18px;height:18px;accent-color:var(--gold)}
 .req-pop{max-width:420px;text-align:center}.req-pop img{width:110px;height:100px;object-fit:contain}.req-pop h2 .gold-num{font-size:1.15em}.pp-foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 
+.shop-row{margin-top:6px}
+
+.ev-row{margin-top:8px;flex-wrap:wrap}.ev-row.live{background:rgba(111,227,165,.07);border-radius:12px;padding:6px}
+.ev-row input[type=date]{width:150px}
+.adm-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.adm-badges span{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.05);font-size:13px;opacity:.45;filter:grayscale(1)}.adm-badges span.on{opacity:1;filter:none;background:rgba(233,168,90,.18)}
+
 </style>
 </head>
 <body>
@@ -369,6 +407,8 @@ const CFG_DEFAULT = {
   missPenalty: 3,         // points lost on a miss
   perLevel: 30,           // learned items per level
   verbMinutes: 5,         // length of an irregular-verb practice (its own button, its own score)
+  exam: { on: true, questions: 20, minutes: 8, pass: 80, minLearned: 10 },   // weekly "Black Run"
+  fixMinutes: 5,          // "Fix my mistakes" practice length
   verbActive: 6,          // verbs in rotation at a time in verb practice, in order
   time: { choose: 9, type: 10, perChar: 1.6, order: 8, perWord: 2.5, hear: 6 },   // seconds
   rewards: [
@@ -381,7 +421,12 @@ const CFG_DEFAULT = {
   coinNo: {},             // rewardKey -> time Dad declined the coins
   bank: [],               // coins Dad added (+) or took (−) by hand: {id, at, amount, note}
   wd: {},                 // withdrawal requests Dad decided: id -> {ok, at, amount}
+  shop: [],               // what coins can buy: {id, name, price, icon}
+  events: [],             // seasonal events: {id, name, icon, from, to (YYYY-MM-DD), mult, weather}
+  rates: [],              // weekly interest history: {from, pct} (0 = off)
   weather: null,          // snow settings; null = WEATHER_DEFAULT
+  speak: true,            // speaking test (Chrome speech recognition)
+  needNet: true,          // sessions start only online, after checking the phone's clock against the internet
 };
 const RULE_TYPES = {
   daily: { label: 'Perfect day: every session of the day', n: false },
@@ -392,6 +437,9 @@ const RULE_TYPES = {
   words: { label: 'Every N items learned', n: 'N items' },
   verbs: { label: 'Every N irregular verbs learned', n: 'N verbs' },
   streak: { label: 'Perfect days in a row', n: 'How many days' },
+  exam: { label: 'Weekly Black Run exam passed', n: false },
+  exam_top: { label: 'Black Run with 95% or more', n: false },
+  badge: { label: 'Every new badge', n: false },
   manual: { label: 'Special: I give it by hand', n: false },
 };
 
@@ -407,9 +455,9 @@ const addDays = (d, n) => { const x = new Date(d + 'T12:00'); x.setDate(x.getDat
 /* ---------- schedule ---------- */
 const slotName = s => { const m = hm(s.from); return m < 12 * 60 ? 'Morning' : m < 17 * 60 ? 'Day' : 'Evening'; };
 const slotIcon = s => { const m = hm(s.from); return m < 12 * 60 ? '☀️' : m < 17 * 60 ? '🏂' : '🌙'; };
-const sessOn = d => LOG.filter(x => x.day === d && x.ok && x.kind !== 'verbs');   // verb practice never fills a word slot
+const sessOn = d => LOG.filter(x => x.day === d && x.ok && !x.kind);   // verb practice and 'fix my mistakes' never fill a word slot
 // How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
-const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && x.kind !== 'verbs'); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
+const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && !x.kind); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
 // status of every slot on a given day: done / open (now) / later / missed
 function dayStatus(d = ymd(), now = clock()) {
   const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
@@ -461,9 +509,17 @@ function rewardState(r) {
     const st = dayStatus(today), done = st.filter(x => x === 'done').length;
     out.cur = `${done} of ${st.length} sessions today`; out.pct = st.length ? done / st.length : 0; out.status = st.includes('missed') ? 'lost' : done === st.length ? 'earned' : 'progress';
   } else if (t === 'session' || t === 'vsession') {
-    const vb = t === 'vsession', list = LOG.filter(x => x.ok && (x.kind === 'verbs') === vb);
+    const vb = t === 'vsession', list = LOG.filter(x => x.ok && (vb ? x.kind === 'verbs' : !x.kind));
     for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
     const today = list.filter(x => x.day === ymd()).length; out.cur = `${today} today`; out.pct = 0;
+  } else if (t === 'exam' || t === 'exam_top') {
+    const list = LOG.filter(x => x.kind === 'exam' && x.passed && (t === 'exam' || x.score >= 95));
+    for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `Black Run ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
+    const wk = LOG.find(x => x.kind === 'exam' && x.day >= weekDays()[0]);
+    out.cur = wk ? `this week: ${wk.score}%${wk.passed ? ' ✓' : ''}` : 'not run this week'; out.pct = wk ? Math.min(1, wk.score / 100) : 0; out.status = wk && !wk.passed ? 'lost' : 'progress';
+  } else if (t === 'badge') {
+    for (const bd of earnedBadges()) out.earned.push({ key: `${r.id}@${bd.id}`, label: `${bd.icon} ${bd.name}`, at: 0 });
+    out.cur = `${out.earned.length} of ${BADGES.length} badges`; out.pct = out.earned.length / BADGES.length;
   } else if (t === 'words') {
     const L = peakLearned(), got = Math.floor(L / n);
     for (let k = 1; k <= got; k++) out.earned.push({ key: `${r.id}@${k * n}`, label: `${k * n} learned` });
@@ -493,25 +549,38 @@ function fmtCoins(n) {
   return sg + a;
 }
 const fullCoins = n => Math.round(n).toLocaleString('en-US');
-function treasury(requests = []) {
+function treasury(requests = [], opt = {}) {
   const hist = [], awaiting = [];
   for (const r of CFG.rewards || []) {
-    const c = Math.max(0, Math.round(r.coins || 0)); if (!c) continue;
+    const c0 = Math.max(0, Math.round(r.coins || 0)); if (!c0 || (opt.noBadge && r.rule?.type === 'badge')) continue;
     for (const e of rewardState(r).earned) {
+      const c = Math.round(c0 * multAt(e.at));
       if (CFG.coinNo?.[e.key]) continue;
       if (r.approve && !CFG.coinOk?.[e.key]) { awaiting.push({ key: e.key, title: r.title, label: e.label, amount: c, at: e.at || 0 }); continue; }
-      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label, at: e.at || 0 });
+      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : ''), at: e.at || 0 });
     }
   }
   for (const b of CFG.bank || []) hist.push({ kind: 'bank', amount: b.amount, title: b.amount >= 0 ? 'From Dad' : 'Taken by Dad', label: b.note || '', at: b.at });
   const pending = [];
   for (const q of requests) {
     const d = CFG.wd?.[q.id];
-    if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id: q.id }); }
+    if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: q.item ? `Bought: ${q.item}` : 'Withdrawn', label: '', at: d.at, id: q.id }); }
     else if (!q.cancelled) pending.push(q);
   }
   // approvals whose request the phone no longer lists still count
   for (const [id, d] of Object.entries(CFG.wd || {})) if (d.ok && !requests.some(q => q.id === id)) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id });
+  // weekly interest: every Monday, on what he kept over the week (the rate that was set at that moment)
+  const rates = (CFG.rates || []).slice().sort((a, b) => a.from - b.from);
+  if (rates.some(r => r.pct > 0) && hist.length) {
+    hist.sort((a, b) => a.at - b.at);
+    const first = Math.max(rates.find(r => r.pct > 0).from, hist[0].at), end = mondayOf().getTime();
+    const B = mondayOf(new Date(first)); B.setDate(B.getDate() + 7);
+    for (; B.getTime() <= end; B.setDate(B.getDate() + 7)) {
+      const t = B.getTime(), rate = [...rates].reverse().find(r => r.from <= t)?.pct || 0; if (!rate) continue;
+      const bal = hist.reduce((a, h) => a + (h.at < t ? h.amount : 0), 0), amt = Math.floor(bal * rate / 100);
+      if (amt > 0) { const k = hist.findIndex(h => h.at >= t); hist.splice(k < 0 ? hist.length : k, 0, { kind: 'interest', amount: amt, title: 'Interest', label: `${rate}% on ${fullCoins(bal)}`, at: t }); }
+    }
+  }
   hist.sort((a, b) => b.at - a.at);
   const balance = hist.reduce((a, h) => a + h.amount, 0), held = pending.reduce((a, q) => a + q.amount, 0);
   return { balance, available: balance - held, pending, awaiting, hist };
@@ -660,6 +729,48 @@ function makeSnow(cv, getW, opts = {}) {
   return { stop() { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', resize); document.removeEventListener('visibilitychange', onVis); }, level: () => I };
 }
 
+/* ---------- seasonal events: coins × N and their own weather for a few days ---------- */
+const EVENT_PRESETS = [
+  ['xmas', '🎄', 'Christmas week', '12-24', '12-31', 2, 'snow'],
+  ['ny', '🎆', 'New Year blizzard', '12-31', '01-02', 3, 'blizzard'],
+  ['birthday', '🎂', 'Birthday week', '10-11', '10-17', 2, 'light'],
+];
+const activeEvents = (d = ymd()) => (CFG.events || []).filter(e => e.from <= d && d <= e.to);
+const multAt = at => { if (!at) return 1; const d = ymd(new Date(at)); return activeEvents(d).reduce((m, e) => Math.max(m, e.mult || 1), 1); };
+const eventWeather = () => { const e = activeEvents().find(x => x.weather); const p = e && WEATHER_PRESETS.find(x => x[0] === e.weather); return p ? { ...weatherOf(CFG.weather), ...p[2] } : null; };
+
+/* ---------- badges: worked out from his real history, so they can't be faked ---------- */
+const BADGES = [
+  ['first', '🎿', 'First Tracks', 'First session that counts', c => c.sess >= 1],
+  ['s25', '🚡', 'Lift Regular', '25 sessions that count', c => c.sess >= 25],
+  ['s100', '🏔️', 'Mountain Local', '100 sessions that count', c => c.sess >= 100],
+  ['w50', '📘', 'Word Collector', '50 words learned', c => c.words >= 50],
+  ['w100', '📗', 'Word Hoarder', '100 words learned', c => c.words >= 100],
+  ['w250', '📙', 'Walking Dictionary', '250 words learned', c => c.words >= 250],
+  ['w500', '📕', 'Lexicon Legend', '500 words learned', c => c.words >= 500],
+  ['v25', '🔁', 'Verb Rookie', '25 irregular verbs learned', c => c.verbs >= 25],
+  ['v50', '🔂', 'Verb Bender', '50 irregular verbs learned', c => c.verbs >= 50],
+  ['v100', '👑', 'Verb Master', 'All 100 irregular verbs learned', c => c.verbs >= 100],
+  ['r7', '🔥', 'Hot Streak', '7 perfect days in a row', c => c.run >= 7],
+  ['r30', '☄️', 'Unstoppable', '30 perfect days in a row', c => c.run >= 30],
+  ['r100', '🌋', 'Volcano', '100 perfect days in a row', c => c.run >= 100],
+  ['ex1', '⛷️', 'Black Run Survivor', 'Pass a Black Run', c => c.exams >= 1],
+  ['ex5', '🏂', 'Black Run Regular', 'Pass 5 Black Runs', c => c.exams >= 5],
+  ['flaw', '💎', 'Flawless', 'A Black Run with 95% or more', c => c.flaw >= 1],
+  ['fix10', '🎯', 'Mistake Hunter', '10 "Fix my mistakes" practices', c => c.fix >= 10],
+  ['c10k', '💰', 'Gold Digger', 'Earn 10,000 coins in total', c => c.earned >= 1e4],
+  ['c100k', '🏦', 'Tycoon', 'Earn 100,000 coins in total', c => c.earned >= 1e5],
+  ['save', '🐷', 'Iron Piggy', 'Have 10,000 coins in the treasury', c => c.bal >= 1e4],
+].map(([id, icon, name, desc, test]) => ({ id, icon, name, desc, test }));
+const allReqs = () => typeof REQ !== 'undefined' ? REQ : (typeof STATE !== 'undefined' && STATE ? STATE.requests || [] : []);
+function badgeCtx() {
+  const T = treasury(allReqs(), { noBadge: true });
+  return { sess: LOG.filter(x => x.ok && !x.kind).length, words: peakLearned(), verbs: peakVerbs(), run: perfectRuns().reduce((m, r) => Math.max(m, r.len), 0),
+    exams: LOG.filter(x => x.kind === 'exam' && x.passed).length, flaw: LOG.filter(x => x.kind === 'exam' && x.score >= 95).length, fix: LOG.filter(x => x.kind === 'fix' && x.ok).length,
+    earned: T.hist.filter(h => h.amount > 0).reduce((a, h) => a + h.amount, 0), bal: T.balance };
+}
+const earnedBadges = () => { const c = badgeCtx(); return BADGES.filter(b => b.test(c)); };
+
 /* =========================================================
    Word Shredder — Dad's desk (admin page)
    Reads his log from the private data repo; writes the signed rules.
@@ -751,13 +862,13 @@ function render() {
 const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
 function toPay() { return CFG.rewards.filter(r => (r.text || '').trim()).flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }   // real-life rewards; coins-only ones go to the treasury
 const REQS = () => STATE?.requests || [];
-const flags = x => [x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : ''].filter(Boolean).join(' · ');
+const flags = x => [x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : '', x.clock ? `⏰ phone clock off by ${x.clock} min (not counted)` : '', x.skew != null && Math.abs(x.skew) > 180 ? `⏰ clock off ${Math.round(x.skew / 60)} min` : ''].filter(Boolean).join(' · ');
 
 function vOverview() {
   if (!STATE && !LOG.length) return `<div class="panel"><h2>No data from his phone yet</h2><p class="hint">Link his phone in <b>Setup</b>. After his first session (with internet), it shows up here.</p></div>`;
   const today = ymd(), wk = weekDays(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], cls = { done: 'g', missed: 'x', open: 'o', later: '' };
-  const all7 = LOG.filter(x => x.start > Date.now() - 7 * DAY), last7 = all7.filter(x => x.kind !== 'verbs'), v7 = all7.filter(x => x.kind === 'verbs'), sum = k => last7.reduce((a, x) => a + (x[k] || 0), 0);
-  const ev = (STATE?.events || []).filter(e => e.t > Date.now() - 7 * DAY), bad = ev.filter(e => e.kind === 'tamper' || e.kind === 'rollback');
+  const all7 = LOG.filter(x => x.start > Date.now() - 7 * DAY), last7 = all7.filter(x => !x.kind), v7 = all7.filter(x => x.kind === 'verbs'), sum = k => last7.reduce((a, x) => a + (x[k] || 0), 0);
+  const ev = (STATE?.events || []).filter(e => e.t > Date.now() - 7 * DAY), bad = ev.filter(e => e.kind === 'tamper' || e.kind === 'rollback'); const clk = ev.filter(e => e.kind === 'clock');
   const due = toPay().filter(e => !paidAt(e.key));
   const lvl = Math.min(LEVELS, Math.floor(peakLearned() / (CFG.perLevel || 30)) + 1);
   return `
@@ -770,6 +881,7 @@ function vOverview() {
       <div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${STATE?.verbs ?? '–'}${STATE?.verbTotal ? ' / ' + STATE.verbTotal : ''}</b><span>verbs learned</span></div><div class="stat"><b>${STATE ? STATE.items.filter(i => i.verb && i.seen && !i.learned).length : '–'}</b><span>verbs in progress</span></div>
         <div class="stat"><b>${v7.filter(x => !x.quit).length}${v7.filter(x => x.quit).length ? ` <small class="hint">(+${v7.filter(x => x.quit).length} quit)</small>` : ''}</b><span>verb practices · last 7 days</span></div><div class="stat"><b>${v7.reduce((a, x) => a + x.cards, 0) ? Math.round(v7.reduce((a, x) => a + x.correct, 0) / v7.reduce((a, x) => a + x.cards, 0) * 100) + '%' : '–'}</b><span>verb answers correct</span></div></div></div>
     ${vTreasury(false)}
+    ${clk.length ? `<div class="panel alert"><b>⏰ His phone's clock was changed</b><div class="hint">${clk.length} time(s) this week: ${clk.slice(-4).map(e => `${new Date(e.t).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} (${esc(e.item)})`).join(' · ')}. Sessions could not be started (or did not count) until the clock was right again.</div></div>` : ''}
     ${bad.length ? `<div class="panel alert"><b>⚠ The rules file on GitHub was changed by someone other than you</b><div class="hint">His app refused it ${bad.length} time(s) this week (${[...new Set(bad.map(e => e.kind === 'tamper' ? 'wrong signature' : 'older copy put back'))].join(', ')}). Your rules were not affected. Check the repo history on GitHub.</div></div>` : ''}
     <div class="panel"><div class="kicker">To pay</div>${due.length ? due.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}<br><span class="hint">${esc(e.r.text || '')}</span></span><button class="btn gold" data-pay="${esc(e.key)}">Payment done</button></div>`).join('') : '<div class="hint">Nothing waiting.</div>'}</div>
     <div class="panel"><div class="kicker">Honesty · word sessions · last 7 days</div>
@@ -780,16 +892,28 @@ function vSessions() {
   const rows = [...LOG].reverse().slice(0, 200);
   return `<div class="panel"><div class="kicker">Sessions (${LOG.length}) · times are his local time</div>${rows.length ? `<div class="tbl"><table><thead><tr><th>Day</th><th>Time</th><th>Result</th><th>Correct</th><th>Flags</th></tr></thead><tbody>
     ${rows.map(x => `<tr><td>${x.day.slice(5)}</td><td>${fmtT(x.start)}–${fmtT(x.end)}</td>
-      <td>${x.kind === 'verbs' ? (x.quit ? '<span class="pill no">verbs · quit</span>' : '<span class="pill verb">🔁 verbs</span>') : x.ok ? (x.slot >= 0 ? `<span class="pill ok">slot ${x.slot + 1}</span>` : '<span class="pill wait">extra</span>') : x.quit ? '<span class="pill no">quit</span>' : '<span class="pill no">not counted</span>'}</td>
+      <td>${x.kind === 'exam' ? `<span class="pill ${x.passed ? 'ok' : 'no'}">⛷️ Black Run ${x.score}%</span>` : x.kind === 'fix' ? `<span class="pill verb">🎯 mistakes${x.quit ? ' · quit' : ''}</span>` : x.kind === 'verbs' ? (x.quit ? '<span class="pill no">verbs · quit</span>' : '<span class="pill verb">🔁 verbs</span>') : x.ok ? (x.slot >= 0 ? `<span class="pill ok">slot ${x.slot + 1}</span>` : '<span class="pill wait">extra</span>') : x.quit ? '<span class="pill no">quit</span>' : '<span class="pill no">not counted</span>'}</td>
       <td>${x.correct} / ${x.cards}${x.need ? ` <span class="hint">(needs ${x.need})</span>` : ''}</td><td class="${flags(x) ? 'warnc' : 'hint'}">${flags(x) || '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="hint">No sessions yet.</div>'}</div>`;
 }
 function vWords() {
   if (!STATE) return '<div class="panel"><div class="hint">No data yet.</div></div>';
   const items = [...STATE.items].sort((a, b) => (b.wrong || 0) - (a.wrong || 0));
-  return `<div class="panel"><div class="kicker">Items (${items.length}) · most missed first</div><div class="tbl"><table><thead><tr><th>Item</th><th>Status</th><th>Seen</th><th>Missed</th></tr></thead><tbody>
+  const score = i => (i.wrong || 0) + 3 * (i.lapses || 0) + (i.lastWrong && Date.now() - i.lastWrong < 14 * DAY ? 3 : 0);
+  const trouble = items.filter(i => i.wrong > 0).sort((a, b) => score(b) - score(a)).slice(0, 20);
+  const TN = { choose: 'choose from 6', type: 'typing', hear: 'listen & type', order: 'build the sentence', gap: 'fill the gap', verb: 'typing verb forms', vchoose: 'choosing verb forms', vsent: 'verb in a sentence', say: 'speaking' };
+  const byTest = {}; items.forEach(i => Object.entries(i.wt || {}).forEach(([k, v]) => byTest[k] = (byTest[k] || 0) + v));
+  const tests = Object.entries(byTest).sort((a, b) => b[1] - a[1]), tTot = tests.reduce((a, [, v]) => a + v, 0);
+  const learned = items.filter(i => i.learned || i.lapses), lapsed = items.filter(i => i.lapses).length, due = items.filter(i => i.learned && (i.nextReview || 0) <= Date.now()).length;
+  return `<div class="panel"><div class="kicker">Memory</div><div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${items.filter(i => i.learned).length}</b><span>learned now</span></div><div class="stat"><b>${due}</b><span>due for review</span></div>
+      <div class="stat"><b>${lapsed}</b><span>forgotten after learning (back in practice)</span></div><div class="stat"><b>${learned.length ? Math.round((1 - lapsed / learned.length) * 100) + '%' : '–'}</b><span>kept after learning</span></div></div></div>
+    <div class="panel"><div class="kicker">Trouble words · top 20</div>${trouble.length ? `<div class="tbl"><table><thead><tr><th>Item</th><th>Missed</th><th>Forgotten</th><th>Last miss</th><th>Missed in</th></tr></thead><tbody>
+      ${trouble.map(i => `<tr><td><b>${esc(i.en)}</b>${i.verb ? ' <span class="pill verb">verb</span>' : ''}</td><td class="${i.wrong >= 3 ? 'warnc' : ''}">${i.wrong}</td><td>${i.lapses || 0}</td><td class="hint">${i.lastWrong ? new Date(i.lastWrong).toLocaleDateString([], { day: 'numeric', month: 'short' }) : '–'}</td><td class="hint">${Object.entries(i.wt || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${TN[k] || k} ${v}`).join(', ') || '–'}</td></tr>`).join('')}</tbody></table></div>
+      <div class="hint" style="margin-top:8px">He has a <b>Fix my mistakes</b> button that drills exactly these.</div>` : '<div class="hint">No mistakes yet.</div>'}</div>
+    ${tTot ? `<div class="panel"><div class="kicker">What trips him up</div>${tests.map(([k, v]) => `<div class="set-row"><span>${TN[k] || k}</span><span style="display:flex;align-items:center;gap:10px;min-width:50%"><span class="bar" style="flex:1;margin:0"><i style="width:${v / tests[0][1] * 100}%"></i></span><b>${Math.round(v / tTot * 100)}%</b></span></div>`).join('')}</div>` : ''}
+    <div class="panel"><div class="kicker">Items (${items.length}) · most missed first</div><div class="tbl"><table><thead><tr><th>Item</th><th>Status</th><th>Seen</th><th>Missed</th></tr></thead><tbody>
     ${items.map(i => `<tr><td>${esc(i.en)}</td><td>${i.learned ? '<span class="pill ok">learned</span>' : i.seen ? `${i.count} / ${CFG.target}` : '<span class="hint">new</span>'}</td><td>${i.seen}</td><td class="${i.wrong >= 3 ? 'warnc' : ''}">${i.wrong}</td></tr>`).join('')}</tbody></table></div></div>`;
 }
-const num = (k, label, hint, min, max, step = 1, obj = 'CFG') => `<div class="set-row"><span>${label}<div class="hint">${hint}</div></span><input type="number" data-num="${obj}.${k}" min="${min}" max="${max}" step="${step}" value="${k.split('.').reduce((o, p) => o[p], CFG)}"></div>`;
+const num = (k, label, hint, min, max, step = 1, obj = 'CFG') => `<div class="set-row"><span>${label}<div class="hint">${hint}</div></span><input type="number" data-num="${obj}.${k}" min="${min}" max="${max}" step="${step}" value="${k.split('.').reduce((o, p) => (o || {})[p], k.startsWith('exam.') ? { exam: { ...CFG_DEFAULT.exam, ...(CFG.exam || {}) } } : CFG) ?? ''}"></div>`;
 function vRules() {
   return `<div class="panel"><div class="kicker">Schedule · every day, no exceptions</div>
       ${CFG.slots.map((s, i) => `<div class="set-row"><span>Session ${i + 1}<div class="hint">He must start it inside this time window</div></span><span class="times"><input type="time" data-slot="${i}.from" value="${s.from}"> – <input type="time" data-slot="${i}.to" value="${s.to}">${CFG.slots.length > 1 ? `<button class="btn x" data-delslot="${i}" title="Remove">✕</button>` : ''}</span></div>`).join('')}
@@ -802,7 +926,16 @@ function vRules() {
       ${num('missPenalty', 'Points lost on a miss', 'Wrong answer, time out or leaving the app', 1, 12)}
       ${num('perLevel', 'Learned items per level', '15 levels in total', 5, 500)}
       ${num('verbMinutes', 'Verb practice length (minutes)', 'Irregular verbs have their own button. Practice never counts as a word session.', 2, 30)}
-      ${num('verbActive', 'Irregular verbs in rotation', 'How many new verbs he practises at a time, in order', 2, 15)}</div>
+      ${num('verbActive', 'Irregular verbs in rotation', 'How many new verbs he practises at a time, in order', 2, 15)}
+      ${num('fixMinutes', '"Fix my mistakes" length (minutes)', 'Extra practice on his trouble words. Never counts as a session.', 2, 30)}
+      <div class="set-row"><span>Speaking test<div class="hint">Sometimes he must say the word out loud; the phone checks it (needs internet and the microphone). He can switch to typing instead.</div></span><label class="sw"><input type="checkbox" data-bool="speak" ${CFG.speak !== false ? 'checked' : ''}><i></i></label></div>
+      <div class="set-row"><span>Sessions need internet<div class="hint">Checks the phone's clock against the internet before each session, so he can't change the time to fake a session. Off: he can train offline, and a wrong clock is caught at the next sync.</div></span><label class="sw"><input type="checkbox" data-bool="needNet" ${CFG.needNet !== false ? 'checked' : ''}><i></i></label></div></div>
+    <div class="panel"><div class="kicker">⛷️ Black Run · weekly exam</div>
+      <div class="set-row"><span>Weekly exam on<div class="hint">Once a week (Mon–Sun) he can take one run on words he has already learned. All typed, one try each. Give coins for it in Rewards: "Weekly Black Run exam passed" / "with 95% or more".</div></span><label class="sw"><input type="checkbox" data-exam="on" ${CFG.exam?.on !== false ? 'checked' : ''}><i></i></label></div>
+      ${num('exam.questions', 'Questions', 'Fewer if he has learned fewer words', 5, 60)}
+      ${num('exam.minutes', 'Time (minutes)', 'Unanswered questions count as wrong', 2, 30)}
+      ${num('exam.pass', 'Pass mark (%)', '', 50, 100)}
+      ${num('exam.minLearned', 'Opens from (learned words)', '', 5, 200)}</div>
     <div class="panel"><div class="kicker">Time limits per answer (seconds)</div>
       ${num('time.choose', 'Choose from 6', 'Total time', 3, 60)}
       ${num('time.type', 'Typing: base time', 'Plus the time per letter below', 3, 60)}
@@ -814,6 +947,7 @@ function vRules() {
 }
 /* ---------- weather (snow on his screen) ---------- */
 let PREVIEW = null;
+const examDefault = () => ({ ...CFG_DEFAULT.exam });
 function vWeather() {
   const w = weatherOf(CFG.weather), cur = WEATHER_PRESETS.find(([, , p]) => Object.entries(p).every(([k, v]) => w[k] === v));
   const sl = (k, label, hint, min, max, unit = '') => `<div class="set-row wx-row"><span>${label}<div class="hint">${hint}</div></span><span class="wx-sl"><input type="range" data-wx="${k}" min="${min}" max="${max}" value="${w[k]}"><b id="wxv-${k}">${w[k]}${unit}</b></span></div>`;
@@ -844,16 +978,38 @@ function vRewards() {
           <label class="chk"><input type="checkbox" data-rw="${i}.approve" ${r.approve ? 'checked' : ''}> needs my approval</label></div></div></div>
       <div class="times" style="margin-top:10px;justify-content:space-between"><span class="hint">Now: ${esc(s.cur)} · earned ${s.earned.length}×</span><span><button class="btn" data-anim="${i}">${r.anim ? 'Change animation' : 'Add animation (1:1)'}</button>${r.rule.type === 'manual' ? ` <button class="btn gold" data-grant="${i}">Give it now</button>` : ''} <button class="btn x" data-delrw="${i}">Delete</button></span></div></div>`; }).join('');
   const all = toPay().sort((a, b) => (paidAt(a.key) ? 1 : 0) - (paidAt(b.key) ? 1 : 0));
-  return `${vTreasury(true)}${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
+  return `${vTreasury(true)}${vEvents()}${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
+    ${vBadges()}
     <div class="panel"><div class="kicker">Earned · real-life rewards (with a text)</div>${all.length ? all.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}${paidAt(e.key) ? `<br><span class="hint">paid ${new Date(paidAt(e.key)).toLocaleDateString()}</span>` : ''}</span>${paidAt(e.key) ? `<span><span class="pill ok">paid ✓</span> <button class="btn x" data-unpay="${esc(e.key)}">undo</button></span>` : `<button class="btn gold" data-pay="${esc(e.key)}">Payment done</button>`}</div>`).join('') : '<div class="hint">Nothing earned yet.</div>'}</div>`;
 }
 /* ---------- treasury ---------- */
+function vEvents() {
+  const wOpts = (sel) => `<option value="">his normal weather</option>${WEATHER_PRESETS.map(([id, name]) => `<option value="${id}" ${sel === id ? 'selected' : ''}>${name}</option>`).join('')}`;
+  return `<div class="panel"><div class="kicker">Seasonal events · coins × N and their own weather</div>
+    ${(CFG.events || []).map((e, i) => `<div class="times ev-row ${activeEvents().includes(e) ? 'live' : ''}"><input type="text" data-ev="${i}.icon" value="${esc(e.icon || '🎉')}" style="width:52px;text-align:center"><input type="text" class="wide" data-ev="${i}.name" value="${esc(e.name)}" style="flex:1;min-width:140px">
+      <input type="date" data-ev="${i}.from" value="${e.from}"> – <input type="date" data-ev="${i}.to" value="${e.to}"><span class="hint">coins ×</span><input type="number" min="1" max="10" step="0.5" data-ev="${i}.mult" value="${e.mult || 1}" style="width:70px">
+      <select data-ev="${i}.weather">${wOpts(e.weather)}</select>${activeEvents().includes(e) ? '<span class="pill ok">on now</span>' : ''}<button class="btn x" data-evdel="${i}">✕</button></div>`).join('') || '<div class="hint">No events yet.</div>'}
+    <div class="times" style="margin-top:10px;flex-wrap:wrap">${EVENT_PRESETS.map(([id, ic, name]) => `<button class="btn" data-evp="${id}">${ic} ${name}</button>`).join('')}<button class="btn" data-evp="custom">+ Custom</button></div>
+    <div class="hint" style="margin-top:6px">During an event every reward that pays coins pays × N, and his snow can change. He sees a banner on his home screen.</div></div>`;
+}
+function vBadges() {
+  const have = new Set(earnedBadges().map(b => b.id));
+  return `<div class="panel"><div class="kicker">His badges · ${have.size} of ${BADGES.length} · pay coins for them with the reward "Every new badge"</div><div class="adm-badges">${BADGES.map(b => `<span class="${have.has(b.id) ? 'on' : ''}" title="${esc(b.desc)}">${b.icon} ${esc(b.name)}</span>`).join('')}</div></div>`;
+}
+const curRate = () => ([...(CFG.rates || [])].sort((a, b) => a.from - b.from).at(-1)?.pct || 0);
+function goalLine(T) { const g = (CFG.shop || []).find(x => x.id === STATE?.goal); if (!g) return '';
+  return `<div class="hint" style="margin:4px 0 8px">🎯 He is saving for <b>${esc(g.name)}</b> (${fullCoins(g.price)}): ${Math.min(100, Math.round(Math.max(0, T.available) / g.price * 100))}%</div>`; }
 function vTreasury(full) {
   const T = treasury(REQS()), d8 = t => t ? new Date(t).toLocaleDateString([], { day: 'numeric', month: 'short' }) : '';
   return `<div class="panel tre"><div class="tre-head"><img src="img/bag_gold.png" alt=""><div><div class="kicker">His treasury · game coins</div><b class="gold-num">${fullCoins(T.balance)}</b> <span class="hint">${fmtCoins(T.balance)}${T.pending.length ? ` · ${fullCoins(T.balance - T.available)} asked for` : ''}</span></div></div>
-    ${T.pending.map(q => `<div class="hist req"><span>💸 <b>Withdraw ${fullCoins(q.amount)}</b><br><span class="hint">asked ${d8(q.at)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</span></span><span><button class="btn x" data-wdno="${q.id}">Decline</button> <button class="btn gold" data-wdok="${q.id}">Approve</button></span></div>`).join('')}
+    ${goalLine(T)}
+    ${T.pending.map(q => `<div class="hist req"><span>${q.item ? `🛒 <b>${esc(q.item)}</b> · ${fullCoins(q.amount)}` : `💸 <b>Withdraw ${fullCoins(q.amount)}</b>`}<br><span class="hint">asked ${d8(q.at)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</span></span><span><button class="btn x" data-wdno="${q.id}">Decline</button> <button class="btn gold" data-wdok="${q.id}">Approve</button></span></div>`).join('')}
     ${T.awaiting.map(a => `<div class="hist"><span>🎁 <b>${esc(a.title)}</b> · ${esc(a.label)}<br><span class="hint">+${fullCoins(a.amount)} coins, waiting for your OK</span></span><span><button class="btn x" data-cno="${esc(a.key)}">Decline</button> <button class="btn gold" data-cok="${esc(a.key)}">Approve</button></span></div>`).join('')}
     ${full ? `<div class="times" style="margin-top:10px;flex-wrap:wrap"><input type="number" id="bank-amt" placeholder="Coins: 500 or -200" style="width:190px"><input type="text" id="bank-note" class="wide" placeholder="Note he sees, e.g. good school marks" style="flex:1;min-width:160px"><button class="btn gold" data-act="bankadd">Add / take</button></div>
+      <div class="kicker" style="margin-top:16px">Shop · what coins can buy</div>
+      ${(CFG.shop || []).map((it, i) => `<div class="times shop-row"><input type="text" data-shop="${i}.icon" value="${esc(it.icon || '🎁')}" style="width:52px;text-align:center"><input type="text" class="wide" data-shop="${i}.name" value="${esc(it.name)}" placeholder="e.g. 1 hour of gaming" style="flex:1"><input type="number" min="1" data-shop="${i}.price" value="${it.price}" style="width:120px"><button class="btn x" data-shopdel="${i}">✕</button></div>`).join('')}
+      <button class="btn" data-act="shopadd" style="margin-top:8px">+ Add an item</button> <span class="hint">He picks from this list (or asks for any amount). You still approve every request.</span>
+      <div class="set-row" style="margin-top:8px"><span>Weekly interest (%)<div class="hint">Every Monday he gets this % of the coins he kept over the week. Teaches saving. 0 = off.</div></span><input type="number" id="rate" min="0" max="20" step="0.5" value="${curRate()}"></div>
       <details style="margin-top:10px"><summary class="hint">History (${T.hist.length})</summary>${T.hist.slice(0, 200).map(h => `<div class="hist"><span>${esc(h.title)}<br><span class="hint">${esc(h.label)} ${d8(h.at)}</span></span><b style="color:${h.amount < 0 ? 'var(--bad)' : 'var(--gold2)'}">${h.amount < 0 ? '−' : '+'}${fullCoins(Math.abs(h.amount))}</b></div>`).join('')}</details>` : ''}</div>`;
 }
 // his withdrawal requests pop up as soon as the page has the latest data
@@ -862,7 +1018,7 @@ function popRequests() {
   const T = treasury(REQS()), q = T.pending.find(x => !askedAbout.has(x.id)); if (!q || !KEY) return;
   askedAbout.add(q.id);
   const sc = document.createElement('div'); sc.className = 'scrim center';
-  sc.innerHTML = `<div class="dlg req-pop"><img src="img/bag_gold.png" alt=""><div class="kicker">Withdrawal request</div><h2>${esc(CFG.name)} wants <span class="gold-num">${fullCoins(q.amount)}</span> coins</h2>
+  sc.innerHTML = `<div class="dlg req-pop"><img src="img/bag_gold.png" alt=""><div class="kicker">Withdrawal request</div><h2>${esc(CFG.name)} wants ${q.item ? `<b>${esc(q.item)}</b> for` : ''} <span class="gold-num">${fullCoins(q.amount)}</span> coins</h2>
     <p class="hint">Asked ${new Date(q.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · his balance ${fullCoins(T.balance)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</p>
     <div class="pp-foot"><button class="btn" data-pp="later">Later</button><button class="btn x" data-pp="no">Decline</button><button class="btn gold" data-pp="ok">Approve</button></div></div>`;
   document.body.appendChild(sc);
@@ -893,7 +1049,9 @@ function vSetup() {
 }
 
 /* ---------- events ---------- */
-const setPath = (path, val) => { const ks = path.split('.'), last = ks.pop(); ks.reduce((o, k) => o[k], CFG)[last] = val; };
+const setPath = (path, val) => { if (path.startsWith('exam.')) CFG.exam = { ...CFG_DEFAULT.exam, ...(CFG.exam || {}) };
+  return setPath0(path, val); };
+const setPath0 = (path, val) => { const ks = path.split('.'), last = ks.pop(); ks.reduce((o, k) => o[k], CFG)[last] = val; };
 document.addEventListener('input', e => {             // weather sliders: live, without redrawing the page
   const d = e.target.dataset; if (!d.wx) return;
   const v = +e.target.value; setWx({ [d.wx]: v });
@@ -904,6 +1062,11 @@ document.addEventListener('input', e => {             // weather sliders: live, 
 document.addEventListener('change', e => {
   const t = e.target, d = t.dataset;
   if (d.wx) return;
+  if (d.bool) { CFG[d.bool] = t.checked; touch(); return; }
+  if (d.ev) { const [i, k] = d.ev.split('.'), e = CFG.events[i]; e[k] = k === 'mult' ? Math.max(1, Math.min(10, +t.value || 1)) : t.value.trim(); if (e.to < e.from) e.to = e.from; touch(); return; }
+  if (d.shop) { const [i, k] = d.shop.split('.'), it = CFG.shop[i]; it[k] = k === 'price' ? Math.max(1, Math.round(+t.value) || 1) : t.value.trim(); touch(); return; }
+  if (t.id === 'rate') { const v = Math.max(0, Math.min(20, +t.value || 0)); if (v !== curRate()) { CFG.rates = [...(CFG.rates || []), { from: Date.now(), pct: v }]; touch(); } return; }
+  if (d.exam) { CFG.exam = { ...examDefault(), ...(CFG.exam || {}), [d.exam]: t.checked }; touch(); return; }
   if ('wxh' in d) { setWx({ haze: t.checked }); return; }
   if (d.num) { const v = parseFloat(t.value); if (isFinite(v)) { setPath(d.num.replace(/^CFG\./, ''), Math.min(+t.max, Math.max(+t.min, v))); touch(); } }
   else if (d.str) { CFG[d.str] = t.value.trim() || CFG[d.str]; touch(); }
@@ -923,6 +1086,14 @@ document.addEventListener('click', async e => {
   if (d.pay) { CFG.paid = { ...CFG.paid, [d.pay]: Date.now() }; return saveRules('payment done'); }
   if (d.unpay) { delete CFG.paid[d.unpay]; return saveRules('payment undone'); }
   if (d.delslot) { CFG.slots.splice(d.delslot, 1); return touch(); }
+  if (d.evdel) { CFG.events.splice(+d.evdel, 1); return touch(); }
+  if (d.evp) { const y = clock().getFullYear(), p = EVENT_PRESETS.find(x => x[0] === d.evp);
+    let ev;
+    if (p) { const [, icon, name, f, t, mult, weather] = p; let from = `${y}-${f}`, to = `${t < f ? y + 1 : y}-${t}`; if (to < ymd()) { from = `${y + 1}-${f}`; to = `${t < f ? y + 2 : y + 1}-${t}`; }
+      ev = { id: 'e-' + uid().slice(0, 6), icon, name, from, to, mult, weather }; }
+    else ev = { id: 'e-' + uid().slice(0, 6), icon: '🎉', name: 'Special week', from: ymd(), to: addDays(ymd(), 6), mult: 2, weather: '' };
+    CFG.events = [...(CFG.events || []), ev]; return touch(); }
+  if (d.shopdel) { CFG.shop.splice(+d.shopdel, 1); return touch(); }
   if (d.delrw) { if (confirm(`Delete the reward "${CFG.rewards[d.delrw].title}"?`)) { CFG.rewards.splice(d.delrw, 1); touch(); } return; }
   if (d.grant) { const r = CFG.rewards[d.grant], note = prompt('What is it for? (he sees this)', ''); if (note === null) return; (r.granted = r.granted || []).push({ at: Date.now(), note: note.trim() || 'special' }); return saveRules('reward given'); }
   if (d.anim) return pickAnim(+d.anim);
@@ -930,6 +1101,7 @@ document.addEventListener('click', async e => {
     case 'save': return saveRules();
     case 'reload': return loadAll();
     case 'addslot': { const last = CFG.slots.at(-1); CFG.slots.push({ from: last ? last.to : '08:00', to: '22:00' }); return touch(); }
+    case 'shopadd': CFG.shop = [...(CFG.shop || []), { id: 's-' + uid().slice(0, 8), name: 'New item', price: 1000, icon: '🎁' }]; return touch();
     case 'bankadd': { const amt = Math.round(+$('#bank-amt').value); if (!amt) return toast('Type an amount, e.g. 500 or -200');
       CFG.bank = [...(CFG.bank || []), { id: uid().slice(0, 8), at: Date.now(), amount: amt, note: $('#bank-note').value.trim() }]; return saveRules(amt > 0 ? 'coins added' : 'coins taken'); }
     case 'addrw': CFG.rewards.push({ id: 'r-' + uid().slice(0, 8), title: 'New reward', text: '', rule: { type: 'perfect_week' } }); return touch();
