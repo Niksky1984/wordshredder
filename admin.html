@@ -311,6 +311,36 @@ div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
 .badge-pop{text-align:center}.bp-icon{font-size:72px;line-height:1;margin-bottom:8px;animation:pop .5s ease}
 @keyframes pop{0%{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:none}}
 
+.slot.excused{background:rgba(120,140,170,.18);border-color:#7e8ea8;color:#d7e0ee}
+.dots i.e{background:#8fa3c0}
+
+.spot-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:0 0 12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#8e1b1b,#d8473f);box-shadow:0 0 0 2px rgba(255,255,255,.15),0 8px 24px rgba(216,71,63,.45);animation:spotpulse 1.6s ease-in-out infinite}
+.spot-card .sp-ic{font-size:30px}.spot-card b{display:block;font-size:17px}.spot-card small{opacity:.9;font-weight:700}.spot-card .sp-go{margin-left:auto;font-weight:900;font-size:16px}
+@keyframes spotpulse{50%{box-shadow:0 0 0 2px rgba(255,255,255,.35),0 8px 30px rgba(255,90,80,.7)}}
+.panel.task .ico{font-size:24px}.panel.task.done{border-color:rgba(82,183,136,.5)}
+
+.wrapbtn{border-color:rgba(255,216,77,.5);background:linear-gradient(135deg,#5a1e6e,#b5442c 55%,#e9a85a);margin:0 0 12px}
+.wrapped{position:relative;width:min(92vw,calc(92vh * 9 / 16));aspect-ratio:9/16;border-radius:24px;overflow:hidden;background:#0b1722;user-select:none}
+.wr-bars{position:absolute;left:12px;right:12px;top:10px;display:flex;gap:4px;z-index:2}.wr-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}.wr-bars i.done,.wr-bars i.on{background:#fff}
+.wr-x{position:absolute;right:10px;top:20px;z-index:3;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.35);color:#fff}
+.wr-card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:radial-gradient(circle at 30% 20%,hsl(var(--h) 70% 45%),transparent 60%),radial-gradient(circle at 80% 90%,hsl(calc(var(--h) + 120) 70% 35%),transparent 55%),#0d1420;animation:rise .35s ease}
+.wr-ic{font-size:64px;margin-bottom:10px}.wr-k{font-size:15px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.wr-big{display:block;font-family:var(--serif);font-size:84px;line-height:1.05;margin:8px 0}.wr-big.sm{font-size:40px}
+.wr-sub{font-size:16px;line-height:1.4;max-width:90%;opacity:.95}.wr-tap{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;opacity:.6}
+
+.gamebtn{border-color:rgba(160,210,255,.5);background:linear-gradient(135deg,#1d4f7a,#5fa3d6)}
+.game{position:relative;width:min(94vw,calc(92vh * 9 / 16));aspect-ratio:9/16;border-radius:24px;overflow:hidden;background:#fff;touch-action:none}
+.game canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.g-hud{position:absolute;left:14px;top:12px;color:#173a5c;display:flex;flex-direction:column}.g-hud b{font-size:28px;font-variant-numeric:tabular-nums}.g-hud span{font-size:12px;font-weight:700;opacity:.7}
+.g-x{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;background:rgba(23,58,92,.15);color:#173a5c}
+.g-hint{position:absolute;left:0;right:0;bottom:16%;text-align:center;color:#173a5c;font-weight:800;opacity:.75;pointer-events:none}
+.g-over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(11,23,34,.78);color:#fff;text-align:center;padding:20px}
+.g-big{font-family:var(--serif);font-size:64px;line-height:1}.g-acts{display:flex;flex-direction:column;gap:8px;width:80%;margin-top:14px}
+
+.neg-num{color:#ff6b5b;font-weight:900;text-shadow:0 1px 0 rgba(60,0,0,.8),0 2px 6px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
+.pen-pop{text-align:center;max-width:380px}.pen-anim{width:min(240px,62vw);margin:0 auto 10px;border-radius:18px;overflow:hidden}
+.pen-pop .kicker{color:#ff8a7a}.pen-why{color:var(--muted);font-size:14px}.pen-amt{font-family:var(--serif);font-size:54px;color:#ff6b5b;line-height:1;margin:6px 0}
+
 /* admin page additions (on top of app.css) */
 body{user-select:text;-webkit-user-select:text}
 #wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:18px 16px 110px}
@@ -372,13 +402,38 @@ td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 .ev-row input[type=date]{width:150px}
 .adm-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.adm-badges span{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.05);font-size:13px;opacity:.45;filter:grayscale(1)}.adm-badges span.on{opacity:1;filter:none;background:rgba(233,168,90,.18)}
 
+.exc{display:block;margin:4px auto 0;font-size:10.5px;padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}.exc.on{background:rgba(143,163,192,.25);color:#fff;font-size:13px}
+
+.tf-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 12px;max-height:280px;overflow:auto;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:12px}
+.tf-list label{display:flex;align-items:center;gap:6px;font-size:14px}.tf-list label.lrn{opacity:.6}.tf-list input{width:18px;height:18px;accent-color:var(--gold)}
+#tf summary{list-style:none;cursor:pointer}#tf summary::-webkit-details-marker{display:none}
+
+/* charts: one series, gold; grid and axes recessive */
+.chart{width:100%;height:auto;display:block;margin-top:8px}
+.chart .gl{stroke:rgba(255,255,255,.08);stroke-width:1}.chart .ax{fill:var(--muted);font-size:11px}
+.chart .mk{fill:var(--gold)}.chart .ln{fill:none;stroke:var(--gold);stroke-width:2;stroke-linejoin:round}.chart .ar{fill:rgba(233,168,90,.12)}
+.chart .dt{fill:var(--gold);stroke:#12263a;stroke-width:2}.chart .hv:hover .mk,.chart .hv:hover .dt{fill:var(--gold2)}
+/* monthly report: on screen dark, printed white */
+.report{background:#fff;color:#1b1b1b;border-radius:16px;padding:28px;max-width:760px;margin:0 auto}
+.report .kicker{color:#8a6a2c}.report h1{font-family:var(--serif);font-size:28px;margin:4px 0 0;color:#111}.report h3{margin:20px 0 6px}
+.rp-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}.rp-head img{width:70px;height:64px;object-fit:contain}
+table.rp{width:100%;border-collapse:collapse}table.rp td{padding:9px 6px;border-bottom:1px solid #e6e1d6;font-size:15px}table.rp td:last-child{text-align:right}
+.rp-foot{margin-top:18px}
+@media print{body{background:#fff!important}canvas,#tabs,header,.no-print,#savebar,#toast{display:none!important}.report{padding:0;box-shadow:none}}
+
+.pen-row{display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.pen-a{width:84px;flex:none;border-radius:12px;overflow:hidden}
+.ph.sm{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px}.hist.pen{background:rgba(216,71,63,.08);border-radius:12px;padding:10px}
+
+.remind div{padding:4px 0}.hc{padding:6px 0;border-bottom:1px solid var(--line)}.hc .hint{margin:2px 0 0 26px}
+.report .btn{background:#efe9dc;color:#222;border-color:#d8cfbd}.report .btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#24170a}
+
 </style>
 </head>
 <body>
 <div id="snow"></div>
 <div id="wrap">
   <div class="top"><div><div class="kicker">Word Shredder</div><h1>Dad's desk 🔐</h1></div><button class="btn" data-act="reload">Refresh</button></div>
-  <nav id="tabs"><button data-tab="overview">Overview</button><button data-tab="sessions">Sessions</button><button data-tab="words">Words</button><button data-tab="rules">Rules</button><button data-tab="rewards">Rewards</button><button data-tab="setup">Setup</button></nav>
+  <nav id="tabs"><button data-tab="overview">Overview</button><button data-tab="sessions">Sessions</button><button data-tab="charts">Charts</button><button data-tab="words">Words</button><button data-tab="rules">Rules</button><button data-tab="rewards">Rewards</button><button data-tab="setup">Setup</button></nav>
   <main id="main"></main>
 </div>
 <div id="savebar" class="hidden"><span>You have unsaved changes</span><button class="btn gold" data-act="save">Save &amp; send to his phone</button></div>
@@ -422,10 +477,23 @@ const CFG_DEFAULT = {
   bank: [],               // coins Dad added (+) or took (−) by hand: {id, at, amount, note}
   wd: {},                 // withdrawal requests Dad decided: id -> {ok, at, amount}
   shop: [],               // what coins can buy: {id, name, price, icon}
+  spots: [],              // spot checks Dad started: {id, at, by}
+  spot: { auto: 0, hours: 2, questions: 5, pass: 80, seed: '' },   // auto = random spot checks per week
+  tasks: [],              // assignments: {id, title, ids, due (YYYY-MM-DD), coins, at}
+  game: { on: true, price: 500, perSession: 1 },   // snowboard mini-game: lift tickets per counted session, or bought with coins
+  wrapped: 'auto',        // year-end recap: 'auto' (15 Dec – 15 Jan), 'on', 'off'
+  penalties: [],          // fines: {id, title, text, amount, rule: {type}, approve, anim, since}
+  fines: [],              // fines Dad gave by hand: {id, pid, at, amount, note}
+  penOk: {},              // key -> amount Dad confirmed (rules set to "needs my approval")
+  penNo: {},              // key -> time Dad forgave it
+  floor: -20000,          // the balance never goes below this
+  excused: {},            // days Dad excused (illness, travel): 'YYYY-MM-DD' -> note. Never breaks a streak or a perfect week.
   events: [],             // seasonal events: {id, name, icon, from, to (YYYY-MM-DD), mult, weather}
   rates: [],              // weekly interest history: {from, pct} (0 = off)
   weather: null,          // snow settings; null = WEATHER_DEFAULT
   speak: true,            // speaking test (Chrome speech recognition)
+  adaptive: true,         // each word's timer shrinks as he answers it fast
+  hardMult: 1.5,          // Hard mode: coins × this for sessions played in Hard mode
   needNet: true,          // sessions start only online, after checking the phone's clock against the internet
 };
 const RULE_TYPES = {
@@ -440,6 +508,7 @@ const RULE_TYPES = {
   exam: { label: 'Weekly Black Run exam passed', n: false },
   exam_top: { label: 'Black Run with 95% or more', n: false },
   badge: { label: 'Every new badge', n: false },
+  spot: { label: 'Spot check passed', n: false },
   manual: { label: 'Special: I give it by hand', n: false },
 };
 
@@ -459,10 +528,12 @@ const sessOn = d => LOG.filter(x => x.day === d && x.ok && !x.kind);   // verb p
 // How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
 const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && !x.kind); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
 // status of every slot on a given day: done / open (now) / later / missed
+const excused = d => !!CFG.excused?.[d];
 function dayStatus(d = ymd(), now = clock()) {
-  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
+  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot)), ex = excused(d);
   return Array.from({ length: slotsOn(d) }, (_, i) => {
     if (done.has(i)) return 'done';
+    if (ex) return 'excused';
     if (d < today) return 'missed';
     if (d > today) return 'later';
     const s = CFG.slots[i], m = nowMin(now);
@@ -479,12 +550,13 @@ const firstDay = () => LOG.length ? LOG.reduce((m, x) => x.day < m ? x.day : m, 
 function perfectRuns() {
   const runs = []; let cur = null;
   for (let d = firstDay(); d <= ymd(); d = addDays(d, 1)) {
-    if (perfectDay(d)) { if (cur) cur.len++; else runs.push(cur = { start: d, len: 1 }); }
+    if (perfectDay(d)) { if (cur) { cur.len++; cur.last = d; } else runs.push(cur = { start: d, len: 1, last: d }); }
+    else if (excused(d)) continue;                        // an excused day pauses the run, never breaks it
     else if (d < ymd()) cur = null;                       // today not perfect yet does not break the run
   }
   return runs;
 }
-function streakDays() { const r = perfectRuns().at(-1); return r && addDays(r.start, r.len) >= ymd() ? r.len : 0; }
+function streakDays() { const r = perfectRuns().at(-1); if (!r) return 0; let d = addDays(r.last, 1); while (d < ymd() && excused(d)) d = addDays(d, 1); return d >= ymd() ? r.len : 0; }
 
 /* ---------- rewards ---------- */
 // For one reward: progress now + every earned instance {key,label}. Keys never change, so "paid" marks stay attached.
@@ -494,7 +566,7 @@ function rewardState(r) {
     for (let mon = mondayOf(new Date(firstDay() + 'T12:00')); mon <= mondayOf(); mon.setDate(mon.getDate() + 7)) {
       const days = weekDays(mon), isCur = ymd(mon) === ymd(mondayOf()), label = `week of ${days[0].slice(8)}.${days[0].slice(5, 7)}`;
       if (t === 'perfect_week') {
-        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done').length, missed = st.filter(s => s === 'missed').length;
+        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done' || s === 'excused').length, missed = st.filter(s => s === 'missed').length;
         if (st.length && done === st.length) out.earned.push({ key: `${r.id}@${days[0]}`, label });
         if (isCur) { out.cur = `${done} of ${st.length} sessions`; out.pct = st.length ? done / st.length : 0; out.status = done === st.length ? 'earned' : missed ? 'lost' : 'progress'; if (missed) out.cur += ` · ${missed} missed`; }
       } else {
@@ -510,13 +582,16 @@ function rewardState(r) {
     out.cur = `${done} of ${st.length} sessions today`; out.pct = st.length ? done / st.length : 0; out.status = st.includes('missed') ? 'lost' : done === st.length ? 'earned' : 'progress';
   } else if (t === 'session' || t === 'vsession') {
     const vb = t === 'vsession', list = LOG.filter(x => x.ok && (vb ? x.kind === 'verbs' : !x.kind));
-    for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
+    for (const x of list) out.earned.push({ mult: x.hard ? (CFG.hardMult || 1.5) : 1, key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
     const today = list.filter(x => x.day === ymd()).length; out.cur = `${today} today`; out.pct = 0;
   } else if (t === 'exam' || t === 'exam_top') {
     const list = LOG.filter(x => x.kind === 'exam' && x.passed && (t === 'exam' || x.score >= 95));
     for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `Black Run ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
     const wk = LOG.find(x => x.kind === 'exam' && x.day >= weekDays()[0]);
     out.cur = wk ? `this week: ${wk.score}%${wk.passed ? ' ✓' : ''}` : 'not run this week'; out.pct = wk ? Math.min(1, wk.score / 100) : 0; out.status = wk && !wk.passed ? 'lost' : 'progress';
+  } else if (t === 'spot') {
+    for (const x of LOG.filter(x => x.kind === 'spot' && x.passed)) out.earned.push({ key: `${r.id}@${x.spotId}`, label: `spot check ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
+    const sp = allSpots(), passed = sp.filter(s => spotStatus(s) === 'passed').length; out.cur = `${passed} of ${sp.filter(s => s.at <= Date.now()).length} passed`; out.pct = 0;
   } else if (t === 'badge') {
     for (const bd of earnedBadges()) out.earned.push({ key: `${r.id}@${bd.id}`, label: `${bd.icon} ${bd.name}`, at: 0 });
     out.cur = `${out.earned.length} of ${BADGES.length} badges`; out.pct = out.earned.length / BADGES.length;
@@ -548,27 +623,42 @@ function fmtCoins(n) {
   if (a >= 1e3) return sg + cut(a / 1e3, a < 1e4 ? 2 : a < 1e5 ? 1 : 0) + 'K';
   return sg + a;
 }
-const fullCoins = n => Math.round(n).toLocaleString('en-US');
+const fullCoins = n => (Math.round(n) || 0).toLocaleString('en-US');   // never "-0"
 function treasury(requests = [], opt = {}) {
   const hist = [], awaiting = [];
   for (const r of CFG.rewards || []) {
     const c0 = Math.max(0, Math.round(r.coins || 0)); if (!c0 || (opt.noBadge && r.rule?.type === 'badge')) continue;
     for (const e of rewardState(r).earned) {
-      const c = Math.round(c0 * multAt(e.at));
+      const c = Math.round(c0 * multAt(e.at) * (e.mult || 1));
       if (CFG.coinNo?.[e.key]) continue;
       if (r.approve && !CFG.coinOk?.[e.key]) { awaiting.push({ key: e.key, title: r.title, label: e.label, amount: c, at: e.at || 0 }); continue; }
-      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : ''), at: e.at || 0 });
+      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : '') + ((e.mult || 1) > 1 ? ' · 🔥 hard' : ''), at: e.at || 0 });
     }
   }
+  for (const t of CFG.tasks || []) { const st = taskState(t); if (st.status === 'done' && t.coins > 0) hist.push({ kind: 'task', amount: Math.round(t.coins * multAt(st.doneAt)), title: `📌 ${t.title}`, label: `assignment done · ${st.total} words`, at: st.doneAt }); }
+  const penAwait = [];
+  for (const p of CFG.penalties || []) {
+    const amt = Math.max(0, Math.round(p.amount || 0)); if (!amt || p.rule?.type === 'manual') continue;
+    for (const e of penaltyEvents(p)) {
+      if (CFG.penNo?.[e.key]) continue;
+      if (p.approve && !CFG.penOk?.[e.key]) { penAwait.push({ key: e.key, title: p.title, label: e.label, amount: amt, at: e.at, pid: p.id }); continue; }
+      hist.push({ kind: 'penalty', amount: -(p.approve ? CFG.penOk[e.key] : amt), title: `⚠️ ${p.title}`, label: e.label, at: e.at, key: e.key, pid: p.id });
+    }
+  }
+  for (const f of CFG.fines || []) if (!CFG.penNo?.[f.id]) { const p = (CFG.penalties || []).find(x => x.id === f.pid); hist.push({ kind: 'penalty', amount: -Math.abs(f.amount), title: `⚠️ ${p?.title || 'Fine'}`, label: f.note || '', at: f.at, key: f.id, pid: f.pid }); }
   for (const b of CFG.bank || []) hist.push({ kind: 'bank', amount: b.amount, title: b.amount >= 0 ? 'From Dad' : 'Taken by Dad', label: b.note || '', at: b.at });
   const pending = [];
   for (const q of requests) {
     const d = CFG.wd?.[q.id];
+    if (q.auto) { if (!q.cancelled) hist.push({ kind: 'ticket', amount: -q.amount, title: `🎟️ ${q.item || 'Lift ticket'}`, label: '', at: q.at, id: q.id }); continue; }
     if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: q.item ? `Bought: ${q.item}` : 'Withdrawn', label: '', at: d.at, id: q.id }); }
     else if (!q.cancelled) pending.push(q);
   }
   // approvals whose request the phone no longer lists still count
   for (const [id, d] of Object.entries(CFG.wd || {})) if (d.ok && !requests.some(q => q.id === id)) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id });
+  // the floor: a fine never takes the balance below CFG.floor (e.g. −20,000)
+  { const fl = Math.min(0, CFG.floor ?? -20000); hist.sort((a, b) => a.at - b.at); let bal = 0;
+    for (const h of hist) { if (h.kind === 'penalty' && bal + h.amount < fl) { const cut = Math.min(0, fl - bal); h.capped = h.amount !== cut; h.amount = cut; if (h.capped) h.label = (h.label ? h.label + ' · ' : '') + 'stopped at the floor'; } bal += h.amount; } }
   // weekly interest: every Monday, on what he kept over the week (the rate that was set at that moment)
   const rates = (CFG.rates || []).slice().sort((a, b) => a.from - b.from);
   if (rates.some(r => r.pct > 0) && hist.length) {
@@ -583,7 +673,7 @@ function treasury(requests = [], opt = {}) {
   }
   hist.sort((a, b) => b.at - a.at);
   const balance = hist.reduce((a, h) => a + h.amount, 0), held = pending.reduce((a, q) => a + q.amount, 0);
-  return { balance, available: balance - held, pending, awaiting, hist };
+  return { balance, available: balance - held, pending, awaiting, penAwait, hist };
 }
 
 /* ---------- signed rules: only Dad's key can change them ---------- */
@@ -606,6 +696,11 @@ function ghClient(get) {                                  // get() -> {owner, to
   return {
     async meta(p) { const r = await call(p); if (r.status === 404) return null; if (!r.ok) throw new Error('GitHub ' + r.status); return r.json(); },
     async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
+    async commits(p) {                                     // upload history of a file, with GitHub's own clock (newest first)
+      const r = await fetch(`${(get().api || 'https://api.github.com').replace(/\/$/, '')}/repos/${get().owner}/${DATA_REPO}/commits?path=${encodeURIComponent(p)}&per_page=100`, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + get().token } });
+      if (!r.ok) throw new Error('GitHub ' + r.status); return (await r.json()).map(c => ({ sha: c.sha, at: Date.parse(c.commit.committer.date) }));
+    },
+    async textAt(p, ref) { const r = await call(`${p}?ref=${ref}`); if (!r.ok) return null; const m = await r.json(); return b64.text(m.content || ''); },
     async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
     // create or replace; finds the current sha itself and retries once if someone wrote in between
     async put(p, content64, message, sha, strict = false) {   // strict: never overwrite a newer copy from another device
@@ -771,6 +866,75 @@ function badgeCtx() {
 }
 const earnedBadges = () => { const c = badgeCtx(); return BADGES.filter(b => b.test(c)); };
 
+/* ---------- spot checks: a surprise 5-word typed quiz he must do within a few hours ---------- */
+const spotCfg = () => ({ auto: 0, hours: 2, questions: 5, pass: 80, seed: '', ...(CFG.spot || {}) });
+const hash32 = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+// random checks: which days and what time, from a secret in Dad's signed rules (same answer on his phone and in Dad's desk)
+function autoSpots() {
+  const S = spotCfg(); if (!S.auto || !CFG.slots.length) return [];
+  const out = [], from = Math.min(...CFG.slots.map(s => hm(s.from))), to = Math.max(...CFG.slots.map(s => hm(s.to))) - S.hours * 60;
+  if (to <= from) return [];
+  const start = mondayOf(new Date(Math.max(Date.parse(firstDay() + 'T12:00'), Date.now() - 35 * DAY))), end = new Date(Date.now() + 7 * DAY);
+  for (const mon = new Date(start); mon < end; mon.setDate(mon.getDate() + 7)) {
+    const days = weekDays(mon), pick = [...days].sort((a, b) => hash32(S.seed + a) - hash32(S.seed + b)).slice(0, Math.min(7, S.auto));
+    for (const d of pick) { if (S.since && d < S.since) continue; const m = from + hash32(S.seed + d + 't') % (to - from), x = new Date(d + 'T00:00'); x.setMinutes(m); out.push({ id: 'auto-' + d, at: x.getTime(), auto: true }); }
+  }
+  return out;
+}
+const allSpots = () => [...(CFG.spots || []), ...autoSpots()].sort((a, b) => a.at - b.at);
+const spotLog = s => LOG.find(x => x.kind === 'spot' && x.spotId === s.id);
+function spotStatus(s, now = Date.now()) {
+  const x = spotLog(s), end = s.at + spotCfg().hours * 3600000;
+  if (x) return x.passed ? 'passed' : 'failed';
+  if (now < s.at) return 'later';
+  return now <= end ? 'open' : 'missed';
+}
+const openSpot = () => allSpots().find(s => spotStatus(s) === 'open') || null;
+
+/* ---------- assignments: "these words by Friday" ---------- */
+const itemsNow = () => typeof words !== 'undefined' ? words : (typeof STATE !== 'undefined' && STATE ? STATE.items || [] : []);
+function taskState(t) {
+  const items = itemsNow(), map = new Map(items.map(i => [i.id, i])), list = (t.ids || []).map(id => map.get(id)).filter(Boolean);
+  const learned = list.filter(i => i.learned || (i.learnedAt && i.learnedAt >= (t.at || 0))), dueEnd = Date.parse(t.due + 'T23:59:59');
+  const doneAt = learned.length === list.length && list.length ? Math.max(...learned.map(i => i.learnedAt || 0)) : 0;
+  const status = doneAt ? (doneAt <= dueEnd ? 'done' : 'late') : Date.now() > dueEnd ? 'missed' : 'open';
+  return { total: list.length, learned: learned.length, doneAt, status, daysLeft: Math.ceil((dueEnd - Date.now()) / DAY) };
+}
+
+/* ---------- lift tickets for the mini-game ---------- */
+const gameCfg = () => ({ on: true, price: 500, perSession: 1, ...(CFG.game || {}) });
+const ticketsEarned = () => LOG.filter(x => x.ok && !x.kind).length * gameCfg().perSession;
+const ticketsBought = reqs => reqs.filter(q => q.auto && !q.cancelled && q.tickets).reduce((a, q) => a + q.tickets, 0);
+
+/* ---------- penalties: automatic ones come from his real history (only after Dad made the rule), manual ones Dad gives ---------- */
+const PEN_TYPES = {
+  missed_session: 'Missed a session',
+  missed_day: 'Missed a whole day (every session)',
+  failed_exam: 'Failed the Black Run',
+  missed_spot: 'Missed a spot check',
+  failed_spot: 'Failed a spot check',
+  quit: 'Quit a session early',
+  clock: 'Changed the phone\'s clock',
+  manual: 'By hand: I press "Fine now" (teeth, dishes, …)',
+};
+function penaltyEvents(p) {
+  const t = p.rule?.type, since = p.since || 0, out = [], dd = d => `${d.slice(8)}.${d.slice(5, 7)}`;
+  if (t === 'missed_session' || t === 'missed_day') {
+    for (let d = ymd(new Date(Math.max(since, Date.parse(firstDay() + 'T00:00')))); d <= ymd(); d = addDays(d, 1)) {
+      const st = dayStatus(d);
+      if (t === 'missed_day') { if (st.length && st.every(s => s === 'missed')) { const at = Date.parse(d + 'T23:59'); if (at >= since && at <= Date.now()) out.push({ key: `${p.id}@${d}`, label: `missed all of ${dd(d)}`, at }); } continue; }
+      st.forEach((s, i) => { if (s !== 'missed') return; const sl = CFG.slots[i], at = sl ? Date.parse(`${d}T${sl.to}`) : Date.parse(d + 'T23:59');
+        if (at >= since && at <= Date.now()) out.push({ key: `${p.id}@${d}#${i}`, label: `missed ${sl ? slotName(sl).toLowerCase() : 'a'} session ${dd(d)}`, at }); });
+    }
+  } else if (t === 'failed_exam') for (const x of LOG.filter(x => x.kind === 'exam' && !x.passed && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `Black Run ${x.score}% · ${dd(x.day)}`, at: x.end });
+  else if (t === 'failed_spot') for (const x of LOG.filter(x => x.kind === 'spot' && !x.passed && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `spot check ${x.score}% · ${dd(x.day)}`, at: x.end });
+  else if (t === 'missed_spot') for (const s of allSpots()) { const end = s.at + spotCfg().hours * 3600000; if (end >= since && spotStatus(s) === 'missed') out.push({ key: `${p.id}@${s.id}`, label: `spot check ${dd(ymd(new Date(s.at)))} not done`, at: end }); }
+  else if (t === 'quit') for (const x of LOG.filter(x => x.quit && x.kind !== 'exam' && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `quit ${dd(x.day)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
+  else if (t === 'clock') { const ev = typeof EV !== 'undefined' ? EV : (typeof STATE !== 'undefined' && STATE ? STATE.events || [] : []);
+    const seen = new Set(); for (const e of ev.filter(e => e.kind === 'clock' && e.t >= since)) { const d = ymd(new Date(e.t)); if (seen.has(d)) continue; seen.add(d); out.push({ key: `${p.id}@clock-${d}`, label: `clock changed ${dd(d)}`, at: e.t }); } }
+  return out;
+}
+
 /* =========================================================
    Word Shredder — Dad's desk (admin page)
    Reads his log from the private data repo; writes the signed rules.
@@ -827,7 +991,7 @@ async function loadAll() {
     for (const e of Array.isArray(dir) ? dir : []) if (/^sessions-\d{4}-\d{2}\.json$/.test(e.name)) { const t = await gh.text('log/' + e.name); try { LOG.push(...JSON.parse(t.text)); } catch {} }
     LOG.sort((a, b) => a.start - b.start);
     const st = await gh.text('log/state.json').catch(() => null); STATE = null; if (st) try { STATE = JSON.parse(st.text); } catch {}
-    busy = ''; dirty = false; setTimeout(popRequests, 300);
+    busy = ''; dirty = false; setTimeout(popRequests, 300); checkIntegrity();
   } catch (e) { busy = ''; toast(e.message, 7000); if (/Token|repo/.test(e.message)) tab = 'setup'; }
   render();
 }
@@ -856,31 +1020,58 @@ function render() {
   $('#savebar').classList.toggle('hidden', !dirty);
   $('#busy').textContent = busy; $('#busy').classList.toggle('hidden', !busy);
   if (!A && tab !== 'setup') tab = 'setup';
-  $('#main').innerHTML = ({ overview: vOverview, sessions: vSessions, words: vWords, rules: vRules, rewards: vRewards, setup: vSetup })[tab]();
+  $('#main').innerHTML = ({ overview: vOverview, sessions: vSessions, charts: vCharts, words: vWords, rules: vRules, rewards: vRewards, setup: vSetup })[tab]();
   mountPreview();
 }
-const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
+const slotRow = d => dayStatus(d).map((s, i) => `<div class="slot ${s}"><b>${s === 'done' ? '✅' : s === 'missed' ? '❌' : s === 'excused' ? '🤒' : CFG.slots[i] ? slotIcon(CFG.slots[i]) : '·'}</b>${CFG.slots[i] ? slotName(CFG.slots[i]) : 'Slot ' + (i + 1)}<small>${CFG.slots[i] ? CFG.slots[i].from + '–' + CFG.slots[i].to : ''}</small></div>`).join('');
 function toPay() { return CFG.rewards.filter(r => (r.text || '').trim()).flatMap(r => rewardState(r).earned.map(e => ({ ...e, r }))); }   // real-life rewards; coins-only ones go to the treasury
 const REQS = () => STATE?.requests || [];
-const flags = x => [x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : '', x.clock ? `⏰ phone clock off by ${x.clock} min (not counted)` : '', x.skew != null && Math.abs(x.skew) > 180 ? `⏰ clock off ${Math.round(x.skew / 60)} min` : ''].filter(Boolean).join(' · ');
+/* ---------- log integrity: when did each session really reach GitHub? (GitHub's clock, not his phone's) ---------- */
+let INTEG = {};                 // session id -> {up: upload time, late: ms after it ended, bad: claims to end after it was uploaded}
+async function checkIntegrity() {
+  try {
+    const cache = JSON.parse(localStorage.getItem('ws-integ') || '{}'), months = [...new Set(LOG.map(x => x.day.slice(0, 7)))].sort().slice(-3);
+    const found = {};
+    for (const m of months) {
+      const path = `log/sessions-${m}.json`, list = (await gh.commits(path)).sort((a, b) => a.at - b.at);
+      let prev = new Set();
+      for (const c of list) {
+        let ids = cache[c.sha];
+        if (!ids) { const t = await gh.textAt(path, c.sha); try { ids = JSON.parse(t).map(x => x.id); } catch { ids = []; } cache[c.sha] = ids; }
+        for (const id of ids) if (!prev.has(id) && !found[id]) found[id] = c.at;
+        prev = new Set(ids);
+      }
+    }
+    localStorage.setItem('ws-integ', JSON.stringify(cache));
+    INTEG = {};
+    for (const x of LOG) { const up = found[x.id]; if (!up) continue; INTEG[x.id] = { up, late: up - x.end, bad: x.end > up + 5 * 60000 }; }
+    // several sessions arriving in one upload, long after they happened = made offline / typed in
+    if (tab === 'overview' || tab === 'sessions') render();
+  } catch (e) { console.warn('integrity', e); }
+}
+const integFlag = x => { const g = INTEG[x.id]; if (!g) return ''; if (g.bad) return `🚩 timestamp after its upload (${fmtT(g.up)}): faked time`; if (g.late > 6 * 3600000) return `⚠ reached GitHub ${Math.round(g.late / 3600000)} h later`; return ''; };
+const flags = x => [integFlag(x), x.timeouts ? `${x.timeouts} timed out` : '', x.left ? `${x.left} left the app` : '', x.fast ? `${x.fast} fast guess${x.fast > 1 ? 'es' : ''}` : '', x.clock ? `⏰ phone clock off by ${x.clock} min (not counted)` : '', x.skew != null && Math.abs(x.skew) > 180 ? `⏰ clock off ${Math.round(x.skew / 60)} min` : ''].filter(Boolean).join(' · ');
 
 function vOverview() {
   if (!STATE && !LOG.length) return `<div class="panel"><h2>No data from his phone yet</h2><p class="hint">Link his phone in <b>Setup</b>. After his first session (with internet), it shows up here.</p></div>`;
-  const today = ymd(), wk = weekDays(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], cls = { done: 'g', missed: 'x', open: 'o', later: '' };
+  const today = ymd(), wk = weekDays(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], cls = { done: 'g', missed: 'x', open: 'o', later: '', excused: 'e' };
   const all7 = LOG.filter(x => x.start > Date.now() - 7 * DAY), last7 = all7.filter(x => !x.kind), v7 = all7.filter(x => x.kind === 'verbs'), sum = k => last7.reduce((a, x) => a + (x[k] || 0), 0);
   const ev = (STATE?.events || []).filter(e => e.t > Date.now() - 7 * DAY), bad = ev.filter(e => e.kind === 'tamper' || e.kind === 'rollback'); const clk = ev.filter(e => e.kind === 'clock');
   const due = toPay().filter(e => !paidAt(e.key));
   const lvl = Math.min(LEVELS, Math.floor(peakLearned() / (CFG.perLevel || 30)) + 1);
-  return `
+  return `${reminders()}
     <div class="panel"><div class="kicker">His phone · ${STATE ? 'last sync ' + ago(STATE.updated) + ' · app ' + esc(STATE.app || '?') + (STATE.cfgV === CFG.v ? ' · has your latest rules ✓' : ' · <b style="color:var(--gold2)">has not picked up your latest rules yet</b>') : 'no state yet'}</div>
       <div class="kicker" style="margin-top:14px">Today (${today}) · his time ${String(clock().getHours()).padStart(2, '0')}:${String(clock().getMinutes()).padStart(2, '0')}</div><div class="slots">${slotRow(today)}</div>
-      <div class="wk">${wk.map((d, i) => `<div class="d ${d === today ? 'today' : ''}">${names[i]}<div class="dots">${dayStatus(d).map(s => `<i class="${cls[s]}"></i>`).join('')}</div>${extrasOn(d) ? `<div style="color:var(--gold2);font-weight:800;margin-top:2px">+${extrasOn(d)}</div>` : ''}</div>`).join('')}</div></div>
+      <div class="wk">${wk.map((d, i) => `<div class="d ${d === today ? 'today' : ''}">${names[i]}<div class="dots">${dayStatus(d).map(s => `<i class="${cls[s]}"></i>`).join('')}</div>${extrasOn(d) ? `<div style="color:var(--gold2);font-weight:800;margin-top:2px">+${extrasOn(d)}</div>` : ''}${d <= today && !perfectDay(d) ? `<button class="exc ${excused(d) ? 'on' : ''}" data-excuse="${d}" title="${excused(d) ? esc(CFG.excused[d]) + ' · tap to undo' : 'Excuse this day (illness, travel)'}">${excused(d) ? '🤒' : 'excuse'}</button>` : ''}</div>`).join('')}</div>
+      ${Object.keys(CFG.excused || {}).length ? `<div class="hint" style="margin-top:8px">Excused: ${Object.entries(CFG.excused).sort().slice(-5).map(([d, n]) => `${d.slice(8)}.${d.slice(5, 7)} (${esc(n)})`).join(' · ')}</div>` : ''}</div>
     <div class="stats four"><div class="stat"><b>${streakDays()}</b><span>perfect days in a row</span></div><div class="stat"><b>${STATE?.learned ?? '–'}</b><span>words learned</span></div>
       <div class="stat"><b>${STATE ? STATE.items.filter(i => !i.verb && i.seen && !i.learned).length : '–'}</b><span>words in progress</span></div><div class="stat"><b>${lvl}</b><span>level · ${esc(DEFAULT_LEVEL_NAMES[lvl - 1])}</span></div></div>
     <div class="panel"><div class="kicker">🔁 Irregular verbs · separate practice, own score</div>
       <div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${STATE?.verbs ?? '–'}${STATE?.verbTotal ? ' / ' + STATE.verbTotal : ''}</b><span>verbs learned</span></div><div class="stat"><b>${STATE ? STATE.items.filter(i => i.verb && i.seen && !i.learned).length : '–'}</b><span>verbs in progress</span></div>
         <div class="stat"><b>${v7.filter(x => !x.quit).length}${v7.filter(x => x.quit).length ? ` <small class="hint">(+${v7.filter(x => x.quit).length} quit)</small>` : ''}</b><span>verb practices · last 7 days</span></div><div class="stat"><b>${v7.reduce((a, x) => a + x.cards, 0) ? Math.round(v7.reduce((a, x) => a + x.correct, 0) / v7.reduce((a, x) => a + x.cards, 0) * 100) + '%' : '–'}</b><span>verb answers correct</span></div></div></div>
+    ${vSpots()}
     ${vTreasury(false)}
+    ${(() => { const bad = LOG.filter(x => INTEG[x.id]?.bad), late = LOG.filter(x => !INTEG[x.id]?.bad && INTEG[x.id]?.late > 6 * 3600000); return bad.length || late.length ? `<div class="panel alert"><b>🚩 Session log check</b><div class="hint">${bad.length ? `${bad.length} session(s) claim a time <b>after</b> they were uploaded to GitHub, which is impossible unless the time was faked. ` : ''}${late.length ? `${late.length} session(s) reached GitHub more than 6 hours after they ended (offline, or added later). ` : ''}See <b>Sessions</b> for which ones.</div></div>` : ''; })()}
     ${clk.length ? `<div class="panel alert"><b>⏰ His phone's clock was changed</b><div class="hint">${clk.length} time(s) this week: ${clk.slice(-4).map(e => `${new Date(e.t).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} (${esc(e.item)})`).join(' · ')}. Sessions could not be started (or did not count) until the clock was right again.</div></div>` : ''}
     ${bad.length ? `<div class="panel alert"><b>⚠ The rules file on GitHub was changed by someone other than you</b><div class="hint">His app refused it ${bad.length} time(s) this week (${[...new Set(bad.map(e => e.kind === 'tamper' ? 'wrong signature' : 'older copy put back'))].join(', ')}). Your rules were not affected. Check the repo history on GitHub.</div></div>` : ''}
     <div class="panel"><div class="kicker">To pay</div>${due.length ? due.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}<br><span class="hint">${esc(e.r.text || '')}</span></span><button class="btn gold" data-pay="${esc(e.key)}">Payment done</button></div>`).join('') : '<div class="hint">Nothing waiting.</div>'}</div>
@@ -892,19 +1083,19 @@ function vSessions() {
   const rows = [...LOG].reverse().slice(0, 200);
   return `<div class="panel"><div class="kicker">Sessions (${LOG.length}) · times are his local time</div>${rows.length ? `<div class="tbl"><table><thead><tr><th>Day</th><th>Time</th><th>Result</th><th>Correct</th><th>Flags</th></tr></thead><tbody>
     ${rows.map(x => `<tr><td>${x.day.slice(5)}</td><td>${fmtT(x.start)}–${fmtT(x.end)}</td>
-      <td>${x.kind === 'exam' ? `<span class="pill ${x.passed ? 'ok' : 'no'}">⛷️ Black Run ${x.score}%</span>` : x.kind === 'fix' ? `<span class="pill verb">🎯 mistakes${x.quit ? ' · quit' : ''}</span>` : x.kind === 'verbs' ? (x.quit ? '<span class="pill no">verbs · quit</span>' : '<span class="pill verb">🔁 verbs</span>') : x.ok ? (x.slot >= 0 ? `<span class="pill ok">slot ${x.slot + 1}</span>` : '<span class="pill wait">extra</span>') : x.quit ? '<span class="pill no">quit</span>' : '<span class="pill no">not counted</span>'}</td>
-      <td>${x.correct} / ${x.cards}${x.need ? ` <span class="hint">(needs ${x.need})</span>` : ''}</td><td class="${flags(x) ? 'warnc' : 'hint'}">${flags(x) || '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="hint">No sessions yet.</div>'}</div>`;
+      <td>${x.kind === 'spot' ? `<span class="pill ${x.passed ? 'ok' : 'no'}">🚨 spot ${x.score}%</span>` : x.kind === 'exam' ? `<span class="pill ${x.passed ? 'ok' : 'no'}">⛷️ Black Run ${x.score}%</span>` : x.kind === 'fix' ? `<span class="pill verb">🎯 mistakes${x.quit ? ' · quit' : ''}</span>` : x.kind === 'verbs' ? (x.quit ? '<span class="pill no">verbs · quit</span>' : '<span class="pill verb">🔁 verbs</span>') : x.ok ? (x.slot >= 0 ? `<span class="pill ok">slot ${x.slot + 1}</span>` : '<span class="pill wait">extra</span>') : x.quit ? '<span class="pill no">quit</span>' : '<span class="pill no">not counted</span>'}</td>
+      <td>${x.hard ? '🔥 ' : ''}${x.correct} / ${x.cards}${x.need ? ` <span class="hint">(needs ${x.need})</span>` : ''}</td><td class="${flags(x) ? 'warnc' : 'hint'}">${flags(x) || '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="hint">No sessions yet.</div>'}</div>`;
 }
 function vWords() {
   if (!STATE) return '<div class="panel"><div class="hint">No data yet.</div></div>';
   const items = [...STATE.items].sort((a, b) => (b.wrong || 0) - (a.wrong || 0));
   const score = i => (i.wrong || 0) + 3 * (i.lapses || 0) + (i.lastWrong && Date.now() - i.lastWrong < 14 * DAY ? 3 : 0);
   const trouble = items.filter(i => i.wrong > 0).sort((a, b) => score(b) - score(a)).slice(0, 20);
-  const TN = { choose: 'choose from 6', type: 'typing', hear: 'listen & type', order: 'build the sentence', gap: 'fill the gap', verb: 'typing verb forms', vchoose: 'choosing verb forms', vsent: 'verb in a sentence', say: 'speaking' };
+  const TN = { choose: 'choose from 6', type: 'typing', hear: 'listen & type', order: 'build the sentence', gap: 'fill the gap', verb: 'typing verb forms', vchoose: 'choosing verb forms', vsent: 'verb in a sentence', say: 'speaking', fam: 'word family', opp: 'opposites' };
   const byTest = {}; items.forEach(i => Object.entries(i.wt || {}).forEach(([k, v]) => byTest[k] = (byTest[k] || 0) + v));
   const tests = Object.entries(byTest).sort((a, b) => b[1] - a[1]), tTot = tests.reduce((a, [, v]) => a + v, 0);
   const learned = items.filter(i => i.learned || i.lapses), lapsed = items.filter(i => i.lapses).length, due = items.filter(i => i.learned && (i.nextReview || 0) <= Date.now()).length;
-  return `<div class="panel"><div class="kicker">Memory</div><div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${items.filter(i => i.learned).length}</b><span>learned now</span></div><div class="stat"><b>${due}</b><span>due for review</span></div>
+  return `${vTasks()}<div class="panel"><div class="kicker">Memory</div><div class="stats four" style="margin:10px 0 0"><div class="stat"><b>${items.filter(i => i.learned).length}</b><span>learned now</span></div><div class="stat"><b>${due}</b><span>due for review</span></div>
       <div class="stat"><b>${lapsed}</b><span>forgotten after learning (back in practice)</span></div><div class="stat"><b>${learned.length ? Math.round((1 - lapsed / learned.length) * 100) + '%' : '–'}</b><span>kept after learning</span></div></div></div>
     <div class="panel"><div class="kicker">Trouble words · top 20</div>${trouble.length ? `<div class="tbl"><table><thead><tr><th>Item</th><th>Missed</th><th>Forgotten</th><th>Last miss</th><th>Missed in</th></tr></thead><tbody>
       ${trouble.map(i => `<tr><td><b>${esc(i.en)}</b>${i.verb ? ' <span class="pill verb">verb</span>' : ''}</td><td class="${i.wrong >= 3 ? 'warnc' : ''}">${i.wrong}</td><td>${i.lapses || 0}</td><td class="hint">${i.lastWrong ? new Date(i.lastWrong).toLocaleDateString([], { day: 'numeric', month: 'short' }) : '–'}</td><td class="hint">${Object.entries(i.wt || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${TN[k] || k} ${v}`).join(', ') || '–'}</td></tr>`).join('')}</tbody></table></div>
@@ -928,7 +1119,13 @@ function vRules() {
       ${num('verbMinutes', 'Verb practice length (minutes)', 'Irregular verbs have their own button. Practice never counts as a word session.', 2, 30)}
       ${num('verbActive', 'Irregular verbs in rotation', 'How many new verbs he practises at a time, in order', 2, 15)}
       ${num('fixMinutes', '"Fix my mistakes" length (minutes)', 'Extra practice on his trouble words. Never counts as a session.', 2, 30)}
+      <div class="set-row"><span>Timers learn his pace<div class="hint">A word he answers fast gets a shorter timer next time (down to 60%). A timeout gives some time back.</div></span><label class="sw"><input type="checkbox" data-bool="adaptive" ${CFG.adaptive !== false ? 'checked' : ''}><i></i></label></div>
+      ${num('hardMult', 'Hard mode coin bonus (×)', 'He can switch on Hard mode in his Settings: −25% time, no picking from options. Session rewards pay × this.', 1, 5, 0.1)}
       <div class="set-row"><span>Speaking test<div class="hint">Sometimes he must say the word out loud; the phone checks it (needs internet and the microphone). He can switch to typing instead.</div></span><label class="sw"><input type="checkbox" data-bool="speak" ${CFG.speak !== false ? 'checked' : ''}><i></i></label></div>
+      <div class="set-row"><span>🏂 Shred run (mini-game)<div class="hint">One lift ticket per session that counts (or bought with coins). One run per ticket. The game gives no coins.</div></span><label class="sw"><input type="checkbox" data-game="on" ${gameCfg().on ? 'checked' : ''}><i></i></label></div>
+      <div class="set-row"><span>Lift ticket price (coins)</span><input type="number" min="0" data-gamen="price" value="${gameCfg().price}"></div>
+      <div class="set-row"><span>Tickets per session that counts</span><input type="number" min="0" max="5" data-gamen="perSession" value="${gameCfg().perSession}"></div>
+      <div class="set-row"><span>Shredder Wrapped (year recap)<div class="hint">A Spotify-style story of his year on his Progress tab. Auto = 15 Dec to 15 Jan.</div></span><select data-wrapped>${['auto', 'on', 'off'].map(v => `<option ${(CFG.wrapped || 'auto') === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       <div class="set-row"><span>Sessions need internet<div class="hint">Checks the phone's clock against the internet before each session, so he can't change the time to fake a session. Off: he can train offline, and a wrong clock is caught at the next sync.</div></span><label class="sw"><input type="checkbox" data-bool="needNet" ${CFG.needNet !== false ? 'checked' : ''}><i></i></label></div></div>
     <div class="panel"><div class="kicker">⛷️ Black Run · weekly exam</div>
       <div class="set-row"><span>Weekly exam on<div class="hint">Once a week (Mon–Sun) he can take one run on words he has already learned. All typed, one try each. Give coins for it in Rewards: "Weekly Black Run exam passed" / "with 95% or more".</div></span><label class="sw"><input type="checkbox" data-exam="on" ${CFG.exam?.on !== false ? 'checked' : ''}><i></i></label></div>
@@ -936,6 +1133,9 @@ function vRules() {
       ${num('exam.minutes', 'Time (minutes)', 'Unanswered questions count as wrong', 2, 30)}
       ${num('exam.pass', 'Pass mark (%)', '', 50, 100)}
       ${num('exam.minLearned', 'Opens from (learned words)', '', 5, 200)}</div>
+    <div class="panel"><div class="kicker">🚨 Spot checks</div>
+      ${[['auto', 'Random spot checks per week', 'At random times inside his session hours, picked with a secret from your signed rules. He can\'t know when. 0 = only when you press "Spot check now".', 0, 7], ['hours', 'Hours to do it', 'Not done in time = "missed" in your Overview', 1, 12], ['questions', 'Words per check', 'Learned words, typed, one try each', 3, 15], ['pass', 'Pass mark (%)', '', 50, 100]].map(([k, l, h, mn, mx]) => `<div class="set-row"><span>${l}<div class="hint">${h}</div></span><input type="number" data-spot="${k}" min="${mn}" max="${mx}" value="${spotCfg()[k]}"></div>`).join('')}
+      <div class="hint" style="margin-top:6px">Pay coins for passing with the reward "Spot check passed".</div></div>
     <div class="panel"><div class="kicker">Time limits per answer (seconds)</div>
       ${num('time.choose', 'Choose from 6', 'Total time', 3, 60)}
       ${num('time.type', 'Typing: base time', 'Plus the time per letter below', 3, 60)}
@@ -978,11 +1178,129 @@ function vRewards() {
           <label class="chk"><input type="checkbox" data-rw="${i}.approve" ${r.approve ? 'checked' : ''}> needs my approval</label></div></div></div>
       <div class="times" style="margin-top:10px;justify-content:space-between"><span class="hint">Now: ${esc(s.cur)} · earned ${s.earned.length}×</span><span><button class="btn" data-anim="${i}">${r.anim ? 'Change animation' : 'Add animation (1:1)'}</button>${r.rule.type === 'manual' ? ` <button class="btn gold" data-grant="${i}">Give it now</button>` : ''} <button class="btn x" data-delrw="${i}">Delete</button></span></div></div>`; }).join('');
   const all = toPay().sort((a, b) => (paidAt(a.key) ? 1 : 0) - (paidAt(b.key) ? 1 : 0));
-  return `${vTreasury(true)}${vEvents()}${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
+  return `${vTreasury(true)}${vPenalties()}${vEvents()}${cards}<button class="btn" data-act="addrw" style="margin-bottom:14px">+ Add a reward</button>
     ${vBadges()}
     <div class="panel"><div class="kicker">Earned · real-life rewards (with a text)</div>${all.length ? all.map(e => `<div class="hist"><span><b>${esc(e.r.title)}</b> · ${esc(e.label)}${paidAt(e.key) ? `<br><span class="hint">paid ${new Date(paidAt(e.key)).toLocaleDateString()}</span>` : ''}</span>${paidAt(e.key) ? `<span><span class="pill ok">paid ✓</span> <button class="btn x" data-unpay="${esc(e.key)}">undo</button></span>` : `<button class="btn gold" data-pay="${esc(e.key)}">Payment done</button>`}</div>`).join('') : '<div class="hint">Nothing earned yet.</div>'}</div>`;
 }
 /* ---------- treasury ---------- */
+function vSpots() {
+  const S = spotCfg(), list = allSpots().filter(s => s.at <= Date.now() + 7 * DAY).slice(-8).reverse(), pill = { passed: 'ok', failed: 'no', missed: 'no', open: 'wait', later: 'dim' };
+  const nm = { passed: 'passed', failed: 'failed', missed: 'missed (not done in time)', open: 'open now', later: 'scheduled' };
+  return `<div class="panel"><div class="kicker">🚨 Spot checks · ${S.questions} learned words, typed, within ${S.hours} h</div>
+    <div class="times" style="margin:8px 0;flex-wrap:wrap"><button class="btn gold" data-act="spotnow" ${openSpot() ? 'disabled' : ''}>🚨 Spot check now</button><span class="hint">${S.auto ? `+ ${S.auto} random one(s) a week (Rules)` : 'Random ones: switch on in Rules'}</span></div>
+    ${list.length ? list.map(s => { const st = spotStatus(s), x = spotLog(s); return `<div class="hist"><span>${new Date(s.at).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} ${s.auto ? '<span class="hint">· random</span>' : ''}</span><span class="pill ${pill[st]}">${st === 'later' && s.auto ? 'hidden from him' : nm[st]}${x ? ` · ${x.score}%` : ''}</span></div>`; }).join('') : '<div class="hint">None yet.</div>'}</div>`;
+}
+function vTasks() {
+  const items = STATE?.items || [], tasks = (CFG.tasks || []).slice().reverse(), pill = { done: 'ok', open: 'wait', late: 'no', missed: 'no' };
+  const q = (TF.q || '').toLowerCase(), pickList = items.filter(i => !q || i.en.toLowerCase().includes(q)).sort((a, b) => (a.learned ? 1 : 0) - (b.learned ? 1 : 0)).slice(0, 120);
+  return `<div class="panel"><div class="kicker">📌 Assignments · "learn these by…"</div>
+    ${tasks.map(t => { const s = taskState(t); return `<div class="hist"><span><b>${esc(t.title)}</b> · ${s.learned} of ${s.total} learned · due ${t.due}${t.coins ? ` · +${fullCoins(t.coins)} coins` : ''}</span><span><span class="pill ${pill[s.status]}">${s.status}</span> <button class="btn x" data-taskdel="${t.id}">✕</button></span></div>`; }).join('') || '<div class="hint">No assignments yet.</div>'}
+    <details ${TF.open ? 'open' : ''} id="tf"><summary class="btn" style="margin-top:10px;display:inline-flex">+ New assignment</summary>
+      <div class="times" style="margin-top:10px;flex-wrap:wrap"><input type="text" class="wide" id="tf-title" placeholder="Title, e.g. School test on Friday" value="${esc(TF.title || '')}" style="flex:1;min-width:200px">
+        <input type="date" id="tf-due" value="${TF.due || addDays(ymd(), 5)}"><input type="number" id="tf-coins" min="0" placeholder="Bonus coins" value="${TF.coins ?? 2000}" style="width:130px"></div>
+      <div class="times" style="margin-top:8px"><input type="text" class="wide" id="tf-q" placeholder="Filter words…" value="${esc(TF.q || '')}" style="flex:1"><span class="hint">${TF.ids.size} chosen</span></div>
+      <div class="tf-list">${pickList.map(i => `<label class="${i.learned ? 'lrn' : ''}"><input type="checkbox" data-tfid="${i.id}" ${TF.ids.has(i.id) ? 'checked' : ''}> ${esc(i.en)}${i.learned ? ' <span class="hint">(learned)</span>' : ''}${i.verb ? ' <span class="hint">verb</span>' : ''}</label>`).join('') || '<div class="hint">No words yet (his phone sends them after the first sync).</div>'}</div>
+      <button class="btn gold" data-act="taskadd" style="margin-top:10px" ${TF.ids.size ? '' : 'disabled'}>Give him this assignment</button></details></div>`;
+}
+const TF = { ids: new Set(), open: false };
+/* ---------- charts: one series each, gold on the dark surface, hover tooltips ---------- */
+function svgChart({ pts, kind = 'bar', h = 150, fmtY = v => v, ymax, label }) {
+  const W = 640, P = { l: 34, r: 8, t: 10, b: 22 }, n = pts.length; if (!n) return '<div class="hint">No data yet.</div>';
+  const max = ymax ?? Math.max(1, ...pts.map(p => p.y)), X = i => P.l + (W - P.l - P.r) * (n === 1 ? .5 : i / (n - 1)), bw = Math.max(3, (W - P.l - P.r) / n - 3);
+  const Xb = i => P.l + (W - P.l - P.r) * (i + .5) / n, Y = v => P.t + (h - P.t - P.b) * (1 - v / max);
+  const ticks = [0, max / 2, max].map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${Y(v)}" y2="${Y(v)}" class="gl"/><text x="${P.l - 6}" y="${Y(v) + 4}" class="ax" text-anchor="end">${fmtY(Math.round(v))}</text>`).join('');
+  const every = Math.ceil(n / 7), xl = pts.map((p, i) => i % every === 0 || i === n - 1 ? `<text x="${kind === 'bar' ? Xb(i) : X(i)}" y="${h - 6}" class="ax" text-anchor="middle">${esc(p.x)}</text>` : '').join('');
+  let marks = '';
+  if (kind === 'bar') marks = pts.map((p, i) => { const y = Y(p.y), x = Xb(i) - bw / 2, hh = Math.max(0, h - P.b - y); return `<g class="hv"><rect x="${x - 2}" y="${P.t}" width="${bw + 4}" height="${h - P.b - P.t}" fill="transparent"/>${hh ? `<path d="M${x},${h - P.b} V${y + 4} Q${x},${y} ${x + 4},${y} H${x + bw - 4} Q${x + bw},${y} ${x + bw},${y + 4} V${h - P.b} Z" class="mk"/>` : ''}<title>${esc(p.tip || p.x + ': ' + fmtY(p.y))}</title></g>`; }).join('');
+  else { const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i)},${Y(p.y)}`).join(' ');
+    marks = `<path d="${d} L${X(n - 1)},${h - P.b} L${X(0)},${h - P.b} Z" class="ar"/><path d="${d}" class="ln"/>` + pts.map((p, i) => `<g class="hv"><rect x="${X(i) - (W / n) / 2}" y="${P.t}" width="${W / n}" height="${h - P.b - P.t}" fill="transparent"/><circle cx="${X(i)}" cy="${Y(p.y)}" r="4" class="dt"/><title>${esc(p.tip || p.x + ': ' + fmtY(p.y))}</title></g>`).join(''); }
+  return `<svg viewBox="0 0 ${W} ${h}" class="chart" role="img" aria-label="${esc(label || '')}">${ticks}${marks}${xl}</svg>`;
+}
+const mondayStr = d => ymd(mondayOf(new Date(d + 'T12:00')));
+function vCharts() {
+  if (!LOG.length && !STATE) return '<div class="panel"><div class="hint">No data yet.</div></div>';
+  const today = ymd(), days = Array.from({ length: 42 }, (_, i) => addDays(today, i - 41));
+  const sess = days.map(d => { const n = sessOn(d).length, sch = slotsOn(d); return { x: d.slice(8) + '.' + d.slice(5, 7), y: n, tip: `${d}: ${n} counted of ${sch} scheduled${excused(d) ? ' · excused' : ''}` }; });
+  const weeks = Array.from({ length: 10 }, (_, i) => ymd(new Date(mondayOf().getTime() - (9 - i) * 7 * DAY)));
+  const acc = weeks.map(w => { const l = LOG.filter(x => !x.kind && mondayStr(x.day) === w), c = l.reduce((a, x) => a + x.correct, 0), t = l.reduce((a, x) => a + x.cards, 0); return t ? { x: w.slice(8) + '.' + w.slice(5, 7), y: Math.round(c / t * 100), tip: `week of ${w}: ${Math.round(c / t * 100)}% (${c} of ${t})` } : null; }).filter(Boolean);   // weeks with no sessions are left out, not drawn as 0%
+  const items = STATE?.items || [];
+  const lrn = weeks.map(w => { const end = Date.parse(w + 'T00:00') + 7 * DAY, n = items.filter(i => i.learnedAt && i.learnedAt < end && (i.learned || i.lapses)).length; return { x: w.slice(8) + '.' + w.slice(5, 7), y: n, tip: `by ${ymd(new Date(end - DAY))}: ${n} learned` }; });
+  const T = treasury(REQS()), asc = [...T.hist].sort((a, b) => a.at - b.at);
+  const coins = weeks.map(w => { const end = Date.parse(w + 'T00:00') + 7 * DAY, v = asc.reduce((a, h) => a + (h.at < end ? h.amount : 0), 0); return { x: w.slice(8) + '.' + w.slice(5, 7), y: Math.max(0, v), tip: `end of week ${w}: ${fullCoins(v)} coins` }; });
+  const months = [...new Set(LOG.map(x => x.day.slice(0, 7)))].sort().reverse();
+  return `<div class="panel"><div class="kicker">Sessions that counted · last 6 weeks</div>${svgChart({ pts: sess, label: 'Sessions per day' })}</div>
+    <div class="panel"><div class="kicker">Answers correct · word sessions, per week</div>${svgChart({ pts: acc, kind: 'line', ymax: 100, fmtY: v => v + '%', label: 'Percent correct per week' })}</div>
+    <div class="panel"><div class="kicker">Words learned · running total</div>${svgChart({ pts: lrn, kind: 'line', label: 'Words learned' })}</div>
+    <div class="panel"><div class="kicker">Treasury balance · end of each week</div>${svgChart({ pts: coins, kind: 'line', fmtY: v => fmtCoins(v), label: 'Coins' })}</div>
+    <div class="panel"><div class="kicker">Monthly report · to print or save as PDF</div><div class="times" style="margin-top:8px"><select id="rep-m">${(months.length ? months : [today.slice(0, 7)]).map(m => `<option>${m}</option>`).join('')}</select><button class="btn gold" data-act="report">Open the report</button></div></div>`;
+}
+function monthReport(m) {
+  const L = LOG.filter(x => x.day.startsWith(m)), days = []; for (let d = m + '-01'; d.startsWith(m) && d <= ymd(); d = addDays(d, 1)) days.push(d);
+  const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done').length, sched = st.filter(s => s !== 'excused').length, perfect = days.filter(perfectDay).length;
+  const W = L.filter(x => !x.kind), c = W.reduce((a, x) => a + x.correct, 0), t = W.reduce((a, x) => a + x.cards, 0), sum = k => L.reduce((a, x) => a + (x[k] || 0), 0);
+  const from = Date.parse(m + '-01T00:00'), to = Date.parse(addDays(days.at(-1) || m + '-28', 1) + 'T00:00');
+  const items = STATE?.items || [], learnedM = items.filter(i => i.learnedAt >= from && i.learnedAt < to), verbsM = learnedM.filter(i => i.verb).length;
+  const trouble = items.filter(i => i.lastWrong >= from && i.lastWrong < to).sort((a, b) => b.wrong - a.wrong).slice(0, 5);
+  const T = treasury(REQS()), hm_ = T.hist.filter(h => h.at >= from && h.at < to), cin = hm_.filter(h => h.amount > 0).reduce((a, h) => a + h.amount, 0), cout = -hm_.filter(h => h.amount < 0).reduce((a, h) => a + h.amount, 0);
+  const ex = L.filter(x => x.kind === 'exam'), sp = L.filter(x => x.kind === 'spot'), flagsN = L.filter(x => INTEG[x.id]?.bad).length, clockN = (STATE?.events || []).filter(e => e.kind === 'clock' && e.t >= from && e.t < to).length;
+  const name = new Date(m + '-15').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const row = (k, v) => `<tr><td>${k}</td><td><b>${v}</b></td></tr>`;
+  return `<div class="report"><div class="rp-head"><img src="img/bag_gold.png" alt=""><div><div class="kicker">Word Shredder · monthly report</div><h1>${esc(CFG.name)} · ${name}</h1></div></div>
+    <table class="rp">${row('Sessions done / scheduled', `${done} / ${sched} (${sched ? Math.round(done / sched * 100) : 0}%)`)}${row('Perfect days', perfect)}${row('Extra sessions', W.filter(x => x.ok && x.slot < 0).length)}
+      ${row('Answers correct (word sessions)', t ? `${Math.round(c / t * 100)}% (${c} of ${t})` : '–')}${row('Words learned this month', learnedM.length - verbsM)}${row('Irregular verbs learned', verbsM)}
+      ${row('Black Runs', ex.length ? ex.map(x => x.score + '%' + (x.passed ? ' ✓' : '')).join(', ') : '–')}${row('Spot checks', sp.length ? sp.map(x => x.score + '%' + (x.passed ? ' ✓' : '')).join(', ') : '–')}
+      ${row('Coins earned / spent', `${fullCoins(cin)} / ${fullCoins(cout)}`)}${row('Excused days', days.filter(excused).length)}
+      ${row('Honesty: timed out · left the app · fast guesses', `${sum('timeouts')} · ${sum('left')} · ${sum('fast')}`)}${row('Clock changes · suspicious log entries', `${clockN} · ${flagsN}`)}</table>
+    ${trouble.length ? `<h3>Hardest words this month</h3><p>${trouble.map(i => `${esc(i.en)} (${i.wrong}×)`).join(' · ')}</p>` : ''}
+    <div class="rp-foot no-print"><button class="btn gold" onclick="print()">Print / save as PDF</button> <button class="btn" data-act="closereport">Close</button></div></div>`;
+}
+const PEN_PRESETS = [
+  ['Missed a session', 'missed_session', 1000, 'Every session you skip costs coins.'],
+  ['Failed the Black Run', 'failed_exam', 2000, ''],
+  ['Missed a spot check', 'missed_spot', 1500, ''],
+  ['Changed the clock', 'clock', 5000, 'Cheating costs more than skipping.'],
+  ["Didn't brush teeth", 'manual', 500, ''],
+  ["Didn't wash the dishes", 'manual', 500, 'After dinner, every time.'],
+];
+function vPenalties() {
+  const T = treasury(REQS()), recent = T.hist.filter(h => h.kind === 'penalty').slice(0, 10);
+  return `<div class="panel pens"><div class="kicker">⚠️ Penalties · coins taken away, even below zero</div>
+    <div class="set-row"><span>Lowest balance possible<div class="hint">Fines stop here, e.g. −20,000</div></span><input type="number" step="1000" max="0" data-floor value="${CFG.floor ?? -20000}"></div>
+    ${(CFG.penalties || []).map((p, i) => `<div class="pen-row"><div class="anim r11 pen-a">${p.animURL ? `<div class="media" style="width:100%;height:100%">${/\.(mp4|webm|mov)$/i.test(p.anim) ? `<video src="${p.animURL}" autoplay muted loop playsinline></video>` : `<img src="${p.animURL}">`}</div>` : `<div class="ph sm"><b>${p.anim ? 'GIF ✓' : 'No GIF'}</b><span>1:1</span></div>`}</div>
+      <div class="tx" style="flex:1"><div class="times"><input type="text" class="wide" data-pen="${i}.title" value="${esc(p.title)}" placeholder="e.g. Didn't brush teeth" style="flex:1"><span class="hint">−</span><input type="number" min="0" step="100" data-pen="${i}.amount" value="${p.amount}" style="width:110px"></div>
+        <input type="text" class="wide" data-pen="${i}.text" value="${esc(p.text || '')}" placeholder="What he sees in the pop-up (optional)" style="margin-top:6px">
+        <div class="times" style="margin-top:6px;flex-wrap:wrap"><select data-pen="${i}.type">${Object.entries(PEN_TYPES).map(([k, v]) => `<option value="${k}" ${p.rule?.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+          ${p.rule?.type !== 'manual' ? `<label class="chk"><input type="checkbox" data-pen="${i}.approve" ${p.approve ? 'checked' : ''}> needs my approval</label>` : ''}</div>
+        <div class="times" style="margin-top:8px;justify-content:space-between;flex-wrap:wrap"><span class="hint">${p.rule?.type === 'manual' ? 'Tap "Fine now" when it happens' : `Counts from ${new Date(p.since || Date.now()).toLocaleDateString()} on`}</span>
+          <span>${p.rule?.type === 'manual' ? `<button class="btn x" data-finenow="${i}">⚠️ Fine now</button> ` : ''}<button class="btn" data-panim="${i}">${p.anim ? 'Change GIF' : 'Add GIF (1:1)'}</button> <button class="btn x" data-pendel="${i}">Delete</button></span></div></div></div>`).join('') || '<div class="hint">No penalties yet.</div>'}
+    <div class="times" style="margin-top:10px;flex-wrap:wrap">${PEN_PRESETS.map(([n], k) => `<button class="btn" data-penp="${k}">+ ${esc(n)}</button>`).join('')}<button class="btn" data-penp="custom">+ Custom</button></div>
+    ${recent.length ? `<div class="kicker" style="margin-top:14px">Recent penalties</div>${recent.map(h => `<div class="hist"><span>${esc(h.title)} · ${esc(h.label)}<br><span class="hint">${new Date(h.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span></span><span><b style="color:var(--bad)">−${fullCoins(Math.abs(h.amount))}</b> <button class="btn" data-pno="${esc(h.key)}">Forgive</button></span></div>`).join('')}` : ''}</div>`;
+}
+/* ---------- reminders, health check ---------- */
+const tokExp = () => ({ dad: '2027-11-18', son: '2027-11-18', ...JSON.parse(localStorage.getItem('ws-exp') || '{}') });
+function reminders() {
+  const out = [], E = tokExp(), days = d => Math.ceil((Date.parse(d + 'T23:59') - Date.now()) / DAY);
+  for (const [k, who] of [['dad', 'Your token'], ['son', "His phone's token"]]) { const n = days(E[k]); if (n <= 30) out.push(n < 0 ? `🔴 <b>${who} has expired</b> (${E[k]}). ${k === 'dad' ? 'Dad\'s desk and Studio can\'t save.' : 'His phone has stopped syncing.'} Renew it in Setup.` : `🟡 <b>${who} expires in ${n} day${n === 1 ? '' : 's'}</b> (${E[k]}). Renew it in Setup before then.`); }
+  if (KEY && !localStorage.getItem('ws-keybk')) out.push('🔑 <b>Back up your signing key</b> (Setup → Back up the key). Without it, a new PC or phone can\'t change his rules.');
+  if (STATE && Date.now() - STATE.updated > 2 * DAY) out.push(`📵 <b>His phone hasn't synced for ${Math.floor((Date.now() - STATE.updated) / DAY)} days.</b> Is the app being opened? Is the phone online?`);
+  return out.length ? `<div class="panel alert remind">${out.map(x => `<div>${x}</div>`).join('')}</div>` : '';
+}
+let HEALTH = '';
+async function healthCheck() {
+  const rows = [], ok = (good, label, fix = '') => rows.push(`<div class="hc ${good ? 'g' : 'b'}">${good ? '✅' : '❌'} ${label}${!good && fix ? `<div class="hint">${fix}</div>` : ''}</div>`);
+  const site = new URL('./', location.href).href;          // Dad's desk lives on the same site as his words
+  try { const r = await fetch(site + 'content/words.json', { cache: 'no-store' }); const j = r.ok ? await r.json() : null; ok(!!j, `Website has his words${j ? ` (${j.words.length} items)` : ''}`, 'Open Studio and press Publish to site. Check GitHub → wordshredder → Settings → Pages is on.'); }
+  catch { ok(false, 'Website reachable', 'Check your internet, and that GitHub Pages is switched on for the wordshredder repo.'); }
+  try { await repoExists(); ok(true, 'Your token opens the private repo'); } catch (e) { ok(false, 'Your token opens the private repo', esc(e.message) + ' Renew the token or check its access in GitHub.'); }
+  ok(!!KEY, 'Signing key is in this browser', 'Setup → Restore from backup (or create one if this is the first time).');
+  ok(!!localStorage.getItem('ws-keybk'), 'Signing key is backed up', 'Setup → Back up the key, and keep the file somewhere safe.');
+  ok(!foreignRules, 'Your rules are signed with this key', 'Someone changed rules.json, or it was saved with another key. Save your rules again from here.');
+  ok(!!STATE, 'His phone has sent its data', 'Open the link on his phone once (Setup → 3).');
+  if (STATE) { ok(Date.now() - STATE.updated < 2 * DAY, `His phone synced ${ago(STATE.updated)}`, 'Open the app on his phone with internet. If it still fails, his phone token may have expired: make a new link.');
+    ok(STATE.cfgV === CFG.v, 'His phone has your latest rules', 'It picks them up the next time the app opens online.'); }
+  const E = tokExp(); ok(Date.parse(E.dad) > Date.now() + 30 * DAY, `Your token is valid until ${E.dad}`, 'Renew it soon.'); ok(Date.parse(E.son) > Date.now() + 30 * DAY, `His phone's token is valid until ${E.son}`, 'Renew it soon.');
+  HEALTH = rows.join(''); render();
+}
 function vEvents() {
   const wOpts = (sel) => `<option value="">his normal weather</option>${WEATHER_PRESETS.map(([id, name]) => `<option value="${id}" ${sel === id ? 'selected' : ''}>${name}</option>`).join('')}`;
   return `<div class="panel"><div class="kicker">Seasonal events · coins × N and their own weather</div>
@@ -1001,9 +1319,10 @@ function goalLine(T) { const g = (CFG.shop || []).find(x => x.id === STATE?.goal
   return `<div class="hint" style="margin:4px 0 8px">🎯 He is saving for <b>${esc(g.name)}</b> (${fullCoins(g.price)}): ${Math.min(100, Math.round(Math.max(0, T.available) / g.price * 100))}%</div>`; }
 function vTreasury(full) {
   const T = treasury(REQS()), d8 = t => t ? new Date(t).toLocaleDateString([], { day: 'numeric', month: 'short' }) : '';
-  return `<div class="panel tre"><div class="tre-head"><img src="img/bag_gold.png" alt=""><div><div class="kicker">His treasury · game coins</div><b class="gold-num">${fullCoins(T.balance)}</b> <span class="hint">${fmtCoins(T.balance)}${T.pending.length ? ` · ${fullCoins(T.balance - T.available)} asked for` : ''}</span></div></div>
+  return `<div class="panel tre"><div class="tre-head"><img src="img/bag_gold.png" alt=""><div><div class="kicker">His treasury · game coins</div><b class="${T.balance < 0 ? 'neg-num' : 'gold-num'}">${T.balance < 0 ? '−' : ''}${fullCoins(Math.abs(T.balance))}</b> <span class="hint">${fmtCoins(T.balance)}${T.pending.length ? ` · ${fullCoins(T.balance - T.available)} asked for` : ''}</span></div></div>
     ${goalLine(T)}
     ${T.pending.map(q => `<div class="hist req"><span>${q.item ? `🛒 <b>${esc(q.item)}</b> · ${fullCoins(q.amount)}` : `💸 <b>Withdraw ${fullCoins(q.amount)}</b>`}<br><span class="hint">asked ${d8(q.at)}${q.amount > T.balance ? ' · <b style="color:var(--bad)">more than he has</b>' : ''}</span></span><span><button class="btn x" data-wdno="${q.id}">Decline</button> <button class="btn gold" data-wdok="${q.id}">Approve</button></span></div>`).join('')}
+    ${T.penAwait.map(a => `<div class="hist pen"><span>⚠️ <b>${esc(a.title)}</b> · ${esc(a.label)}<br><span class="hint">−${fullCoins(a.amount)} coins, waiting for your OK</span></span><span><button class="btn" data-pno="${esc(a.key)}">Forgive</button> <button class="btn x" data-pok="${esc(a.key)}">Apply</button></span></div>`).join('')}
     ${T.awaiting.map(a => `<div class="hist"><span>🎁 <b>${esc(a.title)}</b> · ${esc(a.label)}<br><span class="hint">+${fullCoins(a.amount)} coins, waiting for your OK</span></span><span><button class="btn x" data-cno="${esc(a.key)}">Decline</button> <button class="btn gold" data-cok="${esc(a.key)}">Approve</button></span></div>`).join('')}
     ${full ? `<div class="times" style="margin-top:10px;flex-wrap:wrap"><input type="number" id="bank-amt" placeholder="Coins: 500 or -200" style="width:190px"><input type="text" id="bank-note" class="wide" placeholder="Note he sees, e.g. good school marks" style="flex:1;min-width:160px"><button class="btn gold" data-act="bankadd">Add / take</button></div>
       <div class="kicker" style="margin-top:16px">Shop · what coins can buy</div>
@@ -1040,6 +1359,11 @@ function vSetup() {
     <div class="panel"><div class="kicker">2 · Signing key</div>
       <div class="hint" style="margin:8px 0">${KEY ? 'This browser has your signing key ✓. Only rules signed with it are accepted by his phone. <b>Back it up</b>: without it, on another PC you would have to link his phone again.' : 'No key in this browser yet. Create one (first time), or restore your backup.'}${foreignRules ? '<br><b style="color:var(--gold2)">The rules file on GitHub is not signed with this key. If you did not save from another PC, someone edited it. Press Save on any tab to put your rules back.</b>' : ''}</div>
       ${KEY ? '<button class="btn" data-act="keybackup">Back up the key (file)</button>' : '<button class="btn gold" data-act="keynew">Create a key</button>'} <button class="btn" data-act="keyrestore">Restore from backup</button></div>
+    <div class="panel"><div class="kicker">Token expiry dates · so Dad's desk can remind you</div>
+      <div class="set-row"><span>Your token expires</span><input type="date" id="exp-dad" value="${tokExp().dad}"></div>
+      <div class="set-row"><span>His phone's token expires</span><input type="date" id="exp-son" value="${tokExp().son}"></div>
+      <div class="hint">You'll see a warning on the Overview 30 days before. To renew: GitHub → Settings → Developer settings → Fine-grained tokens → the token → <b>Regenerate</b>, then paste it here (yours) or make a new link (his).</div></div>
+    <div class="panel"><div class="kicker">🩺 Health check</div><button class="btn gold" data-act="health" style="margin-top:8px">Check everything</button><div id="health" style="margin-top:10px">${HEALTH || ''}</div></div>
     <div class="panel"><div class="kicker">3 · Link his phone</div>
       <div class="hint" style="margin:8px 0">Paste <b>his phone's</b> token (a second token with <i>Contents: Read and write</i> on <b>${DATA_REPO}</b> only). You get a link. Open it once on his phone in Chrome, then delete the message you sent it in.</div>
       <div class="set-row"><span>His phone's token</span><input type="password" id="a-son" placeholder="github_pat_…"></div>
@@ -1063,6 +1387,15 @@ document.addEventListener('change', e => {
   const t = e.target, d = t.dataset;
   if (d.wx) return;
   if (d.bool) { CFG[d.bool] = t.checked; touch(); return; }
+  if (t.id === 'exp-dad' || t.id === 'exp-son') { const E = tokExp(); E[t.id.slice(4)] = t.value; localStorage.setItem('ws-exp', JSON.stringify(E)); return render(); }
+  if (d.pen) { const [i, k] = d.pen.split('.'), p = CFG.penalties[i]; if (k === 'type') { p.rule = { type: t.value }; p.since = Date.now(); } else if (k === 'amount') p.amount = Math.max(0, Math.round(+t.value || 0)); else if (k === 'approve') p.approve = t.checked; else p[k] = t.value.trim(); touch(); return; }
+  if ('floor' in d) { CFG.floor = Math.min(0, Math.round(+t.value || 0)); touch(); return; }
+  if (d.game) { CFG.game = { ...gameCfg(), on: t.checked }; touch(); return; }
+  if (d.gamen) { CFG.game = { ...gameCfg(), [d.gamen]: Math.max(0, Math.round(+t.value || 0)) }; touch(); return; }
+  if ('wrapped' in d) { CFG.wrapped = t.value; touch(); return; }
+  if (d.tfid) { t.checked ? TF.ids.add(d.tfid) : TF.ids.delete(d.tfid); TF.open = true; TF.title = $('#tf-title')?.value; TF.due = $('#tf-due')?.value; TF.coins = $('#tf-coins')?.value; const y = scrollY; render(); scrollTo(0, y); return; }
+  if (t.id === 'tf-q') { TF.q = t.value; TF.open = true; TF.title = $('#tf-title')?.value; TF.due = $('#tf-due')?.value; TF.coins = $('#tf-coins')?.value; const y = scrollY; render(); scrollTo(0, y); return; }
+  if (d.spot) { const v = Math.max(0, +t.value || 0), S = { ...spotCfg() }; S[d.spot] = v; if (d.spot === 'auto' && v && !S.seed) { S.seed = uid(); S.since = ymd(); } CFG.spot = S; touch(); return; }
   if (d.ev) { const [i, k] = d.ev.split('.'), e = CFG.events[i]; e[k] = k === 'mult' ? Math.max(1, Math.min(10, +t.value || 1)) : t.value.trim(); if (e.to < e.from) e.to = e.from; touch(); return; }
   if (d.shop) { const [i, k] = d.shop.split('.'), it = CFG.shop[i]; it[k] = k === 'price' ? Math.max(1, Math.round(+t.value) || 1) : t.value.trim(); touch(); return; }
   if (t.id === 'rate') { const v = Math.max(0, Math.min(20, +t.value || 0)); if (v !== curRate()) { CFG.rates = [...(CFG.rates || []), { from: Date.now(), pct: v }]; touch(); } return; }
@@ -1093,21 +1426,41 @@ document.addEventListener('click', async e => {
       ev = { id: 'e-' + uid().slice(0, 6), icon, name, from, to, mult, weather }; }
     else ev = { id: 'e-' + uid().slice(0, 6), icon: '🎉', name: 'Special week', from: ymd(), to: addDays(ymd(), 6), mult: 2, weather: '' };
     CFG.events = [...(CFG.events || []), ev]; return touch(); }
+  if (d.excuse) { const day = d.excuse;
+    if (excused(day)) { if (!confirm(`Undo the excuse for ${day}?`)) return; const e = { ...CFG.excused }; delete e[day]; CFG.excused = e; return saveRules('day un-excused'); }
+    const note = prompt(`Excuse ${day}? His streak and perfect week won't break. Reason (he sees it):`, 'ill'); if (note === null) return;
+    CFG.excused = { ...(CFG.excused || {}), [day]: note.trim() || 'excused' }; return saveRules('day excused'); }
+  if (d.taskdel) { if (!confirm('Delete this assignment?')) return; CFG.tasks = CFG.tasks.filter(t => t.id !== d.taskdel); return saveRules('assignment removed'); }
   if (d.shopdel) { CFG.shop.splice(+d.shopdel, 1); return touch(); }
   if (d.delrw) { if (confirm(`Delete the reward "${CFG.rewards[d.delrw].title}"?`)) { CFG.rewards.splice(d.delrw, 1); touch(); } return; }
   if (d.grant) { const r = CFG.rewards[d.grant], note = prompt('What is it for? (he sees this)', ''); if (note === null) return; (r.granted = r.granted || []).push({ at: Date.now(), note: note.trim() || 'special' }); return saveRules('reward given'); }
   if (d.anim) return pickAnim(+d.anim);
+  if (d.panim) return pickAnim(+d.panim, 'pen');
+  if (d.penp) { const pr = PEN_PRESETS[+d.penp], p = pr ? { title: pr[0], rule: { type: pr[1] }, amount: pr[2], text: pr[3] } : { title: 'New penalty', rule: { type: 'manual' }, amount: 500, text: '' };
+    CFG.penalties = [...(CFG.penalties || []), { id: 'p-' + uid().slice(0, 8), since: Date.now(), approve: false, ...p }]; return touch(); }
+  if (d.pendel) { if (!confirm(`Delete the penalty "${CFG.penalties[+d.pendel].title}"? Fines already given stay.`)) return; CFG.penalties.splice(+d.pendel, 1); return touch(); }
+  if (d.finenow) { const p = CFG.penalties[+d.finenow], note = prompt(`Fine ${CFG.name} −${fullCoins(p.amount)} for "${p.title}"? A note he sees (optional):`, ''); if (note === null) return;
+    CFG.fines = [...(CFG.fines || []), { id: 'f-' + uid().slice(0, 8), pid: p.id, at: Date.now(), amount: p.amount, note: note.trim() }]; return saveRules('fine'); }
+  if (d.pok) { const a = treasury(REQS()).penAwait.find(x => x.key === d.pok); if (!a) return; CFG.penOk = { ...(CFG.penOk || {}), [a.key]: a.amount }; return saveRules('penalty applied'); }
+  if (d.pno) { if (!confirm('Forgive this penalty? The coins go back to him.')) return; CFG.penNo = { ...(CFG.penNo || {}), [d.pno]: Date.now() }; return saveRules('penalty forgiven'); }
   switch (d.act) {
     case 'save': return saveRules();
     case 'reload': return loadAll();
     case 'addslot': { const last = CFG.slots.at(-1); CFG.slots.push({ from: last ? last.to : '08:00', to: '22:00' }); return touch(); }
     case 'shopadd': CFG.shop = [...(CFG.shop || []), { id: 's-' + uid().slice(0, 8), name: 'New item', price: 1000, icon: '🎁' }]; return touch();
+    case 'spotnow': if (!confirm('Start a spot check now? He gets ' + spotCfg().hours + ' hours to do it.')) return;
+      CFG.spots = [...(CFG.spots || []), { id: 'spot-' + uid().slice(0, 8), at: Date.now() }]; return saveRules('spot check');
+    case 'taskadd': { const title = $('#tf-title').value.trim() || 'Assignment', due = $('#tf-due').value || addDays(ymd(), 5), coins = Math.max(0, Math.round(+$('#tf-coins').value || 0));
+      CFG.tasks = [...(CFG.tasks || []), { id: 't-' + uid().slice(0, 8), title, ids: [...TF.ids], due, coins, at: Date.now() }]; TF.ids = new Set(); TF.open = false; TF.title = ''; TF.q = ''; return saveRules('assignment'); }
+    case 'report': { const m = $('#rep-m').value; $('#main').innerHTML = monthReport(m); document.body.classList.add('printing'); scrollTo(0, 0); return; }
+    case 'closereport': document.body.classList.remove('printing'); return render();
+    case 'health': HEALTH = '<div class="hint">Checking…</div>'; render(); return healthCheck();
     case 'bankadd': { const amt = Math.round(+$('#bank-amt').value); if (!amt) return toast('Type an amount, e.g. 500 or -200');
       CFG.bank = [...(CFG.bank || []), { id: uid().slice(0, 8), at: Date.now(), amount: amt, note: $('#bank-note').value.trim() }]; return saveRules(amt > 0 ? 'coins added' : 'coins taken'); }
     case 'addrw': CFG.rewards.push({ id: 'r-' + uid().slice(0, 8), title: 'New reward', text: '', rule: { type: 'perfect_week' } }); return touch();
     case 'connect': { A = { ...(A || {}), owner: $('#a-owner').value.trim(), token: $('#a-token').value.trim() }; localStorage.setItem('ws-admin', JSON.stringify(A)); await loadAll(); if (A && !busy && tab === 'setup') toast('Connected ✓'); return; }
-    case 'keynew': await newKey(); toast('Key created. Back it up now.'); return render();
-    case 'keybackup': { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ wordshredderKey: 1, ...KEY })], { type: 'application/json' })); a.download = 'wordshredder-signing-key.json'; a.click(); return; }
+    case 'keynew': await newKey(); localStorage.removeItem('ws-keybk'); toast('Key created. Back it up now.'); return render();
+    case 'keybackup': { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ wordshredderKey: 1, ...KEY })], { type: 'application/json' })); a.download = 'wordshredder-signing-key.json'; a.click(); localStorage.setItem('ws-keybk', Date.now()); setTimeout(render, 300); return; }
     case 'keyrestore': { const f = $('#f-any'); f.accept = '.json'; f.onchange = async () => { try { const j = JSON.parse(await f.files[0].text()); if (!j.priv || !j.pub) throw 0; KEY = { priv: j.priv, pub: j.pub }; localStorage.setItem('ws-key', JSON.stringify(KEY)); toast('Key restored ✓'); if (A) loadAll(); else render(); } catch { toast('That is not a key backup.'); } }; f.value = ''; return f.click(); }
     case 'makelink': { const tok = $('#a-son').value.trim(); if (!tok) return toast("Paste his phone's token first.");
       if (tok === A.token) return toast('That is YOUR token. His phone needs its own, weaker one.', 6000);
@@ -1116,17 +1469,17 @@ document.addEventListener('click', async e => {
     case 'copylink': { const box = $('#a-link'); box.select(); try { await navigator.clipboard.writeText(box.value); toast('Copied. Send it to his phone, open it once, then delete the message.', 6000); } catch { document.execCommand('copy'); } return; }
   }
 });
-async function pickAnim(i) {
+async function pickAnim(i, kind = 'rw') {
   const f = $('#f-any'); f.accept = 'image/gif,image/webp,image/png,video/mp4,video/webm';
   f.onchange = async () => {
     const file = f.files[0]; if (!file) return;
-    if (file.size > 8 * 1048576) return toast('Too large. Keep reward animations under 8 MB.', 5000);
+    if (file.size > 8 * 1048576) return toast('Too large. Keep animations under 8 MB.', 5000);
     busy = 'Uploading…'; render();
     try {
       const buf = await file.arrayBuffer(), h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].slice(0, 5).map(x => x.toString(16).padStart(2, '0')).join('');
-      const ext = (file.name.split('.').pop() || 'bin').toLowerCase(), r = CFG.rewards[i], path = `rewards/${r.id}-${h}.${ext}`;
+      const ext = (file.name.split('.').pop() || 'bin').toLowerCase(), r = kind === 'pen' ? CFG.penalties[i] : CFG.rewards[i], path = `${kind === 'pen' ? 'penalties' : 'rewards'}/${r.id}-${h}.${ext}`;
       let bin = ''; const u = new Uint8Array(buf); for (let k = 0; k < u.length; k += 0x8000) bin += String.fromCharCode(...u.subarray(k, k + 0x8000));
-      await gh.put(path, btoa(bin), 'reward animation');
+      await gh.put(path, btoa(bin), kind === 'pen' ? 'penalty animation' : 'reward animation');
       r.anim = path; r.animURL = URL.createObjectURL(file); busy = ''; dirty = true; toast('Uploaded. Press Save to send it to his phone.');
     } catch (e) { busy = ''; toast('Upload failed: ' + e.message, 6000); }
     render();

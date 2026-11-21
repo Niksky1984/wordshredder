@@ -48,6 +48,30 @@ Then **Publish to site** (Studio) or **Save & send to his phone** (admin page).
 
 100 verbs built into Studio, in learning order (10 sets of 10). Verbs have **their own button** (home screen and Verbs tab), their own blue practice window and their own score. Verb practice never fills a word session and does not count for word levels; word sessions contain no verbs. Admin page → Rules: *Verb practice length* (default 5 min) and *Irregular verbs in rotation* (default 6). Rewards can use the rule *Every N irregular verbs learned*. First meeting: pick the right forms out of 6. After that: type **both** the past simple and the past participle; one wrong form = miss. Both learnt/learned, burnt/burned, was/were and got/gotten are accepted. His **Verbs** tab shows the sets and his progress.
 
+## New in 0.9
+
+- **Penalties:** Dad's desk → Rewards → **⚠️ Penalties**. Each one has a name, an amount, an optional text he sees and an optional 1:1 GIF.
+  - *Automatic:* missed session, missed whole day, failed Black Run, missed / failed spot check, quit early, changed the clock. These count only from the moment you create the rule, never backwards. Excused days are never fined.
+  - *By hand:* teeth, dishes, anything. Tap **⚠️ Fine now** and add a note.
+  - Tick *needs my approval* to Apply / Forgive each automatic one yourself. Any fine can be forgiven later.
+  - His treasury can go below zero, down to the **lowest balance** you set (default −20,000). Withdraw is locked while he's in the red.
+  - His phone shows a pop-up with your GIF, the reason, the amount and his new balance. His Rewards tab lists the penalties.
+- **Reminders:** the Overview warns you 30 days before a token expires (enter the dates in Setup), if your signing key isn't backed up, or if his phone hasn't synced for 2 days.
+- **🩺 Health check:** Setup → *Check everything*: website, your token, signing key and backup, his phone's last sync and rules, token dates. Each problem comes with a plain fix.
+
+## New in 0.8
+
+- **Spot checks:** Dad's desk → Overview → **🚨 Spot check now**, or random ones each week (Rules → Spot checks). He gets a surprise 5-word typed quiz with a few hours to do it. Not done in time = "missed". Pay coins with the reward *Spot check passed*.
+- **Log integrity:** Dad's desk compares every session with the time it actually reached GitHub (GitHub's clock). A session that claims a time after its upload is flagged 🚩 (time faked); one that arrived hours later is flagged ⚠.
+- **Excuse a day:** Overview → *excuse* under a day (illness, travel). His streak and perfect week don't break. Only you can do it.
+- **Assignments:** Words → *New assignment*: pick words, a due date and bonus coins. They come first in his sessions, with a countdown on his home screen. Done before the due date = coins.
+- **Faster timers, Hard mode:** each word's timer shrinks as he answers it quickly (down to 60%). In his Settings he can turn on 🔥 Hard mode: −25% time, no picking from options, session coins × 1.5 (Rules).
+- **Studio auto-fill:** ✨ in the word editor, or *Auto-fill missing* in the toolbar. Fills empty IPA, example and opposite from a free online dictionary (dictionaryapi.dev); nothing you typed is overwritten. The Russian is still yours.
+- **Word family & opposite:** two optional fields in Studio (and in Excel: columns *Family*, *Opposite*), e.g. `decision (n), decisive (adj)` and `unreliable`. They add "Type the noun of decide" and "Type the opposite of reliable" questions.
+- **Charts & monthly report:** Dad's desk → **Charts**: sessions per day, % correct, words learned, treasury. *Open the report* → print or save as PDF.
+- **Shredder Wrapped:** his year as a story on his Progress tab (15 Dec – 15 Jan, or switch it on/off in Rules).
+- **Shred run:** a downhill mini-game. One lift ticket per session that counts (or bought with coins, price in Rules); one run per ticket; it never pays coins.
+
 ## New in 0.7
 
 - **Progress backup:** his progress is copied to your private repo after every sync. A new or wiped phone gets everything back (learned words, review dates, sessions, coins, requests) the moment you open the link on it.

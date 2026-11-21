@@ -134,6 +134,7 @@ td.num{color:var(--faint);width:44px;font-variant-numeric:tabular-nums}
       <button class="btn" data-a="excel">Import Excel</button>
       <button class="btn" data-a="images">Add images</button>
       <button class="btn" data-a="template">Excel template</button>
+      <button class="btn" data-a="autofill" title="Fill empty IPA and example sentences from a free online dictionary">✨ Auto-fill missing</button>
       <input id="q" type="search" placeholder="Search…">
       <div class="seg" id="flt"></div>
       <div class="stats" id="stats"></div>
@@ -288,7 +289,10 @@ function openWord(id) {
     <div><div class="field"><label>English word</label><input class="big" id="m-en" value="${esc(w?.en)}"></div>
       <div class="field"><label>Transcription (IPA)</label><input id="m-ipa" value="${esc(w?.ipa)}" placeholder="/ˈæp.əl/"></div>
       <div class="field"><label>Russian translation</label><input class="big" id="m-ru" value="${esc(w?.ru)}"></div>
-      <div class="field"><label>Example sentence</label><textarea id="m-ex" rows="3">${esc(w?.example)}</textarea></div></div></div>
+      <div class="field"><label>Example sentence</label><textarea id="m-ex" rows="3">${esc(w?.example)}</textarea></div>
+      <div class="field"><label>Word family <small>(optional) e.g. decision (n), decisive (adj)</small></label><input id="m-fam" value="${esc(w?.family)}" placeholder="decision (n), decisive (adj)"></div>
+      <div class="field"><label>Opposite <small>(optional) e.g. unreliable</small></label><input id="m-opp" value="${esc(w?.opp)}" placeholder="unreliable"></div>
+      <button class="btn" id="m-auto" type="button">✨ Auto-fill IPA, example, opposite</button> <span class="note" id="m-auto-msg"></span></div></div>
     <div class="m-foot"><span class="msg" id="m-msg"></span><button class="btn" id="m-cancel">Cancel</button>${w ? '' : '<button class="btn" id="m-save-next">Save &amp; add another</button>'}<button class="btn gold" id="m-save">Save</button></div></div>`;
   document.body.appendChild(sc);
   const ib = $('#ib', sc);
@@ -309,9 +313,17 @@ function openWord(id) {
   sc.addEventListener('input', validate);
   $('#say', sc).onclick = () => speak($('#m-en', sc).value + '. ' + $('#m-ex', sc).value);
   $('#m-cancel', sc).onclick = () => sc.remove();
+  $('#m-auto', sc).onclick = async () => {          // fills only the empty fields; you check them before saving
+    const en = $('#m-en', sc).value.trim(), msg = $('#m-auto-msg', sc); if (!en) return;
+    msg.textContent = 'Looking it up…'; const d = await lookupWord(en);
+    if (!d) { msg.textContent = 'Not found in the dictionary (phrases often aren\'t). Fill it in by hand.'; return; }
+    const fill = (id, v) => { const el = $(id, sc); if (v && !el.value.trim()) el.value = v; };
+    fill('#m-ipa', d.ipa); fill('#m-ex', d.example); fill('#m-opp', d.opp);
+    msg.textContent = `Filled from the dictionary${d.pos ? ' (' + d.pos + ')' : ''}. Check it before saving.`; validate();
+  };
   const save = async again => {
     if (!validate()) return;
-    const data = { en: $('#m-en', sc).value.trim(), ipa: $('#m-ipa', sc).value.trim(), ru: $('#m-ru', sc).value.trim(), example: $('#m-ex', sc).value.trim(), image, updated: Date.now() };
+    const data = { en: $('#m-en', sc).value.trim(), ipa: $('#m-ipa', sc).value.trim(), ru: $('#m-ru', sc).value.trim(), example: $('#m-ex', sc).value.trim(), family: $('#m-fam', sc).value.trim(), opp: $('#m-opp', sc).value.trim(), image, updated: Date.now() };
     let rec;
     if (w) { Object.assign(w, data); rec = w; } else { rec = { id: uid(), order: nextOrder(), imageName: '', ...data }; words.push(rec); }
     await putWords([rec]); sc.remove(); renderWords(); toast('Saved');
@@ -327,6 +339,35 @@ const nextOrder = () => words.reduce((m, w) => Math.max(m, w.order || 0), 0) + 1
 function speak(t) { if (!('speechSynthesis' in window) || !t.trim()) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); const v = speechSynthesis.getVoices().find(v => /^en[-_]GB/i.test(v.lang)); if (v) u.voice = v; u.lang = 'en-GB'; u.rate = .9; speechSynthesis.speak(u); }
 
 /* ---------- Excel import ---------- */
+/* ---------- auto-fill from a free dictionary (dictionaryapi.dev): IPA, an example, an opposite. Russian stays yours. ---------- */
+const LOOKUP_API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+async function lookupWord(en) {
+  try {
+    const r = await fetch(LOOKUP_API + encodeURIComponent(en.trim().toLowerCase())); if (!r.ok) return null;
+    const j = await r.json(), e = Array.isArray(j) ? j : [];
+    const ipa = (e.map(x => x.phonetic).find(Boolean) || e.flatMap(x => x.phonetics || []).map(p => p.text).find(Boolean) || '').trim();
+    const ms = e.flatMap(x => x.meanings || []), defs = ms.flatMap(m => m.definitions || []);
+    const example = (defs.map(d => d.example).find(x => x && x.toLowerCase().includes(en.toLowerCase().split(' ')[0].slice(0, 5))) || defs.map(d => d.example).find(Boolean) || '').trim();
+    const opp = [...ms.flatMap(m => m.antonyms || []), ...defs.flatMap(d => d.antonyms || [])][0] || '';
+    const fix = s => s && !/^\//.test(s) ? `/${s.replace(/^\[|\]$/g, '')}/` : s;
+    return { ipa: fix(ipa), example: example ? example[0].toUpperCase() + example.slice(1) + (/[.!?]$/.test(example) ? '' : '.') : '', opp, pos: ms[0]?.partOfSpeech || '' };
+  } catch { return null; }
+}
+async function autoFillAll() {
+  const todo = words.filter(w => !w.ipa || !w.example);
+  if (!todo.length) return toast('Every word already has IPA and an example.');
+  if (!confirm(`Look up ${todo.length} word(s) and fill the empty IPA / example / opposite fields? Nothing you typed is overwritten. Check them afterwards.`)) return;
+  let n = 0, got = 0; const changed = [];
+  for (const w of todo) {
+    toast(`Looking up ${++n}/${todo.length}: ${w.en}`, 60000);
+    const d = await lookupWord(w.en); if (!d) continue;
+    let ch = false; if (!w.ipa && d.ipa) { w.ipa = d.ipa; ch = true; } if (!w.example && d.example) { w.example = d.example; ch = true; } if (!w.opp && d.opp) { w.opp = d.opp; ch = true; }
+    if (ch) { w.updated = Date.now(); changed.push(w); got++; }
+    await new Promise(r => setTimeout(r, 120));      // be polite to the free service
+  }
+  if (changed.length) await putWords(changed);
+  renderWords(); toast(`Auto-fill: ${got} of ${todo.length} words filled. The rest weren't in the dictionary (phrases usually aren't).`, 6000);
+}
 async function importExcel() {
   if (!window.XLSX) return toast('Excel reader needs an internet connection the first time. Check the connection and reload.');
   const [f] = await pickFile('.xlsx,.xls,.csv,.ods'); if (!f) return;
@@ -335,16 +376,16 @@ async function importExcel() {
   if (!rows.length) return toast('The sheet is empty.');
   const head = rows[0].map(h => norm(h));
   const find = re => head.findIndex(h => re.test(h));
-  let col = { en: find(/^(en|eng|english|word)/), ipa: find(/ipa|transcr|pronun/), ru: find(/^(ru|rus|russian|translation)/), ex: find(/example|sentence/), img: find(/image|picture|photo|file/) };
+  let col = { en: find(/^(en|eng|english|word)/), ipa: find(/ipa|transcr|pronun/), ru: find(/^(ru|rus|russian|translation)/), ex: find(/example|sentence/), img: find(/image|picture|photo|file/), fam: find(/family|forms/), opp: find(/opposite|antonym/) };
   let start = 1;
-  if (col.en < 0 || col.ru < 0) { col = { en: 0, ipa: 1, ru: 2, ex: 3, img: 4 }; start = 0; }
+  if (col.en < 0 || col.ru < 0) { col = { en: 0, ipa: 1, ru: 2, ex: 3, img: 4, fam: 5, opp: 6 }; start = 0; }
   const mapEn = new Map(words.map(w => [norm(w.en), w]));
   let added = 0, updated = 0; const changed = [];
   let order = nextOrder() - 1;
   for (const r of rows.slice(start)) {
     const g = i => i >= 0 ? String(r[i] ?? '').trim() : '';
     const en = g(col.en), ru = g(col.ru); if (!en || !ru) continue;
-    const rec = { en, ipa: g(col.ipa), ru, example: g(col.ex), imageName: g(col.img) };
+    const rec = { en, ipa: g(col.ipa), ru, example: g(col.ex), imageName: g(col.img), ...(g(col.fam) ? { family: g(col.fam) } : {}), ...(g(col.opp) ? { opp: g(col.opp) } : {}) };
     const w = mapEn.get(norm(en));
     if (w) { Object.assign(w, rec, { imageName: rec.imageName || w.imageName, ipa: rec.ipa || w.ipa, example: rec.example || w.example, updated: Date.now() }); changed.push(w); updated++; }
     else { const nw = { id: uid(), order: ++order, image: null, updated: Date.now(), ...rec }; words.push(nw); mapEn.set(norm(en), nw); changed.push(nw); added++; }
@@ -374,8 +415,8 @@ async function addImages(files) {
 /* ---------- template ---------- */
 function downloadTemplate() {
   if (!window.XLSX) return toast('Needs an internet connection the first time.');
-  const ws = XLSX.utils.aoa_to_sheet([['English', 'IPA', 'Russian', 'Example', 'Image'], ['apple', '/ˈæp.əl/', 'яблоко', 'She eats an apple every morning.', 'apple.jpg'], ['brave', '/breɪv/', 'смелый', 'It was a brave decision.', 'brave.jpg']]);
-  ws['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 18 }, { wch: 48 }, { wch: 18 }];
+  const ws = XLSX.utils.aoa_to_sheet([['English', 'IPA', 'Russian', 'Example', 'Image', 'Family', 'Opposite'], ['apple', '/ˈæp.əl/', 'яблоко', 'She eats an apple every morning.', 'apple.jpg', '', ''], ['brave', '/breɪv/', 'смелый', 'It was a brave decision.', 'brave.jpg', 'bravery (n), bravely (adv)', 'cowardly']]);
+  ws['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 18 }, { wch: 48 }, { wch: 18 }, { wch: 28 }, { wch: 16 }];
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Words'); XLSX.writeFile(wb, 'WordShredder_words_template.xlsx');
 }
 
@@ -425,7 +466,7 @@ function exportDialog() {
     const which = $('input[name=which]:checked', sc).value, incMedia = $('#x-media', sc).checked;
     const list = which === 'all' ? ready : changed;
     if (!list.length && !incMedia) return toast('Nothing to export.');
-    const out = { format: 'wordcrown', version: 1, kind: 'pool', exported: new Date().toISOString(),
+    const out = { format: 'wordshredder', version: 1, kind: 'pool', exported: new Date().toISOString(),
       words: list.map(w => ({ id: w.id, en: w.en, ipa: w.ipa, ru: w.ru, example: w.example, image: w.image, updated: w.updated })) };
     if (incMedia) out.media = { reward: media.reward, know: media.know, recall: media.recall, next: media.next, oops: media.oops, levels: media.levels, levelNames: media.levelNames, wordsPerLevel: media.wordsPerLevel };
     const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
@@ -439,8 +480,8 @@ function exportDialog() {
 /* ---------- open pool / backup into the editor ---------- */
 async function openPool() {
   const [f] = await pickFile('.json,application/json'); if (!f) return;
-  let d; try { d = JSON.parse(await f.text()); } catch { return toast('Not a WordCrown file.'); }
-  if (d.format !== 'wordcrown' || !Array.isArray(d.words)) return toast('Not a WordCrown file.');
+  let d; try { d = JSON.parse(await f.text()); } catch { return toast('Not a Word Shredder file.'); }
+  if (!['wordshredder', 'wordcrown'].includes(d.format) || !Array.isArray(d.words)) return toast('Not a Word Shredder file.');
   await mergeIntoStudio(d);
 }
 async function mergeIntoStudio(d, onSite = null) {
@@ -453,7 +494,7 @@ async function mergeIntoStudio(d, onSite = null) {
   for (const p of d.words) {
     if (!p.en) continue;
     if (p.type === 'verb') { if (p.image) VIMG[p.en] = p.image; VON = true; continue; }
-    const rec = { en: p.en, ipa: p.ipa || '', ru: p.ru || '', example: p.example || '', image: p.image || null, updated: p.updated || Date.now() };
+    const rec = { en: p.en, ipa: p.ipa || '', ru: p.ru || '', example: p.example || '', family: p.family || '', opp: p.opp || '', image: p.image || null, updated: p.updated || Date.now() };
     const w = mapId.get(p.id) || mapEn.get(norm(p.en));
     if (w && onSite && (w.updated || 0) > Math.max(syncAt, lastExport)) continue;   // edited here and not published yet: keep this version
     if (w) { Object.assign(w, rec); changed.push(w); updated++; }
@@ -491,10 +532,10 @@ async function fileFor(dataURL, folder, name) {
 // Build every file the site needs from what is in Studio now
 async function buildSite() {
   const files = new Map(), ready = words.filter(complete);
-  const out = { format: 'wordcrown', version: 2, kind: 'site', updated: new Date().toISOString(), words: [], media: {} };
+  const out = { format: 'wordshredder', version: 2, kind: 'site', updated: new Date().toISOString(), words: [], media: {} };
   for (const w of ready) {
     const f = w.image ? await fileFor(w.image, 'img', slugify(w.en)) : null; if (f) files.set(f.path, f.b64);
-    out.words.push({ id: w.id, en: w.en, ipa: w.ipa || '', ru: w.ru, example: w.example || '', updated: w.updated || 0, image: f ? f.path : '' });
+    out.words.push({ id: w.id, en: w.en, ipa: w.ipa || '', ru: w.ru, example: w.example || '', ...(w.family ? { family: w.family } : {}), ...(w.opp ? { opp: w.opp } : {}), updated: w.updated || 0, image: f ? f.path : '' });
   }
   for (const k of MEDIA_KEYS) if (media[k]) { const f = await fileFor(media[k], 'media', k); if (f) { files.set(f.path, f.b64); out.media[k] = f.path; } }
   out.media.levels = {};
@@ -627,7 +668,7 @@ async function loadFromSite(asked = false) {
     }
     if (r.ok) {
       let n = 0; const all = man.words.length;
-      data = { format: 'wordcrown', words: [], media: { levels: {} } };
+      data = { format: 'wordshredder', words: [], media: { levels: {} } };
       for (const p of man.words) { data.words.push({ ...p, image: p.image ? await get(p.image) : null }); toast(`Loading from the site… ${++n}/${all}`, 120000); }
       const m = man.media || {};
       for (const k of MEDIA_KEYS) if (m[k]) data.media[k] = await get(m[k]);
@@ -678,6 +719,7 @@ document.addEventListener('click', async e => {
   if (a === 'excel') importExcel();
   if (a === 'images') addImages(await pickFile('image/*', true));
   if (a === 'template') downloadTemplate();
+  if (a === 'autofill') autoFillAll();
   if (a === 'export') exportDialog();
   if (a === 'open-pool') openPool();
   if (a === 'load-site') loadFromSite();

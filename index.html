@@ -313,6 +313,36 @@ div#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
 .badge-pop{text-align:center}.bp-icon{font-size:72px;line-height:1;margin-bottom:8px;animation:pop .5s ease}
 @keyframes pop{0%{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:none}}
 
+.slot.excused{background:rgba(120,140,170,.18);border-color:#7e8ea8;color:#d7e0ee}
+.dots i.e{background:#8fa3c0}
+
+.spot-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:0 0 12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#8e1b1b,#d8473f);box-shadow:0 0 0 2px rgba(255,255,255,.15),0 8px 24px rgba(216,71,63,.45);animation:spotpulse 1.6s ease-in-out infinite}
+.spot-card .sp-ic{font-size:30px}.spot-card b{display:block;font-size:17px}.spot-card small{opacity:.9;font-weight:700}.spot-card .sp-go{margin-left:auto;font-weight:900;font-size:16px}
+@keyframes spotpulse{50%{box-shadow:0 0 0 2px rgba(255,255,255,.35),0 8px 30px rgba(255,90,80,.7)}}
+.panel.task .ico{font-size:24px}.panel.task.done{border-color:rgba(82,183,136,.5)}
+
+.wrapbtn{border-color:rgba(255,216,77,.5);background:linear-gradient(135deg,#5a1e6e,#b5442c 55%,#e9a85a);margin:0 0 12px}
+.wrapped{position:relative;width:min(92vw,calc(92vh * 9 / 16));aspect-ratio:9/16;border-radius:24px;overflow:hidden;background:#0b1722;user-select:none}
+.wr-bars{position:absolute;left:12px;right:12px;top:10px;display:flex;gap:4px;z-index:2}.wr-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}.wr-bars i.done,.wr-bars i.on{background:#fff}
+.wr-x{position:absolute;right:10px;top:20px;z-index:3;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.35);color:#fff}
+.wr-card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:radial-gradient(circle at 30% 20%,hsl(var(--h) 70% 45%),transparent 60%),radial-gradient(circle at 80% 90%,hsl(calc(var(--h) + 120) 70% 35%),transparent 55%),#0d1420;animation:rise .35s ease}
+.wr-ic{font-size:64px;margin-bottom:10px}.wr-k{font-size:15px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.wr-big{display:block;font-family:var(--serif);font-size:84px;line-height:1.05;margin:8px 0}.wr-big.sm{font-size:40px}
+.wr-sub{font-size:16px;line-height:1.4;max-width:90%;opacity:.95}.wr-tap{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;opacity:.6}
+
+.gamebtn{border-color:rgba(160,210,255,.5);background:linear-gradient(135deg,#1d4f7a,#5fa3d6)}
+.game{position:relative;width:min(94vw,calc(92vh * 9 / 16));aspect-ratio:9/16;border-radius:24px;overflow:hidden;background:#fff;touch-action:none}
+.game canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.g-hud{position:absolute;left:14px;top:12px;color:#173a5c;display:flex;flex-direction:column}.g-hud b{font-size:28px;font-variant-numeric:tabular-nums}.g-hud span{font-size:12px;font-weight:700;opacity:.7}
+.g-x{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;background:rgba(23,58,92,.15);color:#173a5c}
+.g-hint{position:absolute;left:0;right:0;bottom:16%;text-align:center;color:#173a5c;font-weight:800;opacity:.75;pointer-events:none}
+.g-over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(11,23,34,.78);color:#fff;text-align:center;padding:20px}
+.g-big{font-family:var(--serif);font-size:64px;line-height:1}.g-acts{display:flex;flex-direction:column;gap:8px;width:80%;margin-top:14px}
+
+.neg-num{color:#ff6b5b;font-weight:900;text-shadow:0 1px 0 rgba(60,0,0,.8),0 2px 6px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
+.pen-pop{text-align:center;max-width:380px}.pen-anim{width:min(240px,62vw);margin:0 auto 10px;border-radius:18px;overflow:hidden}
+.pen-pop .kicker{color:#ff8a7a}.pen-why{color:var(--muted);font-size:14px}.pen-amt{font-family:var(--serif);font-size:54px;color:#ff6b5b;line-height:1;margin:6px 0}
+
 </style>
 </head>
 <body>
@@ -376,10 +406,23 @@ const CFG_DEFAULT = {
   bank: [],               // coins Dad added (+) or took (−) by hand: {id, at, amount, note}
   wd: {},                 // withdrawal requests Dad decided: id -> {ok, at, amount}
   shop: [],               // what coins can buy: {id, name, price, icon}
+  spots: [],              // spot checks Dad started: {id, at, by}
+  spot: { auto: 0, hours: 2, questions: 5, pass: 80, seed: '' },   // auto = random spot checks per week
+  tasks: [],              // assignments: {id, title, ids, due (YYYY-MM-DD), coins, at}
+  game: { on: true, price: 500, perSession: 1 },   // snowboard mini-game: lift tickets per counted session, or bought with coins
+  wrapped: 'auto',        // year-end recap: 'auto' (15 Dec – 15 Jan), 'on', 'off'
+  penalties: [],          // fines: {id, title, text, amount, rule: {type}, approve, anim, since}
+  fines: [],              // fines Dad gave by hand: {id, pid, at, amount, note}
+  penOk: {},              // key -> amount Dad confirmed (rules set to "needs my approval")
+  penNo: {},              // key -> time Dad forgave it
+  floor: -20000,          // the balance never goes below this
+  excused: {},            // days Dad excused (illness, travel): 'YYYY-MM-DD' -> note. Never breaks a streak or a perfect week.
   events: [],             // seasonal events: {id, name, icon, from, to (YYYY-MM-DD), mult, weather}
   rates: [],              // weekly interest history: {from, pct} (0 = off)
   weather: null,          // snow settings; null = WEATHER_DEFAULT
   speak: true,            // speaking test (Chrome speech recognition)
+  adaptive: true,         // each word's timer shrinks as he answers it fast
+  hardMult: 1.5,          // Hard mode: coins × this for sessions played in Hard mode
   needNet: true,          // sessions start only online, after checking the phone's clock against the internet
 };
 const RULE_TYPES = {
@@ -394,6 +437,7 @@ const RULE_TYPES = {
   exam: { label: 'Weekly Black Run exam passed', n: false },
   exam_top: { label: 'Black Run with 95% or more', n: false },
   badge: { label: 'Every new badge', n: false },
+  spot: { label: 'Spot check passed', n: false },
   manual: { label: 'Special: I give it by hand', n: false },
 };
 
@@ -413,10 +457,12 @@ const sessOn = d => LOG.filter(x => x.day === d && x.ok && !x.kind);   // verb p
 // How many sessions were scheduled on a day. Past days keep the number that applied then, even if Dad changed the schedule later.
 const slotsOn = d => { const rec = LOG.find(x => x.day === d && x.slots && !x.kind); return d < ymd() && rec ? rec.slots : CFG.slots.length; };
 // status of every slot on a given day: done / open (now) / later / missed
+const excused = d => !!CFG.excused?.[d];
 function dayStatus(d = ymd(), now = clock()) {
-  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot));
+  const today = ymd(now), done = new Set(sessOn(d).filter(x => x.slot >= 0).map(x => x.slot)), ex = excused(d);
   return Array.from({ length: slotsOn(d) }, (_, i) => {
     if (done.has(i)) return 'done';
+    if (ex) return 'excused';
     if (d < today) return 'missed';
     if (d > today) return 'later';
     const s = CFG.slots[i], m = nowMin(now);
@@ -433,12 +479,13 @@ const firstDay = () => LOG.length ? LOG.reduce((m, x) => x.day < m ? x.day : m, 
 function perfectRuns() {
   const runs = []; let cur = null;
   for (let d = firstDay(); d <= ymd(); d = addDays(d, 1)) {
-    if (perfectDay(d)) { if (cur) cur.len++; else runs.push(cur = { start: d, len: 1 }); }
+    if (perfectDay(d)) { if (cur) { cur.len++; cur.last = d; } else runs.push(cur = { start: d, len: 1, last: d }); }
+    else if (excused(d)) continue;                        // an excused day pauses the run, never breaks it
     else if (d < ymd()) cur = null;                       // today not perfect yet does not break the run
   }
   return runs;
 }
-function streakDays() { const r = perfectRuns().at(-1); return r && addDays(r.start, r.len) >= ymd() ? r.len : 0; }
+function streakDays() { const r = perfectRuns().at(-1); if (!r) return 0; let d = addDays(r.last, 1); while (d < ymd() && excused(d)) d = addDays(d, 1); return d >= ymd() ? r.len : 0; }
 
 /* ---------- rewards ---------- */
 // For one reward: progress now + every earned instance {key,label}. Keys never change, so "paid" marks stay attached.
@@ -448,7 +495,7 @@ function rewardState(r) {
     for (let mon = mondayOf(new Date(firstDay() + 'T12:00')); mon <= mondayOf(); mon.setDate(mon.getDate() + 7)) {
       const days = weekDays(mon), isCur = ymd(mon) === ymd(mondayOf()), label = `week of ${days[0].slice(8)}.${days[0].slice(5, 7)}`;
       if (t === 'perfect_week') {
-        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done').length, missed = st.filter(s => s === 'missed').length;
+        const st = days.flatMap(d => dayStatus(d)), done = st.filter(s => s === 'done' || s === 'excused').length, missed = st.filter(s => s === 'missed').length;
         if (st.length && done === st.length) out.earned.push({ key: `${r.id}@${days[0]}`, label });
         if (isCur) { out.cur = `${done} of ${st.length} sessions`; out.pct = st.length ? done / st.length : 0; out.status = done === st.length ? 'earned' : missed ? 'lost' : 'progress'; if (missed) out.cur += ` · ${missed} missed`; }
       } else {
@@ -464,13 +511,16 @@ function rewardState(r) {
     out.cur = `${done} of ${st.length} sessions today`; out.pct = st.length ? done / st.length : 0; out.status = st.includes('missed') ? 'lost' : done === st.length ? 'earned' : 'progress';
   } else if (t === 'session' || t === 'vsession') {
     const vb = t === 'vsession', list = LOG.filter(x => x.ok && (vb ? x.kind === 'verbs' : !x.kind));
-    for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
+    for (const x of list) out.earned.push({ mult: x.hard ? (CFG.hardMult || 1.5) : 1, key: `${r.id}@${x.id}`, label: `${vb ? 'verb practice' : 'session'} ${x.day.slice(8)}.${x.day.slice(5, 7)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
     const today = list.filter(x => x.day === ymd()).length; out.cur = `${today} today`; out.pct = 0;
   } else if (t === 'exam' || t === 'exam_top') {
     const list = LOG.filter(x => x.kind === 'exam' && x.passed && (t === 'exam' || x.score >= 95));
     for (const x of list) out.earned.push({ key: `${r.id}@${x.id}`, label: `Black Run ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
     const wk = LOG.find(x => x.kind === 'exam' && x.day >= weekDays()[0]);
     out.cur = wk ? `this week: ${wk.score}%${wk.passed ? ' ✓' : ''}` : 'not run this week'; out.pct = wk ? Math.min(1, wk.score / 100) : 0; out.status = wk && !wk.passed ? 'lost' : 'progress';
+  } else if (t === 'spot') {
+    for (const x of LOG.filter(x => x.kind === 'spot' && x.passed)) out.earned.push({ key: `${r.id}@${x.spotId}`, label: `spot check ${x.score}% · ${x.day.slice(8)}.${x.day.slice(5, 7)}`, at: x.end });
+    const sp = allSpots(), passed = sp.filter(s => spotStatus(s) === 'passed').length; out.cur = `${passed} of ${sp.filter(s => s.at <= Date.now()).length} passed`; out.pct = 0;
   } else if (t === 'badge') {
     for (const bd of earnedBadges()) out.earned.push({ key: `${r.id}@${bd.id}`, label: `${bd.icon} ${bd.name}`, at: 0 });
     out.cur = `${out.earned.length} of ${BADGES.length} badges`; out.pct = out.earned.length / BADGES.length;
@@ -502,27 +552,42 @@ function fmtCoins(n) {
   if (a >= 1e3) return sg + cut(a / 1e3, a < 1e4 ? 2 : a < 1e5 ? 1 : 0) + 'K';
   return sg + a;
 }
-const fullCoins = n => Math.round(n).toLocaleString('en-US');
+const fullCoins = n => (Math.round(n) || 0).toLocaleString('en-US');   // never "-0"
 function treasury(requests = [], opt = {}) {
   const hist = [], awaiting = [];
   for (const r of CFG.rewards || []) {
     const c0 = Math.max(0, Math.round(r.coins || 0)); if (!c0 || (opt.noBadge && r.rule?.type === 'badge')) continue;
     for (const e of rewardState(r).earned) {
-      const c = Math.round(c0 * multAt(e.at));
+      const c = Math.round(c0 * multAt(e.at) * (e.mult || 1));
       if (CFG.coinNo?.[e.key]) continue;
       if (r.approve && !CFG.coinOk?.[e.key]) { awaiting.push({ key: e.key, title: r.title, label: e.label, amount: c, at: e.at || 0 }); continue; }
-      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : ''), at: e.at || 0 });
+      hist.push({ kind: 'reward', amount: r.approve ? CFG.coinOk[e.key] : c, title: r.title, label: e.label + (multAt(e.at) > 1 ? ` · ×${multAt(e.at)}` : '') + ((e.mult || 1) > 1 ? ' · 🔥 hard' : ''), at: e.at || 0 });
     }
   }
+  for (const t of CFG.tasks || []) { const st = taskState(t); if (st.status === 'done' && t.coins > 0) hist.push({ kind: 'task', amount: Math.round(t.coins * multAt(st.doneAt)), title: `📌 ${t.title}`, label: `assignment done · ${st.total} words`, at: st.doneAt }); }
+  const penAwait = [];
+  for (const p of CFG.penalties || []) {
+    const amt = Math.max(0, Math.round(p.amount || 0)); if (!amt || p.rule?.type === 'manual') continue;
+    for (const e of penaltyEvents(p)) {
+      if (CFG.penNo?.[e.key]) continue;
+      if (p.approve && !CFG.penOk?.[e.key]) { penAwait.push({ key: e.key, title: p.title, label: e.label, amount: amt, at: e.at, pid: p.id }); continue; }
+      hist.push({ kind: 'penalty', amount: -(p.approve ? CFG.penOk[e.key] : amt), title: `⚠️ ${p.title}`, label: e.label, at: e.at, key: e.key, pid: p.id });
+    }
+  }
+  for (const f of CFG.fines || []) if (!CFG.penNo?.[f.id]) { const p = (CFG.penalties || []).find(x => x.id === f.pid); hist.push({ kind: 'penalty', amount: -Math.abs(f.amount), title: `⚠️ ${p?.title || 'Fine'}`, label: f.note || '', at: f.at, key: f.id, pid: f.pid }); }
   for (const b of CFG.bank || []) hist.push({ kind: 'bank', amount: b.amount, title: b.amount >= 0 ? 'From Dad' : 'Taken by Dad', label: b.note || '', at: b.at });
   const pending = [];
   for (const q of requests) {
     const d = CFG.wd?.[q.id];
+    if (q.auto) { if (!q.cancelled) hist.push({ kind: 'ticket', amount: -q.amount, title: `🎟️ ${q.item || 'Lift ticket'}`, label: '', at: q.at, id: q.id }); continue; }
     if (d) { if (d.ok) hist.push({ kind: 'wd', amount: -d.amount, title: q.item ? `Bought: ${q.item}` : 'Withdrawn', label: '', at: d.at, id: q.id }); }
     else if (!q.cancelled) pending.push(q);
   }
   // approvals whose request the phone no longer lists still count
   for (const [id, d] of Object.entries(CFG.wd || {})) if (d.ok && !requests.some(q => q.id === id)) hist.push({ kind: 'wd', amount: -d.amount, title: 'Withdrawn', label: '', at: d.at, id });
+  // the floor: a fine never takes the balance below CFG.floor (e.g. −20,000)
+  { const fl = Math.min(0, CFG.floor ?? -20000); hist.sort((a, b) => a.at - b.at); let bal = 0;
+    for (const h of hist) { if (h.kind === 'penalty' && bal + h.amount < fl) { const cut = Math.min(0, fl - bal); h.capped = h.amount !== cut; h.amount = cut; if (h.capped) h.label = (h.label ? h.label + ' · ' : '') + 'stopped at the floor'; } bal += h.amount; } }
   // weekly interest: every Monday, on what he kept over the week (the rate that was set at that moment)
   const rates = (CFG.rates || []).slice().sort((a, b) => a.from - b.from);
   if (rates.some(r => r.pct > 0) && hist.length) {
@@ -537,7 +602,7 @@ function treasury(requests = [], opt = {}) {
   }
   hist.sort((a, b) => b.at - a.at);
   const balance = hist.reduce((a, h) => a + h.amount, 0), held = pending.reduce((a, q) => a + q.amount, 0);
-  return { balance, available: balance - held, pending, awaiting, hist };
+  return { balance, available: balance - held, pending, awaiting, penAwait, hist };
 }
 
 /* ---------- signed rules: only Dad's key can change them ---------- */
@@ -560,6 +625,11 @@ function ghClient(get) {                                  // get() -> {owner, to
   return {
     async meta(p) { const r = await call(p); if (r.status === 404) return null; if (!r.ok) throw new Error('GitHub ' + r.status); return r.json(); },
     async text(p) { const m = await this.meta(p); return m ? { text: b64.text(m.content || ''), sha: m.sha } : null; },
+    async commits(p) {                                     // upload history of a file, with GitHub's own clock (newest first)
+      const r = await fetch(`${(get().api || 'https://api.github.com').replace(/\/$/, '')}/repos/${get().owner}/${DATA_REPO}/commits?path=${encodeURIComponent(p)}&per_page=100`, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + get().token } });
+      if (!r.ok) throw new Error('GitHub ' + r.status); return (await r.json()).map(c => ({ sha: c.sha, at: Date.parse(c.commit.committer.date) }));
+    },
+    async textAt(p, ref) { const r = await call(`${p}?ref=${ref}`); if (!r.ok) return null; const m = await r.json(); return b64.text(m.content || ''); },
     async blob(p) { const r = await call(p, {}, 'application/vnd.github.raw'); if (!r.ok) throw new Error('GitHub ' + r.status); return r.blob(); },
     // create or replace; finds the current sha itself and retries once if someone wrote in between
     async put(p, content64, message, sha, strict = false) {   // strict: never overwrite a newer copy from another device
@@ -725,6 +795,75 @@ function badgeCtx() {
 }
 const earnedBadges = () => { const c = badgeCtx(); return BADGES.filter(b => b.test(c)); };
 
+/* ---------- spot checks: a surprise 5-word typed quiz he must do within a few hours ---------- */
+const spotCfg = () => ({ auto: 0, hours: 2, questions: 5, pass: 80, seed: '', ...(CFG.spot || {}) });
+const hash32 = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+// random checks: which days and what time, from a secret in Dad's signed rules (same answer on his phone and in Dad's desk)
+function autoSpots() {
+  const S = spotCfg(); if (!S.auto || !CFG.slots.length) return [];
+  const out = [], from = Math.min(...CFG.slots.map(s => hm(s.from))), to = Math.max(...CFG.slots.map(s => hm(s.to))) - S.hours * 60;
+  if (to <= from) return [];
+  const start = mondayOf(new Date(Math.max(Date.parse(firstDay() + 'T12:00'), Date.now() - 35 * DAY))), end = new Date(Date.now() + 7 * DAY);
+  for (const mon = new Date(start); mon < end; mon.setDate(mon.getDate() + 7)) {
+    const days = weekDays(mon), pick = [...days].sort((a, b) => hash32(S.seed + a) - hash32(S.seed + b)).slice(0, Math.min(7, S.auto));
+    for (const d of pick) { if (S.since && d < S.since) continue; const m = from + hash32(S.seed + d + 't') % (to - from), x = new Date(d + 'T00:00'); x.setMinutes(m); out.push({ id: 'auto-' + d, at: x.getTime(), auto: true }); }
+  }
+  return out;
+}
+const allSpots = () => [...(CFG.spots || []), ...autoSpots()].sort((a, b) => a.at - b.at);
+const spotLog = s => LOG.find(x => x.kind === 'spot' && x.spotId === s.id);
+function spotStatus(s, now = Date.now()) {
+  const x = spotLog(s), end = s.at + spotCfg().hours * 3600000;
+  if (x) return x.passed ? 'passed' : 'failed';
+  if (now < s.at) return 'later';
+  return now <= end ? 'open' : 'missed';
+}
+const openSpot = () => allSpots().find(s => spotStatus(s) === 'open') || null;
+
+/* ---------- assignments: "these words by Friday" ---------- */
+const itemsNow = () => typeof words !== 'undefined' ? words : (typeof STATE !== 'undefined' && STATE ? STATE.items || [] : []);
+function taskState(t) {
+  const items = itemsNow(), map = new Map(items.map(i => [i.id, i])), list = (t.ids || []).map(id => map.get(id)).filter(Boolean);
+  const learned = list.filter(i => i.learned || (i.learnedAt && i.learnedAt >= (t.at || 0))), dueEnd = Date.parse(t.due + 'T23:59:59');
+  const doneAt = learned.length === list.length && list.length ? Math.max(...learned.map(i => i.learnedAt || 0)) : 0;
+  const status = doneAt ? (doneAt <= dueEnd ? 'done' : 'late') : Date.now() > dueEnd ? 'missed' : 'open';
+  return { total: list.length, learned: learned.length, doneAt, status, daysLeft: Math.ceil((dueEnd - Date.now()) / DAY) };
+}
+
+/* ---------- lift tickets for the mini-game ---------- */
+const gameCfg = () => ({ on: true, price: 500, perSession: 1, ...(CFG.game || {}) });
+const ticketsEarned = () => LOG.filter(x => x.ok && !x.kind).length * gameCfg().perSession;
+const ticketsBought = reqs => reqs.filter(q => q.auto && !q.cancelled && q.tickets).reduce((a, q) => a + q.tickets, 0);
+
+/* ---------- penalties: automatic ones come from his real history (only after Dad made the rule), manual ones Dad gives ---------- */
+const PEN_TYPES = {
+  missed_session: 'Missed a session',
+  missed_day: 'Missed a whole day (every session)',
+  failed_exam: 'Failed the Black Run',
+  missed_spot: 'Missed a spot check',
+  failed_spot: 'Failed a spot check',
+  quit: 'Quit a session early',
+  clock: 'Changed the phone\'s clock',
+  manual: 'By hand: I press "Fine now" (teeth, dishes, …)',
+};
+function penaltyEvents(p) {
+  const t = p.rule?.type, since = p.since || 0, out = [], dd = d => `${d.slice(8)}.${d.slice(5, 7)}`;
+  if (t === 'missed_session' || t === 'missed_day') {
+    for (let d = ymd(new Date(Math.max(since, Date.parse(firstDay() + 'T00:00')))); d <= ymd(); d = addDays(d, 1)) {
+      const st = dayStatus(d);
+      if (t === 'missed_day') { if (st.length && st.every(s => s === 'missed')) { const at = Date.parse(d + 'T23:59'); if (at >= since && at <= Date.now()) out.push({ key: `${p.id}@${d}`, label: `missed all of ${dd(d)}`, at }); } continue; }
+      st.forEach((s, i) => { if (s !== 'missed') return; const sl = CFG.slots[i], at = sl ? Date.parse(`${d}T${sl.to}`) : Date.parse(d + 'T23:59');
+        if (at >= since && at <= Date.now()) out.push({ key: `${p.id}@${d}#${i}`, label: `missed ${sl ? slotName(sl).toLowerCase() : 'a'} session ${dd(d)}`, at }); });
+    }
+  } else if (t === 'failed_exam') for (const x of LOG.filter(x => x.kind === 'exam' && !x.passed && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `Black Run ${x.score}% · ${dd(x.day)}`, at: x.end });
+  else if (t === 'failed_spot') for (const x of LOG.filter(x => x.kind === 'spot' && !x.passed && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `spot check ${x.score}% · ${dd(x.day)}`, at: x.end });
+  else if (t === 'missed_spot') for (const s of allSpots()) { const end = s.at + spotCfg().hours * 3600000; if (end >= since && spotStatus(s) === 'missed') out.push({ key: `${p.id}@${s.id}`, label: `spot check ${dd(ymd(new Date(s.at)))} not done`, at: end }); }
+  else if (t === 'quit') for (const x of LOG.filter(x => x.quit && x.kind !== 'exam' && x.end >= since)) out.push({ key: `${p.id}@${x.id}`, label: `quit ${dd(x.day)} ${new Date(x.end).toTimeString().slice(0, 5)}`, at: x.end });
+  else if (t === 'clock') { const ev = typeof EV !== 'undefined' ? EV : (typeof STATE !== 'undefined' && STATE ? STATE.events || [] : []);
+    const seen = new Set(); for (const e of ev.filter(e => e.kind === 'clock' && e.t >= since)) { const d = ymd(new Date(e.t)); if (seen.has(d)) continue; seen.add(d); out.push({ key: `${p.id}@clock-${d}`, label: `clock changed ${dd(d)}`, at: e.t }); } }
+  return out;
+}
+
 /* Irregular verbs in real sentences: [past simple sentence, past participle sentence].
    ___ is the gap; the answer is the verb's past or past participle form. A third item narrows the accepted past simple. */
 const VERB_SENT = {
@@ -841,7 +980,7 @@ function verbSentence(w) {
    Words/media: content/words.json (published from Studio)
    Storage: IndexedDB · Rules (schedule, rewards): CFG
    ========================================================= */
-const APP_VERSION = '0.7';   // 0.1 app + Studio · 0.2 online link, signed rules, admin page · 0.3 avatar, real snow · 0.4 irregular verbs
+const APP_VERSION = '0.9';   // 0.1 app + Studio · 0.2 online link, signed rules, admin page · 0.3 avatar, real snow · 0.4 irregular verbs
 const DAY = 86400000;
 const REVIEW_DAYS = [2, 5, 12, 30, 60, 120];
 const ACTIVE_CAP = 12;                                   // items in rotation at a time
@@ -918,6 +1057,7 @@ const PH = {
   ok: ['"Correct" reaction', '16:9 · silent · 2–3 s'],
   bad: ['"Wrong" reaction', '16:9 · silent · 2–3 s'],
   reward: ['Reward animation', '1:1 · silent loop'],
+  penalty: ['Penalty animation', '1:1 · GIF, WebP or MP4 · loops'],
   level: ['Level picture', '1:1'],
 };
 const ph = (kind, extra = '') => `<div class="ph"><b>Here: ${PH[kind][0]}${extra}</b><span>${PH[kind][1]}</span></div>`;
@@ -1035,7 +1175,7 @@ function go(t) {
 }
 function render() { ({ home: renderHome, words: renderWords, verbs: renderVerbs, rewards: renderRewards, progress: renderProgress, settings: renderSettings })[tab](); }
 const greeting = () => { const h = new Date().getHours(); return h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
-const slotHTML = (d = ymd()) => CFG.slots.map((s, i) => { const st = dayStatus(d)[i]; return `<div class="slot ${st}"><b>${st === 'done' ? '✅' : st === 'missed' ? '❌' : slotIcon(s)}</b>${slotName(s, i)}<small>${s.from}–${s.to}</small></div>`; }).join('');
+const slotHTML = (d = ymd()) => CFG.slots.map((s, i) => { const st = dayStatus(d)[i]; return `<div class="slot ${st}"><b>${st === 'done' ? '✅' : st === 'missed' ? '❌' : st === 'excused' ? '🤒' : slotIcon(s)}</b>${slotName(s, i)}<small>${s.from}–${s.to}</small></div>`; }).join('');
 async function levelArt(lvl) { const u = await imgURL('media:level:' + lvl); return u ? `<img src="${u}" alt="">` : ph('level', ' ' + lvl); }
 
 async function renderHome() {
@@ -1044,8 +1184,9 @@ async function renderHome() {
   const vs = verbList(), VL = verbLearned();
   const label = !wordList().length ? 'No words yet' : open >= 0 ? `Start ${slotName(CFG.slots[open], open).toLowerCase()} session` : 'Extra session (bonus)';
   $('#v-home').innerHTML = `
-    <div class="h-top"><div class="who"><button class="avatar ${(await avatarURL()) ? '' : 'empty'}" data-action="avatar" aria-label="Change avatar">${await avatarHTML()}</button><div><div class="kicker">${greeting()}</div><h1>${esc(CFG.name)}</h1></div></div><div class="h-right"><button class="bag" data-action="bank" aria-label="My treasury"><img src="img/bag_gold.png" alt=""><b class="gold-num">${fmtCoins(treasury(REQ).balance)}</b></button><div class="streak">🔥 ${streakDays()} day${streakDays() === 1 ? '' : 's'}</div></div></div>
+    <div class="h-top"><div class="who"><button class="avatar ${(await avatarURL()) ? '' : 'empty'}" data-action="avatar" aria-label="Change avatar">${await avatarHTML()}</button><div><div class="kicker">${greeting()}</div><h1>${esc(CFG.name)}</h1></div></div><div class="h-right"><button class="bag" data-action="bank" aria-label="My treasury"><img src="img/bag_gold.png" alt=""><b class="${treasury(REQ).balance < 0 ? 'neg-num' : 'gold-num'}">${fmtCoins(treasury(REQ).balance)}</b></button><div class="streak">🔥 ${streakDays()} day${streakDays() === 1 ? '' : 's'}</div></div></div>
     <div class="lights">${'<i></i>'.repeat(14)}</div>
+    ${spotCard()}${taskCards()}
     ${activeEvents().map(e => `<div class="ev-banner"><span>${esc(e.icon || '🎉')}</span><div><b>${esc(e.name)}</b><small>${e.mult > 1 ? `coins ×${e.mult} · ` : ''}until ${new Date(e.to + 'T12:00').toLocaleDateString([], { day: 'numeric', month: 'short' })}</small></div></div>`).join('')}
     <div class="r169" style="margin-bottom:12px">${await mediaOrPh('home')}</div>
     <div class="panel"><div class="kicker">Today · ${doneN} of ${st.length} sessions${ex ? ` · +${ex} extra` : ''}</div><div class="slots">${slotHTML()}</div></div>
@@ -1055,6 +1196,7 @@ async function renderHome() {
     <div class="hint" style="text-align:center;margin-top:10px">${wordList().length ? `${CFG.minutes} min · counts with ${CFG.minCorrect}+ correct answers` : 'Dad adds the words in Studio. Open the app with internet to load them.'}</div>
     ${vs.length ? verbButton(vs, VL) : ''}
     ${examButton()}
+    ${gameButton()}
     ${fixButton()}`;
 }
 
@@ -1066,7 +1208,7 @@ function openBank(view = 'main') {
   const T = treasury(REQ), sc = openScrim(`<div class="vault">
     <button class="v-x" data-r="x" aria-label="Close">✕</button>
     <div class="v-top"><div class="kicker">My treasury</div>
-      <div class="v-sum gold-num">${fullCoins(T.balance)}</div><div class="v-unit">coins · ${fmtCoins(T.balance)}</div>
+      <div class="v-sum ${T.balance < 0 ? 'neg-num' : 'gold-num'}">${T.balance < 0 ? '−' : ''}${fullCoins(Math.abs(T.balance))}</div><div class="v-unit">coins · ${fmtCoins(T.balance)}</div>
       ${T.pending.length ? `<div class="v-note">⏳ ${fullCoins(T.pending.reduce((a, q) => a + q.amount, 0))} waiting for Dad</div>` : ''}
       ${T.awaiting.length ? `<div class="v-note">🎁 ${fullCoins(T.awaiting.reduce((a, q) => a + q.amount, 0))} earned, waiting for Dad's OK</div>` : ''}
       ${goalHTML(T)}</div>
@@ -1147,6 +1289,81 @@ async function checkBadges() {                 // a moment for every new badge
   const sc = openScrim(`<div class="dlg badge-pop"><div class="bp-icon">${b.icon}</div><div class="kicker">New badge${fresh.length > 1 ? ` · +${fresh.length - 1} more` : ''}</div><h2>${esc(b.name)}</h2><p>${esc(b.desc)}${coins ? ` · +${fullCoins(coins)} coins` : ''}</p><button class="primary" data-r="1">Nice</button></div>`);
   confetti(100); sc.addEventListener('click', e => { if (e.target.closest('[data-r]') || e.target === sc) sc.close(); });
 }
+function spotCard() {
+  const sp = openSpot(); if (!sp) return '';
+  const left = sp.at + spotCfg().hours * 3600000 - Date.now(), h = Math.floor(left / 3600000), m = Math.floor(left % 3600000 / 60000);
+  return `<button class="spot-card" data-action="start" data-mode="spot"><span class="sp-ic">🚨</span><span><b>Spot check!</b><small>${spotCfg().questions} words · typed · one try · closes in ${h ? h + ' h ' : ''}${m} min</small></span><span class="sp-go">Go ›</span></button>`;
+}
+function taskCards() {
+  return (CFG.tasks || []).map(t => ({ t, s: taskState(t) })).filter(x => x.s.status === 'open' || (x.s.status === 'done' && Date.now() - x.s.doneAt < 2 * DAY)).map(({ t, s }) =>
+    `<div class="panel task ${s.status}"><div class="row"><div class="ico">📌</div><div class="tx"><b>${esc(t.title)}</b>${s.status === 'done' ? 'Done ✓' : `${s.learned} of ${s.total} words learned · ${s.daysLeft <= 0 ? 'due today' : s.daysLeft === 1 ? '1 day left' : s.daysLeft + ' days left'}`}${t.coins ? ` · <span class="gold-num">+${fmtCoins(t.coins)}</span>` : ''}</div></div><div class="bar"><i style="width:${s.total ? s.learned / s.total * 100 : 0}%"></i></div></div>`).join('');
+}
+let spotNoticed = '';
+async function noticeSpot() {                 // when the app opens during a spot check: ask straight away
+  const sp = openSpot(); if (!sp || sess || spotNoticed === sp.id || $('.scrim')) return; spotNoticed = sp.id;
+  if (await confirmDlg('🚨 Spot check!', `Dad wants to see what you really know: ${spotCfg().questions} words you've learned, typed, one try each. It closes in a few hours. Do it now?`, 'Start')) startSession('spot');
+}
+/* ---------- Shredder Wrapped: the year in a story ---------- */
+const wrappedYear = () => { const d = clock(); return d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear(); };
+const wrappedOpen = () => { const m = CFG.wrapped || 'auto'; if (m === 'off') return false; if (m === 'on') return true; const d = clock(), md = (d.getMonth() + 1) * 100 + d.getDate(); return md >= 1215 || md <= 115; };
+function wrappedData(y = wrappedYear()) {
+  const L = LOG.filter(x => x.day.startsWith(String(y))), W = L.filter(x => !x.kind && x.ok), from = Date.parse(y + '-01-01T00:00'), to = Date.parse((y + 1) + '-01-01T00:00');
+  const mins = Math.round(L.reduce((a, x) => a + Math.max(0, (x.end - x.start)), 0) / 60000);
+  const lw = words.filter(w => w.learnedAt >= from && w.learnedAt < to), verbs = lw.filter(isVerb).length;
+  const hardest = [...words].filter(w => w.wrong).sort((a, b) => b.wrong - a.wrong)[0];
+  const runs = perfectRuns().filter(r => r.start.startsWith(String(y))), best = runs.reduce((m, r) => Math.max(m, r.len), 0);
+  const ex = L.filter(x => x.kind === 'exam'), bestEx = ex.reduce((m, x) => Math.max(m, x.score), 0);
+  const T = treasury(REQ), H = T.hist.filter(h => h.at >= from && h.at < to), cin = H.filter(h => h.amount > 0).reduce((a, h) => a + h.amount, 0), cout = -H.filter(h => h.amount < 0).reduce((a, h) => a + h.amount, 0);
+  const big = H.filter(h => h.amount < 0).sort((a, b) => a.amount - b.amount)[0];
+  const months = Array.from({ length: 12 }, (_, i) => W.filter(x => +x.day.slice(5, 7) === i + 1).length), topM = months.indexOf(Math.max(...months));
+  const correct = L.reduce((a, x) => a + x.correct, 0), cards = L.reduce((a, x) => a + x.cards, 0);
+  return { y, sessions: W.length, all: L.length, mins, words: lw.length - verbs, verbs, hardest, best, ex: ex.filter(x => x.passed).length, bestEx, cin, cout, big, badges: earnedBadges(), lvl: levelInfo(), topM, correct, cards };
+}
+function openWrapped() {
+  const D = wrappedData(), M = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const cards = [
+    ['🎁', `${esc(CFG.name)}'s`, `<b class="wr-big">${D.y}</b>`, 'on the mountain. Tap to see it.'],
+    ['🎿', 'You showed up', `<b class="wr-big">${D.sessions}</b>`, `sessions that counted · ${D.all} runs in total · ${D.mins} minutes of training`],
+    ['📚', 'You learned', `<b class="wr-big">${D.words}</b>`, `words${D.verbs ? ` and <b>${D.verbs}</b> irregular verbs` : ''}. ${D.cards ? `${Math.round(D.correct / D.cards * 100)}% of ${D.cards.toLocaleString('en-US')} answers right.` : ''}`],
+    ['🔥', 'Longest streak', `<b class="wr-big">${D.best}</b>`, `perfect day${D.best === 1 ? '' : 's'} in a row`],
+    ['😤', 'Your nemesis', `<b class="wr-big sm">${esc(D.hardest?.en || '—')}</b>`, D.hardest ? `missed ${D.hardest.wrong} times. Next year it's yours.` : 'No word beat you. Suspicious.'],
+    ['⛷️', 'Black Runs passed', `<b class="wr-big">${D.ex}</b>`, D.bestEx ? `best run: ${D.bestEx}%` : 'Next year: drop in.'],
+    ['💰', 'Coins earned', `<b class="wr-big gold-num">${fmtCoins(D.cin)}</b>`, `spent ${fullCoins(D.cout)}${D.big ? ` · biggest buy: ${esc(D.big.title.replace(/^Bought: /, ''))}` : ''}`],
+    ['🏅', 'Badges', `<b class="wr-big">${D.badges.length}</b>`, D.badges.slice(-4).map(b => `${b.icon} ${esc(b.name)}`).join(' · ') || 'The wall is waiting.'],
+    ['🏔️', 'You reached', `<b class="wr-big sm">${esc(D.lvl.name)}</b>`, `level ${D.lvl.lvl} of ${LEVELS}${D.sessions ? ` · your busiest month: ${M[D.topM]}` : ''}`],
+    ['🎆', `See you in ${D.y + 1}`, `<b class="wr-big sm">Next goal?</b>`, 'Pick it with Dad. Then go and get it.'],
+  ];
+  let i = 0;
+  const sc = openScrim(`<div class="wrapped" id="wr"></div>`);
+  const draw = () => { const [ic, k, big, sub] = cards[i]; $('#wr', sc).innerHTML = `<div class="wr-bars">${cards.map((_, j) => `<i class="${j < i ? 'done' : j === i ? 'on' : ''}"></i>`).join('')}</div><button class="wr-x" data-wr="x">✕</button>
+      <div class="wr-card" style="--h:${(i * 37) % 360}"><div class="wr-ic">${ic}</div><div class="wr-k">${k}</div>${big}<div class="wr-sub">${sub}</div></div><div class="wr-tap">${i < cards.length - 1 ? 'tap ›' : 'tap to close'}</div>`;
+    if (i === cards.length - 1) confetti(120); };
+  sc.addEventListener('click', e => { if (e.target.closest('[data-wr="x"]')) return sc.close(); const r = $('#wr', sc).getBoundingClientRect(); if (e.clientX < r.left + r.width * .3 && i > 0) i--; else if (i < cards.length - 1) i++; else return sc.close(); draw(); });
+  draw();
+}
+/* ---------- penalties: a pop-up for every new fine ---------- */
+let penBusy = false;
+async function checkPenalties() {
+  if (penBusy || sess) return; penBusy = true;
+  try {
+    const T = treasury(REQ), pens = T.hist.filter(h => h.kind === 'penalty'), seen = (await kvGet('penSeen')) || [];
+    const unseen = pens.filter(h => !seen.includes(h.key)); if (!unseen.length) return;
+    await kvSet('penSeen', [...seen, ...unseen.map(h => h.key)].slice(-2000));
+    const fresh = unseen.filter(h => h.at > Date.now() - 7 * DAY).sort((a, b) => a.at - b.at); if (!fresh.length) return;   // old ones (e.g. restored on a new phone) are not shown again
+    const h = fresh.at(-1), p = (CFG.penalties || []).find(x => x.id === h.pid), total = fresh.reduce((a, x) => a + x.amount, 0);
+    const sc = openScrim(`<div class="dlg pen-pop"><div class="pen-anim r11">${await mediaOrPh('penalty:' + (h.pid || ''), 'penalty')}</div>
+      <div class="kicker">Penalty${fresh.length > 1 ? ` · ${fresh.length} new` : ''}</div><h2>${esc(p?.title || h.title.replace(/^⚠️ /, ''))}</h2>
+      ${p?.text ? `<p>${esc(p.text)}</p>` : ''}<p class="pen-why">${esc(h.label)}</p>
+      <div class="pen-amt">−${fullCoins(Math.abs(total))}</div><p>Treasury now: <b class="${T.balance < 0 ? 'neg-num' : 'gold-num'}">${T.balance < 0 ? '−' : ''}${fullCoins(Math.abs(T.balance))}</b></p>
+      <button class="primary" data-r="1">OK</button></div>`);
+    sc.addEventListener('click', e => { if (e.target.closest('[data-r]')) { sc.close(); render(); } });
+  } finally { penBusy = false; }
+}
+function penaltiesHTML() {
+  const list = (CFG.penalties || []).filter(p => p.amount > 0); if (!list.length) return '';
+  return `<div class="panel"><div class="kicker" style="margin-bottom:6px">⚠️ Penalties · set by Dad</div>${list.map(p => `<div class="hist"><span><b>${esc(p.title)}</b><br><span class="hint">${esc(p.rule?.type === 'manual' ? (p.text || 'Dad gives it by hand') : PEN_TYPES[p.rule?.type] || '')}</span></span><b class="neg-num">−${fullCoins(p.amount)}</b></div>`).join('')}
+    <div class="hint" style="margin-top:6px">Your treasury can go below zero (down to ${fullCoins(CFG.floor ?? -20000)}).</div></div>`;
+}
 let vSet = -1;
 async function renderVerbs() {
   const vs = verbList();
@@ -1182,7 +1399,7 @@ function renderWords() {
 
 async function renderRewards() {
   const days = weekDays(), today = ymd(), names = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-  const cls = { done: 'g', missed: 'x', open: 'o', later: '' };
+  const cls = { done: 'g', missed: 'x', open: 'o', later: '', excused: 'e' };
   const cards = [], hist = [];
   for (const r of CFG.rewards) {
     const s = rewardState(r), unpaid = (r.text || '').trim() ? s.earned.filter(e => !paidAt(e.key)) : [];   // coins-only rewards need no "Payment done"
@@ -1195,6 +1412,7 @@ async function renderRewards() {
     <div class="panel"><div class="kicker">This week</div><div class="wk">${days.map((d, i) => `<div class="d ${d === today ? 'today' : ''}">${names[i]}<div class="dots">${dayStatus(d).map(s => `<i class="${cls[s]}"></i>`).join('')}</div>${extrasOn(d) ? `<div style="color:var(--gold2);font-weight:800;margin-top:2px">+${extrasOn(d)}</div>` : ''}</div>`).join('')}</div>
       <div class="hint" style="margin-top:10px">🟢 done · 🟡 open now · 🔴 missed · +N extra sessions</div></div>
     ${cards.join('')}
+    ${penaltiesHTML()}
     <div class="panel"><div class="kicker" style="margin-bottom:4px">Earned</div>${hist.length ? hist.map(h => `<div class="hist"><span><b>${esc(h.title)}</b> · ${esc(h.label)}</span>${paidAt(h.key) ? '<span class="pill ok">paid ✓</span>' : '<span class="pill wait">to pay</span>'}</div>`).join('') : '<div class="hint">Nothing earned yet. The mountain is patient.</div>'}</div>`;
 }
 
@@ -1206,6 +1424,7 @@ async function renderProgress() {
   $('#v-progress').innerHTML = `<div class="v-head"><div class="kicker">Level ${L.lvl} of ${LEVELS}</div><h1>${esc(L.name)}</h1></div>
     <div class="stats"><div class="stat"><b>${L.total}</b><span>items learned</span></div><div class="stat"><b>${wordList().filter(w => w.seen && !w.learned).length}</b><span>in progress</span></div>
       <div class="stat"><b>${tot ? Math.round(corr / tot * 100) + '%' : '–'}</b><span>correct this week</span></div><div class="stat"><b>${WL.filter(x => x.ok).length}</b><span>sessions that counted</span></div></div>
+    ${wrappedOpen() ? `<button class="vbtn wrapbtn" data-action="wrapped"><span class="vb-ico">🎁</span><span class="vb-tx"><b>Shredder Wrapped ${wrappedYear()}</b><small>Your year on the mountain</small></span></button>` : ''}
     ${badgesHTML()}
     <div class="panel"><div class="kicker" style="margin-bottom:12px">The way up</div><div class="road">${nodes.join('')}</div></div>`;
 }
@@ -1216,6 +1435,8 @@ function renderSettings() {
     <div class="panel"><div class="kicker">Pronunciation</div>
       <div class="set-row"><span>Voice</span><select id="s-voice">${gb.length ? gb.map(v => `<option value="${esc(v.voiceURI)}" ${pickVoice()?.voiceURI === v.voiceURI ? 'selected' : ''}>${esc(v.name)}</option>`).join('') : '<option>British (default)</option>'}</select></div>
       <div class="set-row"><span>Test the voice</span><button class="pill" style="height:36px;padding:0 16px" data-action="voice-test">Play</button></div></div>
+    <div class="panel"><div class="kicker">🔥 Hard mode</div>
+      <div class="set-row"><span>Hard mode<div class="hint">Shorter timers (−25%), no picking from options after the first meeting. Sessions pay coins × ${CFG.hardMult || 1.5}.</div></span><label class="sw"><input type="checkbox" id="s-hard" ${S.hard ? 'checked' : ''}><i></i></label></div></div>
     <div class="panel"><div class="kicker">Rules</div>
       <div class="hint" style="margin-top:8px">Session length, times, scoring and rewards are set by Dad. Now: <b>${CFG.slots.length}</b> session${CFG.slots.length === 1 ? '' : 's'} a day · <b>${CFG.minutes} min</b> · <b>${CFG.minCorrect}+</b> correct answers to count · a miss costs <b>${CFG.missPenalty}</b>.</div></div>
     <div class="panel"><div class="kicker">Link to Dad</div>
@@ -1234,7 +1455,7 @@ async function mergePool(data) {
   for (const p of data.words || []) {
     if (!p.en || !p.ru) continue;
     let w = mapId.get(p.id);
-    const base = { en: p.en.trim(), ipa: (p.ipa || '').trim(), ru: p.ru.trim(), example: (p.example || '').trim(), updated: p.updated || Date.now(),
+    const base = { en: p.en.trim(), ipa: (p.ipa || '').trim(), ru: p.ru.trim(), example: (p.example || '').trim(), family: (p.family || '').trim(), opp: (p.opp || '').trim(), updated: p.updated || Date.now(),
       ...(p.type === 'verb' ? { type: 'verb', past: p.past || [], pp: p.pp || [], seq: p.seq || 0, note: p.note || '' } : { type: '' }) };
     if (w) Object.assign(w, base);
     else { w = { id: p.id || uid(), ...base, order: ++order, count: 0, seen: 0, wrong: 0, learned: false, learnedAt: 0, stage: 0, nextReview: 0, lastSeen: 0 }; words.push(w); mapId.set(w.id, w); added++; }
@@ -1303,11 +1524,12 @@ async function syncFromSite(manual = false) {
 let sess = null, tickT = null;
 const logEvent = (kind, w) => { EV.push({ t: Date.now(), kind, item: w?.en || '', sid: sess?.id || '' }); if (EV.length > 600) EV = EV.slice(-600); kvSet('events', EV); };
 function refillDeck() {                    // word sessions get only words; verb practice gets only verbs
-  if (sess.mode === 'exam') { if (!sess.examIds) { sess.examIds = shuffle(examPool()).slice(0, examCfg().questions).map(w => w.id); sess.deck = sess.examIds.map(id => ({ id })); } else sess.deck = []; return; }
+  if (sess.mode === 'exam' || sess.mode === 'spot') { if (!sess.examIds) { const pool = examPool().length >= 3 ? examPool() : words.filter(w => w.seen); sess.examIds = shuffle(pool).slice(0, sess.mode === 'spot' ? spotCfg().questions : examCfg().questions).map(w => w.id); sess.deck = sess.examIds.map(id => ({ id })); } else sess.deck = []; return; }
   if (sess.mode === 'fix') { sess.deck = shuffle(troubleList(12).map(w => ({ id: w.id }))); if (!sess.deck.length) sess.deck = shuffle(words.filter(w => w.seen)).slice(0, 8).map(w => ({ id: w.id })); return; }
   const now = Date.now(), vm = sess.mode === 'verbs', pool = words.filter(w => isVerb(w) === vm);
   const notL = pool.filter(w => !w.learned), cap = vm ? Math.max(2, CFG.verbActive || 6) : ACTIVE_CAP;
-  const ord = vm ? notL.sort((a, b) => a.seq - b.seq) : notL;                              // verbs come in their fixed order
+  const taskIds = new Set((CFG.tasks || []).filter(t => taskState(t).status === 'open').flatMap(t => t.ids || []));   // assignment words first
+  const ord = vm ? notL.sort((a, b) => a.seq - b.seq) : [...notL.filter(w => taskIds.has(w.id)), ...notL.filter(w => !taskIds.has(w.id))];                              // verbs come in their fixed order
   const active = [...ord.filter(w => w.seen), ...ord.filter(w => !w.seen)].slice(0, cap);
   let due = pool.filter(w => w.learned && (w.nextReview || 0) <= now).sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0)).slice(0, 10);   // most overdue first: memory fades
   if (vm && !active.length && !due.length) due = shuffle(pool.filter(w => w.learned)).slice(0, 10);   // all 100 learned: keep them fresh
@@ -1325,10 +1547,11 @@ async function serverSkew() {                               // ms the phone is o
 }
 let starting = false;
 async function startSession(mode = 'words') {
-  const vm = mode === 'verbs', fx = mode === 'fix', ex = mode === 'exam', E = examCfg();
+  const vm = mode === 'verbs', fx = mode === 'fix', sp = mode === 'spot', ex = mode === 'exam' || sp, E = sp ? { ...examCfg(), minutes: Math.max(2, Math.ceil(spotCfg().questions * .6)), pass: spotCfg().pass } : examCfg(), SPOT = sp ? openSpot() : null;
+  if (sp && !SPOT) return toast('No spot check open right now.');
   if (fx && !troubleList().length) return toast('No mistakes to fix. Nice.');
-  if (ex && (!E.on || examThisWeek() || examPool().length < E.minLearned)) return toast('The Black Run is not open right now.');
-  if (ex && !(await confirmDlg('⛷️ Black Run', `${Math.min(E.questions, examPool().length)} questions on words you already learned. All typed, one try each, ${E.minutes} minutes. You need ${E.pass}%. Only one run a week. Ready?`, 'Drop in'))) return;
+  if (ex && !sp && (!E.on || examThisWeek() || examPool().length < E.minLearned)) return toast('The Black Run is not open right now.');
+  if (ex && !sp && !(await confirmDlg('⛷️ Black Run', `${Math.min(E.questions, examPool().length)} questions on words you already learned. All typed, one try each, ${E.minutes} minutes. You need ${E.pass}%. Only one run a week. Ready?`, 'Drop in'))) return;
   if (!fx && !ex && !(vm ? verbList() : wordList()).length) return toast(vm ? 'No verbs yet.' : 'No words yet.');
   if (starting) return;
   let skew = null;
@@ -1341,9 +1564,9 @@ async function startSession(mode = 'words') {
     }
   }
   const slot = vm || fx || ex ? -1 : openSlot(), ms = (vm ? CFG.verbMinutes || 5 : fx ? CFG.fixMinutes || 5 : ex ? E.minutes : CFG.minutes) * 60000;
-  sess = { id: uid(), mode, start: Date.now(), skew: skew === null ? null : Math.round(skew / 1000), slot, total: ms, remaining: ms, last: performance.now(), cards: 0, correct: 0, wrong: 0, timeouts: 0, left: 0, fast: 0, learned: 0, deck: [], prevId: null, cur: null, done: false };
+  sess = { id: uid(), mode, spotId: SPOT?.id, hard: !!S.hard && (mode === 'words' || mode === 'verbs'), start: Date.now(), skew: skew === null ? null : Math.round(skew / 1000), slot, total: ms, remaining: ms, last: performance.now(), cards: 0, correct: 0, wrong: 0, timeouts: 0, left: 0, fast: 0, learned: 0, deck: [], prevId: null, cur: null, done: false };
   refillDeck();
-  $('#session').classList.toggle('verbs', vm || fx); $('#session').classList.toggle('exam', ex); $('#s-mode').textContent = vm ? '🔁 Irregular verbs' : fx ? '🎯 Fix my mistakes' : ex ? '⛷️ Black Run' : '';
+  $('#session').classList.toggle('verbs', vm || fx); $('#session').classList.toggle('exam', ex); $('#s-mode').textContent = vm ? '🔁 Irregular verbs' : fx ? '🎯 Fix my mistakes' : sp ? '🚨 Spot check' : ex ? '⛷️ Black Run' : '';
   $('#session').classList.remove('hidden'); updateHead();
   clearInterval(tickT); tickT = setInterval(tick, 100);
   await nextCard();
@@ -1366,7 +1589,7 @@ function tick() {
 function updateHead() {
   const s = Math.max(0, Math.ceil(sess.remaining / 1000));
   $('#s-time').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-  $('#s-count').innerHTML = sess.mode === 'exam' ? `Q <b>${Math.min(sess.cards + 1, sess.examIds?.length || 0)}</b> / ${sess.examIds?.length || 0}` : sess.mode !== 'words' ? `<b>${sess.correct}</b> correct` : `<b>${sess.correct}</b> / ${CFG.minCorrect} correct`;
+  $('#s-count').innerHTML = sess.mode === 'exam' || sess.mode === 'spot' ? `Q <b>${Math.min(sess.cards + 1, sess.examIds?.length || 0)}</b> / ${sess.examIds?.length || 0}` : sess.mode !== 'words' ? `<b>${sess.correct}</b> correct` : `<b>${sess.correct}</b> / ${CFG.minCorrect} correct`;
 }
 // Leaving the app in the middle of a test = miss (he could be looking the word up)
 document.addEventListener('visibilitychange', () => {
@@ -1398,7 +1621,7 @@ function distractors(w, n, key) {   // wrong options: same kind first (word with
 // Which test for this item now. Early steps may be recognition; later steps and the last one are always typed.
 /* ---------- speaking: he says the English word, the phone checks it (Chrome speech recognition, needs internet) ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const canListen = () => !!SR && CFG.speak !== false && navigator.onLine && sess?.mode !== 'exam';
+const canListen = () => !!SR && CFG.speak !== false && navigator.onLine && sess?.mode !== 'exam' && sess?.mode !== 'spot';
 const sayNorm = t => String(t || '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
 const saidRight = (alts, en) => { const want = sayNorm(en).replace(/^(to|a|an|the) /, ''); return alts.some(a => { const g = sayNorm(a); return g === want || g.replace(/^(to|a|an|the) /, '') === want || (` ${g} `).includes(` ${want} `) && g.split(' ').length <= want.split(' ').length + 2; }); };
 let rec = null;
@@ -1420,16 +1643,23 @@ function toType() { const c = sess?.cur; if (!c || c.phase !== 'test' || c.test 
   $('#stage').querySelector('.t-kick').textContent = 'Type it in English';
   $('#stage').insertAdjacentHTML('beforeend', keyboardHTML(/[0-9]/.test(c.w.en))); drawTyped(); }
 
+/* ---------- word families and opposites (optional fields from Studio) ---------- */
+const TAGS = { n: 'noun', noun: 'noun', v: 'verb', verb: 'verb', adj: 'adjective', adjective: 'adjective', adv: 'adverb', adverb: 'adverb' };
+const famList = w => String(w.family || '').split(/[,;]/).map(x => x.trim()).map(x => { const m = /^(.+?)\s*\(([a-z.]+)\)$/i.exec(x); return m ? { form: m[1].trim(), tag: TAGS[m[2].toLowerCase().replace('.', '')] || m[2] } : x ? { form: x, tag: '' } : null; }).filter(Boolean);
+const oppList = w => String(w.opp || '').split(/[,/;]/).map(x => x.trim()).filter(Boolean);
+function extraTest(w) { const t = []; if (famList(w).length) t.push('fam'); if (oppList(w).length) t.push('opp'); return t.length ? t[Math.floor(Math.random() * t.length)] : null; }
+
 function pickTest(w) {
-  if (sess?.mode === 'exam') return isVerb(w) ? (VERB_SENT[w.en] && Math.random() < .5 ? 'vsent' : 'verb') : kindOf(w) === 'sentence' ? 'type' : Math.random() < .75 ? 'type' : 'hear';   // exam: always typed
+  if (sess?.mode === 'exam' || sess?.mode === 'spot') return isVerb(w) ? (VERB_SENT[w.en] && Math.random() < .5 ? 'vsent' : 'verb') : kindOf(w) === 'sentence' ? 'type' : Math.random() < .75 ? 'type' : 'hear';   // exam: always typed
   const kind = kindOf(w), p = w.learned ? CFG.target : (w.count || 0), last = w.learned || p + 1 >= CFG.target;
   if (kind === 'verb') return p === 0 ? 'vchoose' : last || !VERB_SENT[w.en] ? 'verb' : Math.random() < .5 ? 'vsent' : 'verb';   // first: pick the forms; then both forms or one in a sentence; to learn it: both forms
   const canChoose = words.length >= 6, gap = gapParts(w);
   if (kind === 'sentence') return last ? 'type' : p < 2 ? 'order' : Math.random() < .5 ? 'order' : 'hear';
+  if (w.learned && extraTest(w) && Math.random() < .35) return extraTest(w);   // reviews: sometimes the family or the opposite
   if (last) return Math.random() < .7 ? 'type' : 'hear';
   if (p === 0 && canChoose) return 'choose';
-  if (p === 1) return kind === 'phrase' ? 'order' : gap ? 'gap' : canChoose ? 'choose' : 'type';
-  const pool = ['type', 'type', 'hear']; if (gap) pool.push('gap'); if (canListen() && kind !== 'sentence') pool.push('say');
+  if (p === 1) return kind === 'phrase' ? 'order' : gap ? 'gap' : canChoose && !sess?.hard ? 'choose' : 'type';
+  const pool = ['type', 'type', 'hear']; if (gap) pool.push('gap'); if (p >= 2 && extraTest(w)) pool.push(extraTest(w)); if (canListen() && kind !== 'sentence') pool.push('say');
   return pool[Math.floor(Math.random() * pool.length)];
 }
 const vforms = w => `${w.past.join(' / ')} – ${w.pp.join(' / ')}`;
@@ -1448,14 +1678,18 @@ function gapParts(w) {                                    // example sentence wi
 }
 async function nextCard() {
   const w = pickItem();
-  if (!w) { if (sess.mode === 'exam') return finishSession(true); toast('No words to study.'); return finishSession(false); }
-  const test = pickTest(w), T = CFG.time, len = typeNorm(w.en).length, wc = tokens(w.en).length;
+  if (!w) { if (sess.mode === 'exam' || sess.mode === 'spot') return finishSession(true); toast('No words to study.'); return finishSession(false); }
+  let test = pickTest(w); if ((test === 'fam' && !famList(w).length) || (test === 'opp' && !oppList(w).length) || (test === 'vsent' && !VERB_SENT[w.en])) test = isVerb(w) ? 'verb' : 'type';
+  const T = CFG.time, len = typeNorm(w.en).length, wc = tokens(w.en).length;
   const vlen = isVerb(w) ? typeNorm(w.past[0] + w.pp[0]).length : 0;
   const vs = test === 'vsent' ? verbSentence(w) : null;
-  const limit = 1000 * (test === 'vsent' ? T.type + T.perChar * typeNorm(vs.ans[0]).length + 5 : test === 'choose' || test === 'vchoose' ? T.choose : test === 'order' ? T.order + T.perWord * wc : test === 'verb' ? T.type + T.perChar * vlen + 4 : T.type + T.perChar * len + (test === 'hear' ? T.hear : 0));
-  const c = sess.cur = { w, test, vs, phase: 'test', limit, left: limit, shown: performance.now(), typed: '', keys: 0, built: [], f: ['', ''], fi: 0 };
+  const fx = test === 'fam' ? (() => { const f = famList(w)[Math.floor(Math.random() * famList(w).length)]; return { q: f.tag ? `the ${f.tag} of` : 'a word from the family of', ans: [f.form], f }; })() : test === 'opp' ? { q: 'the opposite of', ans: oppList(w) } : null;
+  const limit = 1000 * (fx ? T.type + T.perChar * typeNorm(fx.ans[0]).length + 3 : test === 'vsent' ? T.type + T.perChar * typeNorm(vs.ans[0]).length + 5 : test === 'choose' || test === 'vchoose' ? T.choose : test === 'order' ? T.order + T.perWord * wc : test === 'verb' ? T.type + T.perChar * vlen + 4 : T.type + T.perChar * len + (test === 'hear' ? T.hear : 0));
+  const pace = (CFG.adaptive !== false ? Math.min(1, Math.max(.6, w.pace || 1)) : 1) * (sess.hard ? .75 : 1), lim = Math.round(limit * pace);
+  const c = sess.cur = { w, test, vs, fx, phase: 'test', limit: lim, base: limit, left: lim, shown: performance.now(), typed: '', keys: 0, built: [], f: ['', ''], fi: 0 };
   sess.prevId = w.id;
   const pic = await imgURL('img:' + w.id), kick = t => `<div class="t-kick">${t}</div>`;
+  if (sess?.cur !== c) return;                       // the session ended (or moved on) while the picture was loading
   let body, bottom = '';
   if (test === 'vchoose') {
     c.vopts = verbOptions(w); c.right = vforms(w);
@@ -1481,7 +1715,8 @@ async function nextCard() {
     if (test === 'say') { body = `${kick('Say it in English')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q ${kindOf(w) === 'word' ? '' : 'sm'}">${esc(w.ru)}</div>
       <div class="say-box"><button class="say-btn" id="say-btn" data-action="listen">🎤</button><div class="say-st" id="say-st">Tap the mic and say it</div><button class="ghost say-type" data-action="totype">⌨ Type instead</button></div>`; }
     else {
-    const head = test === 'vsent' ? `${kick(`Irregular verb · ${vs.form === 'pp' ? 'past participle' : 'past simple'}`)}${pic ? `<img class="t-pic sm" src="${pic}" alt="">` : ''}<div class="t-q sm vs-q">${esc(vs.text).replace('___', `<span class="gapw">____</span>`)}</div><div class="t-sub">(${esc(w.en)}) · ${esc(w.ru)}</div>`
+    const head = fx ? `${kick(test === 'fam' ? 'Word family' : 'Opposite')}<div class="t-q sm">Type ${fx.q}</div><div class="t-q">${esc(w.en)}</div><div class="t-sub">${esc(w.ru)}</div>`
+      : test === 'vsent' ? `${kick(`Irregular verb · ${vs.form === 'pp' ? 'past participle' : 'past simple'}`)}${pic ? `<img class="t-pic sm" src="${pic}" alt="">` : ''}<div class="t-q sm vs-q">${esc(vs.text).replace('___', `<span class="gapw">____</span>`)}</div><div class="t-sub">(${esc(w.en)}) · ${esc(w.ru)}</div>`
       : test === 'hear' ? `${kick('Listen and type it')}<button class="t-speak" data-action="say">🔊</button>`
       : test === 'gap' ? `${kick('Type the missing part')}<div class="t-q sm">${esc(gapParts(w)[0])}<span style="color:var(--gold2)"> ____ </span>${esc(gapParts(w)[1])}</div><div class="t-sub">${esc(w.ru)}</div>`
       : `${kick('Type it in English')}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}<div class="t-q ${kindOf(w) === 'word' ? '' : 'sm'}">${esc(w.ru)}</div>`;
@@ -1529,6 +1764,7 @@ function check() {
   if (c.test === 'order') { if (!c.built.length) return; c.given = c.built.map(ix => c.tiles[ix].t).join(' '); return resolve(c.given === c.want.join(' '), 'order'); }
   if (!typeNorm(c.typed)) return;
   c.given = c.typed.trim();
+  if (c.fx) return resolve(c.fx.ans.some(a => typeNorm(a) === typeNorm(c.typed)), c.test);
   if (c.test === 'vsent') return resolve(c.vs.ans.some(a => typeNorm(a) === typeNorm(c.typed)), 'vsent');
   resolve(typeNorm(c.typed) === typeNorm(c.w.en), c.test);
 }
@@ -1567,7 +1803,11 @@ async function resolve(ok, why) {
     if (w.learned) { w.learned = false; w.count = Math.max(0, CFG.target - CFG.missPenalty); } else w.count = Math.max(0, was - CFG.missPenalty);
     const lost = was - w.count;
     chip = `<span class="chip down">${why === 'timeout' ? "Time's up" : why === 'left' ? 'You left the app' : 'Wrong'}${lost > 0 ? ' · −' + lost : ''}</span>`;
-    if (sess.mode !== 'exam') sess.deck = sess.deck.filter(x => x.id !== w.id), sess.deck.splice(Math.min(sess.deck.length, 2 + Math.floor(Math.random() * 3)), 0, { id: w.id });
+    if (sess.mode !== 'exam' && sess.mode !== 'spot') sess.deck = sess.deck.filter(x => x.id !== w.id), sess.deck.splice(Math.min(sess.deck.length, 2 + Math.floor(Math.random() * 3)), 0, { id: w.id });
+  }
+  if (CFG.adaptive !== false && c.base) {               // fast and right → this word's timer gets shorter next time; a timeout gives some back
+    const used = performance.now() - c.shown;
+    if (ok && used < c.base * .45) w.pace = Math.max(.6, (w.pace || 1) * .9); else if (why === 'timeout') w.pace = Math.min(1, (w.pace || 1) * 1.15);
   }
   sess.cards++; (ok ? sfx.good : sfx.bad)(); await saveWord(w); updateHead();
   if (why === 'choose') await new Promise(r => setTimeout(r, ok ? 500 : 1100));
@@ -1577,7 +1817,7 @@ async function resolve(ok, why) {
   const pips = Array.from({ length: CFG.target }, (_, i) => `<i class="${w.learned || i < (w.count || 0) ? 'on' : ''}"></i>`).join('');
   $('#stage').innerHTML = `<div class="tcard">${chip}${pic ? `<img class="t-pic" src="${pic}" alt="">` : ''}
       ${isVerb(w) ? `<div class="r-en">${esc(w.en)} – ${esc(w.past.join(' / '))} – ${esc(w.pp.join(' / '))}</div><div class="r-ru">${esc(w.ru)}</div>${c.vs ? `<div class="r-ex">${esc(c.vs.text).replace('___', `<b>${esc(c.vs.ans.join(' / '))}</b>`)}</div>` : ''}${w.note ? `<div class="t-sub">${esc(w.note)}</div>` : ''}`
-        : `<div class="r-en">${esc(w.en)}</div>${w.ipa ? `<div class="t-sub">${esc(w.ipa)}</div>` : ''}<div class="r-ru">${esc(w.ru)}</div>${ex}`}
+        : `<div class="r-en">${esc(w.en)}</div>${w.ipa ? `<div class="t-sub">${esc(w.ipa)}</div>` : ''}<div class="r-ru">${esc(w.ru)}</div>${c.fx ? `<div class="r-ex">${c.test === 'fam' ? `Family: <b>${esc(w.family)}</b>` : `Opposite: <b>${esc(w.opp)}</b>`}</div>` : ex}`}
       ${!ok && c.given ? `<div class="r-yours">You answered: ${esc(c.given)}</div>` : ''}<div class="pips">${pips}</div></div>
     <button class="react r-h" data-action="next">${await mediaOrPh(ok ? 'ok' : 'bad')}<span class="lbl">${sess.remaining <= 0 ? 'Finish ›' : 'Next ›'}</span></button>`;
   speak(isVerb(w) ? `${w.en}, ${w.past.join(' or ')}, ${w.pp.join(' or ')}` : w.en);
@@ -1589,14 +1829,14 @@ async function finishSession(timeUp) {
   sess.done = true; clearInterval(tickT); if (canSpeak) speechSynthesis.cancel();
   if (sess.mode === 'verbs') return finishVerbs(timeUp);
   if (sess.mode === 'fix') return finishFix(timeUp);
-  if (sess.mode === 'exam') return finishExam(timeUp);
+  if (sess.mode === 'exam' || sess.mode === 'spot') return finishExam(timeUp);
   const s = sess, valid = timeUp && s.correct >= CFG.minCorrect, day = ymd(new Date(s.start));
   // which slot gets the credit: the one that was open at the start, if not already done today; otherwise it is an extra
   const credit = valid && s.slot >= 0 && !sessOn(day).some(x => x.slot === s.slot) ? s.slot : -1;
-  const rec = { id: s.id, day, start: s.start, end: Date.now(), skew: s.skew, ok: valid, slot: credit, slots: CFG.slots.length, cfgV: CFG.v || 0, minutes: CFG.minutes, need: CFG.minCorrect, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  const rec = { id: s.id, day, start: s.start, end: Date.now(), skew: s.skew, hard: s.hard || undefined, ok: valid, slot: credit, slots: CFG.slots.length, cfgV: CFG.v || 0, minutes: CFG.minutes, need: CFG.minCorrect, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
   LOG.push(rec); await kvSet('sessions', LOG);
   if (learnedCount() > PEAK) { PEAK = learnedCount(); await kvSet('peak', PEAK); }
-  const close = () => { $('#session').classList.add('hidden'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };   // send the log once the session is closed
+  const close = () => { $('#session').classList.add('hidden'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); setTimeout(checkPenalties, 600); };   // send the log once the session is closed
   if (!timeUp) return close();
   const b = await blobGet('media:done'), url = b ? await imgURL('media:done') : null;
   const head = valid ? (credit >= 0 ? `${slotName(CFG.slots[credit], credit)} session done ✓` : 'Extra session done ⭐') : 'This one does not count';
@@ -1611,7 +1851,7 @@ async function finishSession(timeUp) {
 
 async function finishVerbs(timeUp) {          // verb practice: logged on its own, never fills a word slot
   const s = sess, day = ymd(new Date(s.start));
-  const rec = { id: s.id, kind: 'verbs', day, start: s.start, end: Date.now(), skew: s.skew, ok: timeUp, slot: -1, minutes: CFG.verbMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
+  const rec = { id: s.id, kind: 'verbs', day, start: s.start, end: Date.now(), skew: s.skew, hard: s.hard || undefined, ok: timeUp, slot: -1, minutes: CFG.verbMinutes || 5, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: s.learned, quit: !timeUp };
   const prevBest = verbStats().best;
   LOG.push(rec); await kvSet('sessions', LOG);
   if (verbLearned() > VPEAK) { VPEAK = verbLearned(); await kvSet('vpeak', VPEAK); }
@@ -1628,8 +1868,20 @@ async function finishVerbs(timeUp) {          // verb practice: logged on its ow
 }
 
 async function finishExam(done) {             // done = all questions answered or time up; quitting = 0%
-  const s = sess, E = examCfg(), day = ymd(new Date(s.start)), total = s.examIds.length;
+  const s = sess, spot = s.mode === 'spot', E = spot ? { ...examCfg(), pass: spotCfg().pass } : examCfg(), day = ymd(new Date(s.start)), total = s.examIds.length;
   const score = done ? Math.round(s.correct / total * 100) : 0, passed = score >= E.pass;
+  if (spot) {
+    LOG.push({ id: s.id, kind: 'spot', spotId: s.spotId, day, start: s.start, end: Date.now(), skew: s.skew, ok: true, passed, score, total, need: E.pass, slot: -1, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: 0, quit: !done });
+    await kvSet('sessions', LOG);
+    const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('exam'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };
+    const coins = CFG.rewards.filter(r => r.rule?.type === 'spot').reduce((a, r) => a + (r.coins || 0), 0);
+    const sc = openScrim(`<div class="dlg vdone exam-done" style="max-width:440px"><div class="kicker">🚨 Spot check</div><h2 style="margin-top:6px">${passed ? 'Checked and cleared ✓' : 'Caught out'}</h2>
+      <div class="vd-score"><b>${score}%</b><span>${s.correct} of ${total} · you needed ${E.pass}%</span></div><p>${passed ? (coins ? `+${fullCoins(coins)} coins. ` : '') + 'Dad sees it.' : 'Dad sees it. The words you missed are back in practice.'}</p>
+      <button class="primary" id="fin-ok">Done</button></div>`);
+    if (passed) confetti(70);
+    $('#fin-ok', sc).onclick = () => { sc.close(); close(); };
+    return;
+  }
   LOG.push({ id: s.id, kind: 'exam', day, start: s.start, end: Date.now(), skew: s.skew, ok: true, passed, score, total, need: E.pass, slot: -1, minutes: E.minutes, cards: s.cards, correct: s.correct, wrong: s.wrong, timeouts: s.timeouts, left: s.left, fast: s.fast, learned: 0, quit: !done });
   await kvSet('sessions', LOG);
   const close = () => { $('#session').classList.add('hidden'); $('#session').classList.remove('exam'); $('#stage').innerHTML = ''; sess = null; render(); syncData(); checkBadges(); };
@@ -1682,8 +1934,13 @@ async function pullRules() {
   for (const r of CFG.rewards) if (r.anim && src[r.id] !== r.anim) {
     try { const b = await gh.blob(r.anim); await tx('blobs', 'readwrite', st => { st.put(b, 'media:reward:' + r.id); }); dropURL('media:reward:' + r.id); src[r.id] = r.anim; } catch {}
   }
+  for (const p of CFG.penalties || []) if (p.anim && src['p:' + p.id] !== p.anim) {
+    try { const b = await gh.blob(p.anim); await tx('blobs', 'readwrite', st => { st.put(b, 'media:penalty:' + p.id); }); dropURL('media:penalty:' + p.id); src['p:' + p.id] = p.anim; } catch {}
+  }
   await kvSet('rewSrc', src);
   if (changed && !sess) { render(); noticeDecisions(); checkBadges(); }
+  if (!sess) checkPenalties();
+  if (!sess) noticeSpot();
 }
 async function pushLog() {
   if (!words.length || !(await kvGet('restoreChecked'))) return;   // never overwrite the backup before this phone has checked it
@@ -1695,7 +1952,7 @@ async function pushLog() {
     await kvSet('sessions', LOG); await kvSet('shas', shas);
   }
   const state = { v: 1, updated: Date.now(), tz: new Date().getTimezoneOffset(), app: APP_VERSION, cfgV: CFG.v || 0, learned: learnedCount(), peak: peakLearned(), verbs: verbLearned(), vpeak: peakVerbs(), verbTotal: verbList().length,
-    items: words.map(w => ({ id: w.id, en: w.en, ...(isVerb(w) ? { verb: 1 } : {}), count: w.count || 0, learned: !!w.learned, seen: w.seen || 0, wrong: w.wrong || 0, lastSeen: w.lastSeen || 0, stage: w.stage || 0, nextReview: w.nextReview || 0, learnedAt: w.learnedAt || 0, lapses: w.lapses || 0, lastWrong: w.lastWrong || 0, wt: w.wt || {} })), events: EV.slice(-300), requests: REQ.slice(-200), coins: treasury(REQ).balance, goal: GOAL };
+    items: words.map(w => ({ id: w.id, en: w.en, ...(isVerb(w) ? { verb: 1 } : {}), count: w.count || 0, learned: !!w.learned, seen: w.seen || 0, wrong: w.wrong || 0, lastSeen: w.lastSeen || 0, stage: w.stage || 0, nextReview: w.nextReview || 0, learnedAt: w.learnedAt || 0, lapses: w.lapses || 0, lastWrong: w.lastWrong || 0, wt: w.wt || {}, pace: w.pace || 1 })), events: EV.slice(-300), requests: REQ.slice(-200), coins: treasury(REQ).balance, goal: GOAL, runs: RUNS.length, best: bestRun() };
   const sig = JSON.stringify([JSON.stringify(state.requests), state.goal, state.learned, state.peak, state.verbs, state.vpeak, state.cfgV, state.items.map(i => [i.count, i.learned, i.seen, i.wrong, i.nextReview, i.lapses]), EV.length]);
   if (months.length || sig !== await kvGet('stateSig')) { shas['log/state.json'] = await gh.put('log/state.json', b64.utf8(JSON.stringify(state)), 'state', shas['log/state.json'] || undefined); await kvSet('shas', shas); await kvSet('stateSig', sig); }
 }
@@ -1713,7 +1970,7 @@ async function restoreFromBackup(force = false) {
     const byIdItem = new Map(state.items.map(i => [i.id, i])), changed = [];
     for (const w of words) { const i = byIdItem.get(w.id); if (!i || !(i.seen || i.learned)) continue;
       Object.assign(w, { count: i.count || 0, learned: !!i.learned, seen: i.seen || 0, wrong: i.wrong || 0, lastSeen: i.lastSeen || 0, stage: i.stage || 0,
-        nextReview: i.nextReview || (i.learned ? Date.now() : 0), learnedAt: i.learnedAt || (i.learned ? i.lastSeen || Date.now() : 0), lapses: i.lapses || 0, lastWrong: i.lastWrong || 0, wt: i.wt || {} });
+        nextReview: i.nextReview || (i.learned ? Date.now() : 0), learnedAt: i.learnedAt || (i.learned ? i.lastSeen || Date.now() : 0), lapses: i.lapses || 0, lastWrong: i.lastWrong || 0, wt: i.wt || {}, pace: i.pace || 1 });
       changed.push(w); n++; }
     if (changed.length) await tx('words', 'readwrite', s2 => changed.forEach(w => s2.put(w)));
     PEAK = Math.max(PEAK, state.peak || 0); VPEAK = Math.max(VPEAK, state.vpeak || 0); await kvSet('peak', PEAK); await kvSet('vpeak', VPEAK);
@@ -1762,18 +2019,20 @@ document.addEventListener('click', async e => {
     case 'check': return check();
     case 'say': return speak(c?.w.en);
     case 'listen': return listen();
+    case 'wrapped': return openWrapped();
+    case 'game': return openGame();
     case 'totype': return toType();
     case 'vsay': { const v = byId(el.dataset.id); return v && speak(`${v.en}, ${v.past.join(' or ')}, ${v.pp.join(' or ')}`); }
     case 'vset': vSet = +el.dataset.i; return renderVerbs();
     case 'tile': { if (c?.phase !== 'test') return; const tl = c.tiles[el.dataset.i]; if (tl.used) return; tl.used = true; c.built.push(tl.i); sfx.key(); return drawOrder(); }
     case 'untile': { if (c?.phase !== 'test') return; const ix = c.built.splice(el.dataset.n, 1)[0]; c.tiles[ix].used = false; return drawOrder(); }
-    case 'next': if (c?.phase !== 'result') return; return sess.remaining <= 0 || (sess.mode === 'exam' && !sess.deck.length) ? finishSession(true) : nextCard();
+    case 'next': if (c?.phase !== 'result') return; return sess.remaining <= 0 || ((sess.mode === 'exam' || sess.mode === 'spot') && !sess.deck.length) ? finishSession(true) : nextCard();
     case 'quit': if (await confirmDlg('Quit this session?', 'A session only counts if you finish the timer.', 'Quit')) finishSession(false); return;
     case 'voice-test': return speak('Fresh powder today. Try not to fall.');
     case 'update': await syncFromSite(true); await syncData(); return renderSettings();
   }
 });
-document.addEventListener('change', e => { if (e.target.id === 's-voice') { S.voiceURI = e.target.value; kvSet('settings', S); speak('Hello from the lodge.'); } });
+document.addEventListener('change', e => { if (e.target.id === 's-hard') { S.hard = e.target.checked; kvSet('settings', S); toast(S.hard ? '🔥 Hard mode on. Good luck.' : 'Hard mode off'); return; } if (e.target.id === 's-voice') { S.voiceURI = e.target.value; kvSet('settings', S); speak('Hello from the lodge.'); } });
 // physical keyboard (PC testing); paste is ignored because there is no text field at all
 document.addEventListener('keydown', e => {
   if (!sess || sess.cur?.phase !== 'test' || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -1790,7 +2049,7 @@ document.addEventListener('keydown', e => {
   CFG = { ...structuredClone(CFG_DEFAULT), ...((await kvGet('cfg')) || {}) };
   LOG = (await kvGet('sessions')) || []; EV = (await kvGet('events')) || [];
   LV = { names: DEFAULT_LEVEL_NAMES.slice(), ...((await kvGet('levels')) || {}) };
-  PEAK = (await kvGet('peak')) || 0; VPEAK = (await kvGet('vpeak')) || 0; LINK = (await kvGet('link')) || null; AV = (await kvGet('avatars')) || []; REQ = (await kvGet('requests')) || []; GOAL = (await kvGet('goal')) || '';
+  PEAK = (await kvGet('peak')) || 0; VPEAK = (await kvGet('vpeak')) || 0; LINK = (await kvGet('link')) || null; AV = (await kvGet('avatars')) || []; REQ = (await kvGet('requests')) || []; RUNS = (await kvGet('runs')) || []; GOAL = (await kvGet('goal')) || '';
   await takeLinkFromURL();
   render(); snow();
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
@@ -1800,6 +2059,100 @@ document.addEventListener('keydown', e => {
   window.addEventListener('online', syncData);
   setInterval(() => { if (!sess && tab === 'home' && !document.hidden) renderHome(); }, 60000);   // slot status follows the clock
 })();
+
+/* =========================================================
+   Shred run: a short downhill game. One lift ticket = one run. No coins from it.
+   Steer with your finger (or ← →). Trees and rocks end the run, ✨ snowflakes give points.
+   ========================================================= */
+let RUNS = [];                                   // [{at, score}]
+const ticketsLeft = () => ticketsEarned() + ticketsBought(REQ) - RUNS.length;
+const bestRun = () => RUNS.reduce((m, r) => Math.max(m, r.score), 0);
+function gameButton() {
+  const G = gameCfg(); if (!G.on) return '';
+  const t = ticketsLeft();
+  return `<button class="vbtn gamebtn" data-action="game"><span class="vb-ico">🏂</span><span class="vb-tx"><b>Shred run</b><small>${t > 0 ? `${t} lift ticket${t === 1 ? '' : 's'} · best ${bestRun().toLocaleString('en-US')}` : `No tickets · finish a session, or buy one for ${fullCoins(G.price)}`}</small></span><span class="vb-sc"><b>🎟️ ${Math.max(0, t)}</b></span></button>`;
+}
+async function openGame() {
+  if (sess) return;
+  if (ticketsLeft() <= 0) {
+    const G = gameCfg(), T = treasury(REQ);
+    if (T.available < G.price) return confirmDlg('No lift tickets', `Every session that counts gives you a ticket. Or buy one for ${fullCoins(G.price)} coins (you have ${fullCoins(T.available)}).`, 'OK');
+    if (!(await confirmDlg('Buy a lift ticket?', `${fullCoins(G.price)} coins for one run. You have ${fullCoins(T.available)}.`, 'Buy'))) return;
+    REQ.push({ id: uid(), at: Date.now(), amount: G.price, item: 'Lift ticket', auto: true, tickets: 1 }); await kvSet('requests', REQ); syncData();
+  }
+  RUNS.push({ at: Date.now(), score: 0 }); await kvSet('runs', RUNS);        // the ticket is used when the run starts
+  playRun(RUNS.length - 1);
+}
+function playRun(idx) {
+  const sc = openScrim(`<div class="game"><canvas id="g-cv"></canvas><div class="g-hud"><b id="g-score">0</b><span>best ${bestRun().toLocaleString('en-US')}</span></div><button class="g-x" data-g="x">✕</button><div class="g-hint" id="g-hint">Hold and slide to steer</div></div>`);
+  const cv = $('#g-cv', sc), box = $('.game', sc), ctx = cv.getContext('2d');
+  const r0 = box.getBoundingClientRect(), W = r0.width, H = r0.height, dpr = Math.min(2, devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  let av = null; avatarURL().then(u => { if (u) { const im = new Image(); im.onload = () => av = im; im.src = u; } });
+  const P = { x: W / 2, y: H * .28, tx: W / 2, r: 16 };
+  let things = [], trail = [], dist = 0, bonus = 0, speed = 230, last = performance.now(), over = false, raf = 0, spawnAt = 120, t0 = performance.now(), flash = 0;
+  const spawn = () => {                                  // a row of obstacles with at least one gap wide enough to pass
+    const lanes = Math.max(4, Math.floor(W / 64)), gap = Math.floor(Math.random() * lanes), n = Math.min(lanes - 2, 1 + Math.floor(dist / 900));
+    const used = new Set([gap, gap + 1]);
+    for (let k = 0; k < n; k++) { const l = Math.floor(Math.random() * lanes); if (used.has(l)) continue; used.add(l);
+      things.push({ x: (l + .5) * W / lanes + (Math.random() - .5) * 18, y: H + 30, kind: Math.random() < .75 ? 'tree' : 'rock' }); }
+    if (Math.random() < .55) things.push({ x: (gap + .5 + Math.random()) * W / lanes, y: H + 30 + Math.random() * 40, kind: 'flake' });
+  };
+  const steer = e => { const r = cv.getBoundingClientRect(); P.tx = Math.max(20, Math.min(W - 20, e.clientX - r.left)); $('#g-hint', sc)?.remove(); };
+  cv.addEventListener('pointerdown', e => { steer(e); cv.setPointerCapture?.(e.pointerId); });
+  cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') steer(e); });
+  const key = e => { if (e.key === 'ArrowLeft') P.tx = Math.max(20, P.tx - 60); if (e.key === 'ArrowRight') P.tx = Math.min(W - 20, P.tx + 60); };
+  addEventListener('keydown', key);
+  const end = async () => {
+    over = true; cancelAnimationFrame(raf); removeEventListener('keydown', key);
+    const score = Math.round(dist / 10) + bonus, best = bestRun(); RUNS[idx].score = score; await kvSet('runs', RUNS);
+    const isBest = score > best && best > 0;
+    box.insertAdjacentHTML('beforeend', `<div class="g-over"><div class="kicker">Wipe out!</div><div class="g-big">${score.toLocaleString('en-US')}</div><div>${isBest ? '🏆 New best!' : `best ${Math.max(best, score).toLocaleString('en-US')}`}</div>
+      <div class="g-acts"><button class="primary" data-g="x">Done</button>${ticketsLeft() > 0 ? `<button class="ghost" data-g="again">Another run (🎟️ ${ticketsLeft()})</button>` : ''}</div></div>`);
+    if (isBest) confetti(80);
+    render(); syncData();
+  };
+  sc.game = { end, P, things, get over() { return over; } };   // for tests
+  sc.addEventListener('click', e => { const g = e.target.closest('[data-g]')?.dataset.g; if (!g) return; if (g === 'x') { if (!over) { end().then(() => sc.close()); } else sc.close(); } if (g === 'again') { sc.close(); openGame(); } });
+  function frame(now) {
+    if (over) return;
+    const dt = Math.min(.04, (now - last) / 1000); last = now;
+    speed = Math.min(560, 230 + (now - t0) / 1000 * 9);
+    const dy = speed * dt; dist += dy;
+    P.x += (P.tx - P.x) * Math.min(1, dt * 9);
+    spawnAt -= dy; if (spawnAt <= 0) { spawn(); spawnAt = Math.max(70, 150 - dist / 60) + Math.random() * 60; }
+    for (const t of things) t.y -= dy;
+    things = things.filter(t => t.y > -40); sc.game.things = things;
+    trail.push({ x: P.x, y: P.y }); for (const p of trail) p.y -= dy; trail = trail.filter(p => p.y > -10).slice(-80);
+    for (const t of things) {
+      const d = Math.hypot(t.x - P.x, t.y - P.y);
+      if (t.kind === 'flake' && d < 26) { t.kind = 'got'; bonus += 50; flash = .25; }
+      if ((t.kind === 'tree' && d < 24) || (t.kind === 'rock' && d < 20)) { draw(); return end(); }
+    }
+    flash = Math.max(0, flash - dt); draw();
+    $('#g-score', sc).textContent = (Math.round(dist / 10) + bonus).toLocaleString('en-US');
+    raf = requestAnimationFrame(frame);
+  }
+  function draw() {
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#dfeaf5'); g.addColorStop(1, '#ffffff'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(150,180,210,.25)'; for (let i = 0; i < 18; i++) { const y = (i * 97 - dist * .9) % (H + 40); ctx.fillRect((i * 53) % W, (y + H + 40) % (H + 40) - 20, 26, 2); }   // snow ripples
+    ctx.strokeStyle = 'rgba(120,150,190,.55)'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.beginPath(); trail.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const t of things) {
+      if (t.kind === 'tree') { ctx.font = '38px serif'; ctx.fillText('🌲', t.x, t.y); }
+      else if (t.kind === 'rock') { ctx.fillStyle = '#7d8794'; ctx.beginPath(); ctx.ellipse(t.x, t.y, 18, 12, 0, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(t.x - 3, t.y - 6, 10, 4, 0, 0, 7); ctx.fill(); }
+      else if (t.kind === 'flake') { ctx.font = '26px serif'; ctx.fillText('✨', t.x, t.y); }
+    }
+    const tilt = Math.max(-.5, Math.min(.5, (P.tx - P.x) / 80));
+    ctx.save(); ctx.translate(P.x, P.y); ctx.rotate(tilt);
+    if (av) { ctx.fillStyle = '#d8473f'; ctx.beginPath(); ctx.roundRect(-22, 12, 44, 8, 4); ctx.fill(); }   // a board under his photo (the emoji has its own)
+    if (av) { ctx.save(); ctx.beginPath(); ctx.arc(0, -2, P.r, 0, 7); ctx.clip(); ctx.drawImage(av, -P.r, -2 - P.r, P.r * 2, P.r * 2); ctx.restore(); ctx.strokeStyle = '#e9a85a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, -2, P.r, 0, 7); ctx.stroke(); }
+    else { ctx.font = '34px serif'; ctx.fillText('🏂', 0, -2); }
+    ctx.restore();
+    if (flash) { ctx.fillStyle = `rgba(255,216,77,${flash})`; ctx.fillRect(0, 0, W, H); }
+  }
+  draw(); raf = requestAnimationFrame(frame);
+}
 
 </script>
 </body>
